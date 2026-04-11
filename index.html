@@ -2,202 +2,264 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LookUp Music | Premium</title>
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <title>LookUp | Professional Music Platform</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <style>
-        :root { --accent: #1db954; --bg: #080808; --card: #121212; --text: #fff; }
-        body { background: var(--bg); color: var(--text); font-family: 'Arial', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        :root { --accent: #1db954; --bg: #050505; --card: #121212; --text: #fff; --sub: #888; }
+        .theme-purple { --accent: #a333ff; }
+        .theme-red { --accent: #ff3333; }
+        .theme-blue { --accent: #3385ff; }
+        .theme-green { --accent: #1db954; }
+
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar */
-        .sidebar { width: 250px; background: #000; padding: 20px; border-right: 1px solid #222; display: flex; flex-direction: column; gap: 15px; }
-        .nav-btn { padding: 12px; cursor: pointer; border-radius: 8px; transition: 0.3s; color: #b3b3b3; font-weight: bold; }
-        .nav-btn:hover, .nav-btn.active { background: #282828; color: #fff; }
+        /* Сетка */
+        .sidebar { width: 280px; background: #000; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+        .main { flex: 1; overflow-y: auto; padding: 40px; padding-bottom: 150px; position: relative; }
 
-        /* Main View */
-        .content { flex: 1; overflow-y: auto; padding: 40px; padding-bottom: 120px; }
-        .section { display: none; }
-        .section.active { display: block; }
+        /* Элементы меню */
+        .nav-btn { padding: 12px 15px; cursor: pointer; border-radius: 8px; color: var(--sub); font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 12px; }
+        .nav-btn:hover, .nav-btn.active { background: #1a1a1a; color: #fff; }
+        .admin-btn { border: 1px solid var(--accent); color: var(--accent); margin-top: auto; display: none; }
 
-        /* Profile Style */
-        .profile-header { display: flex; align-items: center; gap: 25px; background: var(--card); padding: 30px; border-radius: 20px; margin-bottom: 30px; }
-        .avatar-container { position: relative; width: 150px; height: 150px; }
-        #user-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); }
-        .edit-ava-btn { position: absolute; bottom: 5px; right: 5px; background: var(--accent); border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 18px; }
+        /* Профиль */
+        .profile-hero { display: flex; gap: 30px; background: linear-gradient(180deg, #222, var(--card)); padding: 40px; border-radius: 20px; align-items: flex-end; }
+        .p-avatar { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent); cursor: pointer; }
+        .p-info h1 { font-size: 48px; margin: 0; }
+        .p-info p { color: var(--accent); font-weight: bold; margin: 5px 0; }
 
-        /* Track List */
-        .track-card { background: var(--card); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
-        .track-card:hover { border-color: var(--accent); background: #1a1a1a; }
-        .track-card img { width: 50px; height: 50px; border-radius: 5px; object-fit: cover; }
+        /* Список треков */
+        .track-item { display: flex; align-items: center; padding: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; position: relative; }
+        .track-item:hover { background: #1a1a1a; }
+        .track-item img { width: 45px; height: 45px; border-radius: 4px; margin-right: 15px; }
+        .track-item .dots { margin-left: auto; color: var(--sub); font-size: 20px; padding: 5px; }
 
-        /* Player Bar */
-        .player-bar { position: fixed; bottom: 0; width: 100%; height: 90px; background: #000; border-top: 1px solid #222; display: flex; align-items: center; padding: 0 20px; box-sizing: border-box; }
-        .player-info { width: 30%; display: flex; align-items: center; gap: 15px; }
-        .player-controls { width: 40%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        #progress { width: 100%; accent-color: var(--accent); cursor: pointer; }
+        /* Плеер */
+        .player { position: fixed; bottom: 0; left: 0; width: 100%; height: 100px; background: #000; border-top: 1px solid #222; display: flex; align-items: center; padding: 0 30px; box-sizing: border-box; z-index: 1000; }
+        .p-controls { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .btn-group { display: flex; align-items: center; gap: 20px; font-size: 28px; }
+        .p-slider-box { width: 100%; max-width: 600px; display: flex; align-items: center; gap: 10px; font-size: 12px; }
+        input[type="range"] { flex: 1; accent-color: var(--accent); cursor: pointer; }
 
-        /* Inputs */
-        input { background: #222; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 5px; width: 100%; margin: 5px 0; }
-        .btn-main { background: var(--accent); color: #000; border: none; padding: 12px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        /* Текст песен */
+        .lyrics-box { position: fixed; inset: 0 0 100px 0; background: rgba(0,0,0,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 900; overflow-y: auto; padding: 100px 20px; }
+        .lyric-line { font-size: 32px; font-weight: 800; color: #333; margin: 15px 0; transition: 0.4s; text-align: center; }
+        .lyric-line.active { color: var(--accent); transform: scale(1.1); filter: drop-shadow(0 0 15px var(--accent)); }
+
+        /* Модалки и формы */
+        .view { display: none; }
+        .view.active { display: block; }
+        .card { background: var(--card); padding: 25px; border-radius: 15px; margin-top: 20px; border: 1px solid #222; }
+        input, textarea, select { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px; width: 100%; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
+        .btn-act { background: var(--accent); color: #000; font-weight: bold; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
-<body>
+<body id="app-body">
 
     <div class="sidebar">
-        <h2 style="color: var(--accent)">LookUp</h2>
-        <div class="nav-btn active" onclick="showPage('home')">🏠 Главная</div>
-        <div class="nav-btn" onclick="showPage('profile')">👤 Профиль</div>
-        <div class="nav-btn" onclick="showPage('upload')">📤 Загрузить трек</div>
+        <h2 style="color: var(--accent); margin-bottom: 20px;">LookUp Premium</h2>
+        <div class="nav-btn active" onclick="showV('home')">🏠 Главная</div>
+        <div class="nav-btn" onclick="showV('profile')">👤 Мой Профиль</div>
+        <div class="nav-btn" onclick="showV('playlists')">📚 Плейлисты</div>
+        <div class="nav-btn" onclick="showV('upload')">📤 Опубликовать</div>
+        <div class="nav-btn" onclick="showV('settings')">⚙️ Настройки</div>
+        <div class="nav-btn admin-btn" id="adm-tab" onclick="showV('admin')">🛡️ МОДЕРАЦИЯ</div>
     </div>
 
-    <div class="content">
-        <div id="home" class="section active">
-            <h1>Новые релизы</h1>
-            <div id="track-list"></div>
+    <div class="main">
+        <div id="home" class="view active">
+            <h1>Мировые релизы</h1>
+            <div id="feed"></div>
         </div>
 
-        <div id="profile" class="section">
-            <div class="profile-header">
-                <div class="avatar-container">
-                    <img id="user-avatar" src="https://via.placeholder.com/150">
-                    <button class="edit-ava-btn" onclick="uploadAvatar()">📸</button>
+        <div id="profile" class="view">
+            <div class="profile-hero">
+                <img id="u-ava" src="https://via.placeholder.com/180" class="p-avatar" onclick="changeAva()">
+                <div class="p-info">
+                    <input type="text" id="u-name" placeholder="Имя" onblur="saveUser()">
+                    <p id="u-nick">@nickname</p>
+                    <input type="text" id="u-city" placeholder="Город" style="font-size: 16px; color: var(--sub);" onblur="saveUser()">
+                    <textarea id="u-bio" placeholder="О себе..." style="background:none; border:none; color:var(--sub); width:100%;" onblur="saveUser()"></textarea>
+                    <div style="margin-top:10px;"><b>1,240</b> Подписчиков • <b>340</b> Подписок</div>
                 </div>
-                <div>
-                    <input type="text" id="input-name" placeholder="Твое имя" oninput="saveProfile()">
-                    <input type="text" id="input-nick" placeholder="@никнейм" oninput="saveProfile()">
-                    <p style="color: #b3b3b3; margin-top: 10px;">Статус: Артист LookUp</p>
+            </div>
+            <h3>Мои треки</h3>
+            <div id="user-tracks-list"></div>
+        </div>
+
+        <div id="settings" class="view">
+            <h2>Настройки</h2>
+            <div class="card">
+                <label>Тема оформления</label>
+                <div style="display:flex; gap:10px; margin: 15px 0;">
+                    <div onclick="setT('theme-green')" style="width:40px;height:40px;background:#1db954;border-radius:50%;cursor:pointer;"></div>
+                    <div onclick="setT('theme-purple')" style="width:40px;height:40px;background:#a333ff;border-radius:50%;cursor:pointer;"></div>
+                    <div onclick="setT('theme-red')" style="width:40px;height:40px;background:#ff3333;border-radius:50%;cursor:pointer;"></div>
+                    <div onclick="setT('theme-blue')" style="width:40px;height:40px;background:#3385ff;border-radius:50%;cursor:pointer;"></div>
                 </div>
+                
+                <label>Переводчик</label>
+                <select id="lang-toggle">
+                    <option value="ru">🇷🇺 Русский (Вкл)</option>
+                    <option value="en">🇺🇸 English</option>
+                    <option value="off">Выключить</option>
+                </select>
+
+                <button class="btn-act" style="background:#ff3333; margin-top:20px;" onclick="alert('Подписка будет активна до конца месяца')">Отключить Premium</button>
+                <button class="btn-act" style="background:#444; color:#fff; margin-top:10px;" onclick="showV('report')">Сообщить об ошибке</button>
             </div>
         </div>
 
-        <div id="upload" class="section">
-            <div style="max-width: 500px; background: var(--card); padding: 30px; border-radius: 15px;">
-                <h2>Опубликовать трек</h2>
-                <input type="text" id="track-name" placeholder="Название трека">
-                <input type="text" id="track-desc" placeholder="Описание / Фиты">
-                <button class="btn-main" id="btn-select-audio">1. Выбрать файл (.mp3)</button>
-                <button class="btn-main" id="btn-select-cover" style="background: #444; color: #fff;">2. Выбрать обложку</button>
-                <p id="upload-status" style="font-size: 12px; color: var(--accent); margin-top: 10px;"></p>
-                <button class="btn-main" onclick="sendToMod()" style="margin-top: 20px; border: 2px solid var(--accent); background: transparent; color: var(--accent);">Отправить на модерацию</button>
+        <div id="admin" class="view">
+            <h2>Очередь модерации</h2>
+            <div id="mod-container">Здесь будут треки на проверку...</div>
+        </div>
+
+        <div id="report" class="view">
+            <h2>Сообщить об ошибке</h2>
+            <div class="card">
+                <textarea id="err-desc" placeholder="Опишите проблему..."></textarea>
+                <button class="btn-act" onclick="upErrImg()">Прикрепить скриншот</button>
+                <button class="btn-act" style="margin-top:10px; width:100%" onclick="sendReport()">Отправить жалобу</button>
             </div>
         </div>
     </div>
 
-    <div class="player-bar">
-        <div class="player-info">
-            <img id="now-playing-img" src="https://via.placeholder.com/50" style="width:50px; height:50px; border-radius:5px;">
-            <div>
-                <b id="now-playing-title">Тишина</b><br>
-                <small id="now-playing-artist" style="color:#b3b3b3">LookUp Music</small>
+    <div id="lyrics-layer" class="lyrics-box" onclick="toggleL()">
+        <div id="lyrics-content"></div>
+    </div>
+
+    <div class="player">
+        <div style="width:30%; display:flex; align-items:center; gap:15px;">
+            <img id="p-img" src="https://via.placeholder.com/60" style="border-radius:5px">
+            <div><b id="p-name">Тишина</b><br><small id="p-artist" style="color:var(--sub)">LookUp</small></div>
+        </div>
+        <div class="p-controls">
+            <div class="btn-group">
+                <span onclick="prev()">⏮</span>
+                <span id="play-btn" onclick="togglePlay()">▶️</span>
+                <span onclick="next()">⏭</span>
+            </div>
+            <div class="p-slider-box">
+                <span id="cur-time">0:00</span>
+                <input type="range" id="progress" value="0">
+                <span id="dur-time">0:00</span>
             </div>
         </div>
-        <div class="player-controls">
-            <audio id="audio-player"></audio>
-            <input type="range" id="progress" value="0">
+        <div style="width:30%; text-align:right">
+            <span style="font-size:24px; cursor:pointer;" onclick="toggleL()">🎤</span>
         </div>
     </div>
 
     <script>
-        // 1. ТВОИ РАБОЧИЕ ССЫЛКИ (АДМИН-КОНТЕНТ)
-        const adminTracks = [
-            { title: "Lee McQueen", url: "https://res.cloudinary.com/di2uzhg1c/video/upload/v1775946402/korolevskij_XVII_-_Lee_McQueen__SkySound.cc_x9fguw.mp3", cover: "https://via.placeholder.com/150/000000/1DB954?text=McQueen" },
-            { title: "Sad Amber Perfume", url: "https://res.cloudinary.com/di2uzhg1c/video/upload/v1775946427/korolevskij_XVII_-_sad_amber_perfume__SkySound.cc_zzerr7.mp3", cover: "https://via.placeholder.com/150/1a1a1a/1DB954?text=Amber" },
-            { title: "Moscow Demo", url: "https://res.cloudinary.com/di2uzhg1c/video/upload/v1775946418/korolevskij_XVII_-_sv_moscow_demo_version__SkySound.cc_bxluab.mp3", cover: "https://via.placeholder.com/150/222/1DB954?text=Moscow" }
-        ];
+        // --- КОНФИГУРАЦИЯ ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDESE8nQzP2iF0YKVexxqRJ6kWoLjDmHw8",
+            authDomain: "exzzy1-84d88.firebaseapp.com",
+            projectId: "exzzy1-84d88",
+            storageBucket: "exzzy1-84d88.firebasestorage.app",
+            messagingSenderId: "892085705947",
+            appId: "1:892085705947:web:9c9425a0f5d096abdbc0fe"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        const audio = document.getElementById('audio-player');
-        const progress = document.getElementById('progress');
+        let audio = new Audio();
+        let isPlaying = false;
+        let activeLyrics = [];
 
-        // 2. ФУНКЦИИ ИНТЕРФЕЙСА
-        function showPage(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.currentTarget.classList.add('active');
+        // 1. ПЛЕЕР С БЕЗБАЖНОЙ ПОЛОСКОЙ
+        function play(url, name, artist, img, lyrics) {
+            audio.pause();
+            audio.src = url;
+            document.getElementById('p-name').innerText = name;
+            document.getElementById('p-artist').innerText = artist;
+            document.getElementById('p-img').src = img;
+            
+            // Сброс полоски и времени
+            document.getElementById('progress').value = 0;
+            document.getElementById('cur-time').innerText = "0:00";
+            
+            activeLyrics = lyrics || [];
+            renderLyrics();
+            
+            audio.play();
+            isPlaying = true;
+            document.getElementById('play-btn').innerText = "⏸";
         }
 
-        // 3. ПЛЕЕР
-        function loadTracks() {
-            const list = document.getElementById('track-list');
-            list.innerHTML = "";
-            adminTracks.forEach(t => {
-                const div = document.createElement('div');
-                div.className = 'track-card';
-                div.innerHTML = `<img src="${t.cover}"> <div><b>${t.title}</b><br><small>Королевский XVII</small></div>`;
-                div.onclick = () => {
-                    audio.src = t.url;
-                    document.getElementById('now-playing-title').innerText = t.title;
-                    document.getElementById('now-playing-img').src = t.cover;
-                    audio.play();
-                };
-                list.appendChild(div);
-            });
-        }
-
-        audio.ontimeupdate = () => { progress.value = (audio.currentTime / audio.duration) * 100 || 0; };
-        progress.oninput = () => { audio.currentTime = (progress.value / 100) * audio.duration; };
-
-        // 4. CLOUDINARY ЗАГРУЗКА (ДЛЯ ЮЗЕРОВ)
-        let lastUploadedAudio = "";
-        let lastUploadedCover = "";
-
-        const createWidget = (type, callback) => {
-            return cloudinary.createUploadWidget({
-                cloudName: 'di2uzhg1c',
-                uploadPreset: 'lookup_preset',
-                sources: ['local'],
-                multiple: false,
-                clientAllowedFormats: type === 'image' ? ['jpg', 'png'] : ['mp3']
-            }, (err, res) => {
-                if (!err && res.event === "success") callback(res.info.secure_url);
-            });
+        audio.ontimeupdate = () => {
+            const slider = document.getElementById('progress');
+            slider.value = (audio.currentTime / audio.duration) * 100 || 0;
+            document.getElementById('cur-time').innerText = formatT(audio.currentTime);
+            document.getElementById('dur-time').innerText = formatT(audio.duration || 0);
+            syncLyrics(audio.currentTime);
         };
 
-        const audioWidget = createWidget('video', (url) => { 
-            lastUploadedAudio = url; 
-            document.getElementById('upload-status').innerText = "✅ Файл загружен!";
-        });
-
-        const coverWidget = createWidget('image', (url) => { 
-            lastUploadedCover = url; 
-            document.getElementById('btn-select-cover').innerText = "✅ Обложка выбрана";
-        });
-
-        const avatarWidget = createWidget('image', (url) => {
-            document.getElementById('user-avatar').src = url;
-            saveProfile();
-        });
-
-        document.getElementById('btn-select-audio').onclick = () => audioWidget.open();
-        document.getElementById('btn-select-cover').onclick = () => coverWidget.open();
-        function uploadAvatar() { avatarWidget.open(); }
-
-        function sendToMod() {
-            if(!lastUploadedAudio) return alert("Сначала загрузи трек!");
-            alert("Трек " + document.getElementById('track-name').value + " отправлен модератору!");
-            // Тут в будущем можно слать данные в базу
+        function togglePlay() {
+            if(isPlaying) { audio.pause(); document.getElementById('play-btn').innerText = "▶️"; }
+            else { audio.play(); document.getElementById('play-btn').innerText = "⏸"; }
+            isPlaying = !isPlaying;
         }
 
-        // 5. СОХРАНЕНИЕ ПРОФИЛЯ (LOCALSTORAGE)
-        function saveProfile() {
+        // 2. СИНХРОНИЗАЦИЯ ТЕКСТА (КАРАОКЕ)
+        function renderLyrics() {
+            const cont = document.getElementById('lyrics-content');
+            cont.innerHTML = activeLyrics.map(l => `<div class="lyric-line">${l.text}</div>`).join('');
+        }
+
+        function syncLyrics(time) {
+            const lines = document.querySelectorAll('.lyric-line');
+            activeLyrics.forEach((l, i) => {
+                if(time >= l.t) {
+                    lines.forEach(el => el.classList.remove('active'));
+                    lines[i].classList.add('active');
+                    // Авто-скролл к активной строке
+                    lines[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }
+
+        // 3. ПРОФИЛЬ И БАЗА
+        async function saveUser() {
+            const user = auth.currentUser;
+            if(!user) return;
             const data = {
-                name: document.getElementById('input-name').value,
-                nick: document.getElementById('input-nick').value,
-                ava: document.getElementById('user-avatar').src
+                name: document.getElementById('u-name').value,
+                city: document.getElementById('u-city').value,
+                bio: document.getElementById('u-bio').value
             };
-            localStorage.setItem('lookup_user', JSON.stringify(data));
+            await db.collection("users").doc(user.uid).set(data, {merge: true});
         }
 
-        function loadProfile() {
-            const saved = JSON.parse(localStorage.getItem('lookup_user'));
-            if(saved) {
-                document.getElementById('input-name').value = saved.name || "";
-                document.getElementById('input-nick').value = saved.nick || "";
-                document.getElementById('user-avatar').src = saved.ava || "https://via.placeholder.com/150";
+        // 4. ТЕМЫ И ПЕРЕКЛЮЧЕНИЯ
+        function setT(theme) { document.getElementById('app-body').className = theme; }
+        function showV(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'lyrics-layer') toggleL();
+        }
+        function toggleL() {
+            const l = document.getElementById('lyrics-layer');
+            l.style.display = (l.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function formatT(s) {
+            let m = Math.floor(s/60);
+            let sc = Math.floor(s%60);
+            return `${m}:${sc < 10 ? '0' : ''}${sc}`;
+        }
+        
+        // Модерация (Проверка на админа)
+        auth.onAuthStateChanged(user => {
+            if(user && user.email === "ТВОЙ_EMAIL") {
+                document.getElementById('adm-tab').style.display = 'flex';
             }
-        }
-
-        window.onload = () => { loadTracks(); loadProfile(); };
+        });
     </script>
 </body>
 </html>
