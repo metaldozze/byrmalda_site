@@ -1,1331 +1,760 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Fell Brawl</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto:wght@400;700;900&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mell Brawl</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Nunito:wght@400;700;900&display=swap');
+    :root {
+      --primary: #ff2d2d;
+      --blue-bg: #1e3a8a;
+      --skull: rgba(30, 58, 138, 0.6);
+      --glass: rgba(255,255,255,0.15);
+      --border: rgba(255,255,255,0.3);
+      --btn-bg: #ffd700;
+      --btn-text: #111;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-user-select:none; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+      width: 100vw; height: 100vh;
+    }
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
-  }
+    /* ================= SPLASH ================= */
+    #splash {
+      position:fixed; inset:0; background:#000; display:flex; align-items:center; justify-content:center;
+      z-index:9999; opacity:1; transition: opacity 0.6s;
+    }
+    #splash.hidden { opacity:0; pointer-events:none; }
+    #splash span {
+      font-family:'Russo One',sans-serif; font-size:2.5rem; color:#fff;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse { from{transform:scale(1);opacity:0.7} to{transform:scale(1.05);opacity:1} }
 
-  body {
-    overflow: hidden;
-    font-family: 'Roboto', sans-serif;
-    background: #000;
-    color: #fff;
-    width: 100vw;
-    height: 100vh;
-  }
+    /* ================= LOADING ================= */
+    #loading {
+      position:fixed; inset:0; display:none; flex-direction:column; align-items:center; justify-content:flex-end;
+      padding:0 20px 80px; background-size:cover; background-position:center; z-index:9998;
+    }
+    #loading::before { content:''; position:absolute; inset:0; background:rgba(0,0,0,0.5); z-index:0; }
+    .loader-logo {
+      position:absolute; top:20px; left:20px; z-index:2; display:flex; gap:8px;
+    }
+    .loader-logo .red {
+      font-family:'Russo One',sans-serif; font-size:2.2rem; color:var(--primary);
+      -webkit-text-stroke: 2px #000; text-shadow: 3px 3px 0 #000;
+    }
+    .loader-logo .white {
+      font-family:'Russo One',sans-serif; font-size:2.2rem; color:#fff;
+      -webkit-text-stroke: 2px #000; text-shadow: 3px 3px 0 #000;
+    }
+    .progress-container { position:relative; z-index:1; width:90%; max-width:400px; text-align:center; }
+    .progress-text { font-size:1.1rem; margin-bottom:10px; font-weight:700; text-shadow:2px 2px 0 #000; }
+    .progress-bar {
+      width:100%; height:24px; background:rgba(0,0,0,0.6); border-radius:12px; overflow:hidden;
+      border:2px solid #fff; box-shadow:0 0 10px rgba(0,0,0,0.5);
+    }
+    .progress-fill {
+      height:100%; width:0%; background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+      border-radius:10px; transition: width 0.4s ease;
+    }
 
-  /* ===== ЭКРАНЫ ===== */
-  .screen {
-    display: none;
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    top: 0; left: 0;
-  }
-  .screen.active {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
+    /* ================= AUTH SCREEN ================= */
+    #auth {
+      position:fixed; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center;
+      background: linear-gradient(135deg, #0f172a, #1e3a8a); overflow:hidden; z-index:9997;
+    }
+    .skull-bg {
+      position:absolute; inset:0; pointer-events:none; overflow:hidden;
+    }
+    .skull {
+      position:absolute; font-size:4rem; opacity:0.15; animation: floatSkull 15s linear infinite;
+    }
+    @keyframes floatSkull {
+      0% { transform: translateY(100vh) rotate(0deg); opacity:0.15; }
+      50% { opacity:0.3; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity:0; }
+    }
 
-  /* ===== ЧЕРНЫЙ ЭКРАН ===== */
-  #screen-black {
-    background: #000;
-  }
+    .auth-container {
+      width:92%; max-width:380px; background: var(--glass); backdrop-filter: blur(12px);
+      border: 2px solid var(--border); border-radius:20px; padding:20px;
+      position:relative; z-index:2; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .tabs { display:flex; gap:10px; margin-bottom:20px; }
+    .tab-btn {
+      flex:1; padding:10px; background:rgba(0,0,0,0.4); border:1px solid var(--border);
+      border-radius:10px; color:#aaa; font-weight:700; cursor:pointer; transition:0.3s;
+    }
+    .tab-btn.active { background:var(--btn-bg); color:var(--btn-text); border-color:#fff; }
 
-  /* ===== BY WASHEDOUT ===== */
-  #screen-washedout {
-    background: #000;
-  }
-  .washedout-text {
-    font-family: 'Russo One', sans-serif;
-    font-size: 28px;
-    color: #aaa;
-    letter-spacing: 4px;
-    animation: fadeInWash 0.8s ease;
-  }
-  @keyframes fadeInWash {
-    from { opacity: 0; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1); }
-  }
+    .step { display:none; animation: fadeIn 0.4s; }
+    .step.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-  /* ===== ЭКРАН ЗАГРУЗКИ ===== */
-  #screen-loading {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    position: relative;
-  }
-  #screen-loading::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.3);
-    z-index: 0;
-  }
+    .step h2 { font-family:'Russo One',sans-serif; text-align:center; margin-bottom:15px; font-size:1.4rem; }
+    .input-group { margin-bottom:15px; }
+    .input-group label { display:block; margin-bottom:5px; font-size:0.9rem; color:#ccc; }
+    .input-group input {
+      width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border);
+      border-radius:10px; color:#fff; font-size:1rem; outline:none;
+    }
+    .input-group input:focus { border-color: var(--btn-bg); }
+    .btn {
+      width:100%; padding:12px; background:var(--btn-bg); color:var(--btn-text); border:none;
+      border-radius:10px; font-weight:900; font-size:1.1rem; cursor:pointer; margin-top:10px;
+      box-shadow: 0 4px 0 #b89600; transition: transform 0.1s;
+    }
+    .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #b89600; }
+    .btn.secondary { background:#333; color:#fff; box-shadow: 0 4px 0 #111; }
+    .btn.secondary:active { box-shadow: 0 2px 0 #111; }
+    .btn.full { width:100%; }
 
-  .logo-container {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .logo-fell {
-    font-family: 'Russo One', sans-serif;
-    font-size: 42px;
-    font-weight: 900;
-    color: #ff2d2d;
-    text-shadow:
-      -2px -2px 0 #000,
-       2px -2px 0 #000,
-      -2px  2px 0 #000,
-       2px  2px 0 #000,
-       0 0 10px rgba(255,0,0,0.5);
-    letter-spacing: 2px;
-  }
-  .logo-brawl {
-    font-family: 'Russo One', sans-serif;
-    font-size: 42px;
-    font-weight: 900;
-    color: #ffffff;
-    text-shadow:
-      -2px -2px 0 #000,
-       2px -2px 0 #000,
-      -2px  2px 0 #000,
-       2px  2px 0 #000;
-    letter-spacing: 2px;
-  }
+    .error { color:#ff4444; font-size:0.85rem; margin-top:5px; min-height:1.2em; }
+    .success { color:#4ade80; font-size:0.9rem; margin-top:5px; }
+    .id-display {
+      background:#111; padding:10px; border-radius:8px; font-family:monospace;
+      text-align:center; margin:10px 0; border:1px dashed var(--btn-bg); word-break:break-all;
+    }
+    .checkbox-group { display:flex; align-items:center; gap:8px; margin:10px 0; font-size:0.9rem; }
+    .checkbox-group input { width:18px; height:18px; cursor:pointer; }
 
-  .loading-bar-container {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70%;
-    z-index: 2;
-    text-align: center;
-  }
-  .loading-percent {
-    font-family: 'Russo One', sans-serif;
-    font-size: 22px;
-    margin-bottom: 8px;
-    color: #fff;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-  }
-  .loading-bar-bg {
-    width: 100%;
-    height: 14px;
-    background: rgba(0,0,0,0.6);
-    border-radius: 7px;
-    border: 2px solid rgba(255,255,255,0.3);
-    overflow: hidden;
-  }
-  .loading-bar-fill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #ff6b00, #ffcc00);
-    border-radius: 7px;
-    transition: width 0.5s ease;
-  }
-  .loading-server-text {
-    font-family: 'Roboto', sans-serif;
-    font-size: 18px;
-    color: #aaa;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000;
-  }
+    /* Email confirmation modal */
+    .modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center;
+      z-index:10001; padding:20px;
+    }
+    .modal-overlay.active { display:flex; }
+    .modal {
+      background: var(--glass); border:2px solid var(--border); border-radius:20px; padding:25px;
+      max-width:400px; width:100%; text-align:center; backdrop-filter: blur(10px);
+    }
+    .modal h3 { font-family:'Russo One'; margin-bottom:15px; font-size:1.3rem; }
+    .modal p { font-size:0.95rem; color:#ccc; margin-bottom:20px; line-height:1.4; }
+    .modal .email-hint {
+      background:rgba(0,0,0,0.4); padding:10px; border-radius:8px; font-family:monospace;
+      margin:10px 0; word-break:break-all; font-size:0.85rem;
+    }
 
-  /* ===== ЭКРАН АВТОРИЗАЦИИ ===== */
-  #screen-auth {
-    position: relative;
-    overflow: hidden;
-  }
+    /* ================= SUPPORT CHAT ================= */
+    #support-chat {
+      position:fixed; inset:0; display:none; flex-direction:column; background:#0f172a; z-index:10000;
+    }
+    .chat-header {
+      padding:15px; background:rgba(0,0,0,0.6); display:flex; justify-content:space-between; align-items:center;
+      border-bottom:1px solid var(--border);
+    }
+    .chat-messages { flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px; }
+    .msg { padding:10px 14px; max-width:80%; border-radius:12px; font-size:0.95rem; line-height:1.3; }
+    .msg.support { background:#334155; align-self:flex-start; border-bottom-left-radius:4px; }
+    .msg.user { background:#2563eb; align-self:flex-end; border-bottom-right-radius:4px; }
+    .chat-input {
+      padding:10px; background:rgba(0,0,0,0.5); display:flex; gap:8px; border-top:1px solid var(--border);
+    }
+    .chat-input input { flex:1; padding:10px; border-radius:20px; border:none; background:#1e293b; color:#fff; }
+    .chat-input button { padding:10px 15px; background:var(--btn-bg); color:#000; border:none; border-radius:20px; font-weight:700; }
 
-  .auth-bg {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, #1a1a5e, #0d0d3b, #2a2a8e);
-    animation: bgScroll 8s ease-in-out infinite alternate;
-    z-index: 0;
-  }
-  @keyframes bgScroll {
-    0% { background-position: 0% 0%; }
-    100% { background-position: 100% 100%; }
-  }
+    /* ================= MAIN MENU ================= */
+    #main-menu {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background: radial-gradient(circle at center, #1e3a8a, #000); z-index:9996;
+    }
+    #main-menu h1 { font-family:'Russo One'; font-size:3rem; text-shadow:0 0 20px #fff; }
 
-  .skull {
-    position: absolute;
-    font-size: 30px;
-    opacity: 0.12;
-    z-index: 0;
-    animation: floatSkull linear infinite;
-    pointer-events: none;
-  }
-  @keyframes floatSkull {
-    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.12; }
-    90% { opacity: 0.12; }
-    100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-  }
-
-  .auth-container {
-    position: relative;
-    z-index: 2;
-    width: 90%;
-    max-width: 420px;
-    background: rgba(0,0,0,0.55);
-    border-radius: 20px;
-    border: 2px solid rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    padding: 30px 25px;
-    text-align: center;
-  }
-
-  .auth-tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 25px;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid rgba(255,255,255,0.2);
-  }
-  .auth-tab {
-    flex: 1;
-    padding: 12px;
-    font-family: 'Russo One', sans-serif;
-    font-size: 16px;
-    cursor: pointer;
-    background: rgba(255,255,255,0.05);
-    color: #888;
-    transition: all 0.3s;
-    border: none;
-    outline: none;
-  }
-  .auth-tab.active {
-    background: linear-gradient(135deg, #4a4aff, #2a2adf);
-    color: #fff;
-  }
-
-  .auth-step {
-    display: none;
-  }
-  .auth-step.active {
-    display: block;
-    animation: fadeStep 0.4s ease;
-  }
-  @keyframes fadeStep {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .auth-title {
-    font-family: 'Russo One', sans-serif;
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #fff;
-  }
-
-  .auth-input {
-    width: 100%;
-    padding: 14px 18px;
-    border-radius: 12px;
-    border: 2px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    font-size: 16px;
-    outline: none;
-    margin-bottom: 15px;
-    transition: border-color 0.3s;
-  }
-  .auth-input:focus {
-    border-color: #4a4aff;
-  }
-  .auth-input::placeholder {
-    color: #666;
-  }
-
-  .auth-btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    background: linear-gradient(135deg, #4a4aff, #2a2adf);
-    color: #fff;
-    font-family: 'Russo One', sans-serif;
-    font-size: 16px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    margin-top: 5px;
-  }
-  .auth-btn:hover {
-    transform: scale(1.03);
-    box-shadow: 0 4px 20px rgba(74,74,255,0.5);
-  }
-  .auth-btn:active {
-    transform: scale(0.97);
-  }
-
-  .auth-error {
-    color: #ff4444;
-    font-size: 13px;
-    margin-top: -10px;
-    margin-bottom: 10px;
-    min-height: 18px;
-  }
-
-  .auth-info {
-    color: #aaa;
-    font-size: 14px;
-    margin-bottom: 15px;
-    line-height: 1.5;
-  }
-
-  .auth-id-display {
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 15px;
-    margin: 15px 0;
-    font-family: 'Courier New', monospace;
-    font-size: 18px;
-    color: #ffcc00;
-    letter-spacing: 3px;
-    border: 1px solid rgba(255,204,0,0.3);
-  }
-
-  .checkbox-container {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin: 15px 0;
-    text-align: left;
-  }
-  .checkbox-container input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: #4a4aff;
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
-  .checkbox-container label {
-    font-size: 13px;
-    color: #ccc;
-    line-height: 1.4;
-  }
-
-  /* ===== ПОДТВЕРЖДЕНИЕ АККАУНТА ===== */
-  .account-confirm-card {
-    background: rgba(255,255,255,0.08);
-    border-radius: 15px;
-    padding: 20px;
-    margin: 15px 0;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  .account-nick {
-    font-family: 'Russo One', sans-serif;
-    font-size: 22px;
-    color: #ffcc00;
-    margin-bottom: 8px;
-  }
-  .account-trophies {
-    font-size: 16px;
-    color: #aaa;
-  }
-  .account-trophies span {
-    color: #ffcc00;
-    font-weight: 700;
-  }
-
-  .confirm-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-  }
-  .confirm-buttons .auth-btn {
-    flex: 1;
-  }
-  .btn-yes {
-    background: linear-gradient(135deg, #22cc44, #18a832) !important;
-  }
-  .btn-no {
-    background: linear-gradient(135deg, #cc2222, #a81818) !important;
-  }
-
-  .support-link {
-    color: #4488ff;
-    cursor: pointer;
-    font-weight: 700;
-    text-decoration: underline;
-  }
-  .support-link:hover {
-    color: #66aaff;
-  }
-
-  .error-message-box {
-    background: rgba(255,0,0,0.1);
-    border: 1px solid rgba(255,0,0,0.3);
-    border-radius: 12px;
-    padding: 15px;
-    margin: 15px 0;
-    font-size: 13px;
-    line-height: 1.6;
-    color: #ccc;
-    text-align: left;
-  }
-
-  /* ===== ЧАТ ПОДДЕРЖКИ ===== */
-  #screen-support {
-    position: relative;
-    overflow: hidden;
-  }
-  .support-container {
-    position: relative;
-    z-index: 2;
-    width: 95%;
-    max-width: 500px;
-    height: 85vh;
-    background: rgba(0,0,0,0.6);
-    border-radius: 20px;
-    border: 2px solid rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .support-header {
-    padding: 18px 20px;
-    background: rgba(74,74,255,0.3);
-    font-family: 'Russo One', sans-serif;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  .support-back-btn {
-    background: rgba(255,255,255,0.15);
-    border: none;
-    color: #fff;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-family: 'Russo One', sans-serif;
-  }
-  .support-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .support-msg {
-    max-width: 80%;
-    padding: 10px 15px;
-    border-radius: 15px;
-    font-size: 14px;
-    line-height: 1.4;
-  }
-  .support-msg.bot {
-    align-self: flex-start;
-    background: rgba(74,74,255,0.3);
-    border-bottom-left-radius: 4px;
-  }
-  .support-msg.user {
-    align-self: flex-end;
-    background: rgba(255,255,255,0.15);
-    border-bottom-right-radius: 4px;
-  }
-  .support-input-area {
-    display: flex;
-    gap: 8px;
-    padding: 12px 15px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
-  .support-input {
-    flex: 1;
-    padding: 10px 15px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    font-size: 14px;
-    outline: none;
-  }
-  .support-send-btn {
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: none;
-    background: #4a4aff;
-    color: #fff;
-    font-family: 'Russo One', sans-serif;
-    cursor: pointer;
-  }
-
-  /* ===== ГЛАВНОЕ МЕНЮ ===== */
-  #screen-menu {
-    position: relative;
-    overflow: hidden;
-  }
-  .menu-bg {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, #1a1a5e, #0d0d3b, #2a2a8e);
-    animation: bgScroll 8s ease-in-out infinite alternate;
-    z-index: 0;
-  }
-  .menu-container {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    width: 100%;
-  }
-  .menu-logo {
-    font-family: 'Russo One', sans-serif;
-    font-size: 48px;
-    margin-bottom: 10px;
-  }
-  .menu-logo .fell { color: #ff2d2d; }
-  .menu-logo .brawl { color: #fff; }
-
-  .menu-player-info {
-    background: rgba(0,0,0,0.4);
-    border-radius: 15px;
-    padding: 15px 25px;
-    display: inline-block;
-    margin: 15px 0;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  .menu-player-nick {
-    font-family: 'Russo One', sans-serif;
-    font-size: 22px;
-    color: #ffcc00;
-  }
-  .menu-player-id {
-    font-size: 12px;
-    color: #888;
-    margin-top: 3px;
-    font-family: 'Courier New', monospace;
-  }
-  .menu-player-trophies {
-    font-size: 16px;
-    color: #aaa;
-    margin-top: 5px;
-  }
-  .menu-player-trophies span { color: #ffcc00; font-weight: 700; }
-
-  .menu-play-btn {
-    padding: 18px 60px;
-    border-radius: 15px;
-    border: none;
-    background: linear-gradient(135deg, #ff6b00, #ff9500);
-    color: #fff;
-    font-family: 'Russo One', sans-serif;
-    font-size: 24px;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    box-shadow: 0 4px 20px rgba(255,107,0,0.4);
-  }
-  .menu-play-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 30px rgba(255,107,0,0.6);
-  }
-
-  .menu-footer {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    text-align: center;
-    color: #555;
-    font-size: 12px;
-    z-index: 2;
-  }
-
-  /* ===== СКРОЛЛБАР ===== */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-
-  /* ===== УВЕДОМЛЕНИЕ ===== */
-  .toast {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-100px);
-    background: rgba(0,0,0,0.85);
-    color: #fff;
-    padding: 12px 25px;
-    border-radius: 12px;
-    font-size: 14px;
-    z-index: 9999;
-    transition: transform 0.4s ease;
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
-  }
-  .toast.show {
-    transform: translateX(-50%) translateY(0);
-  }
-  .toast.success { border-color: #22cc44; }
-  .toast.error { border-color: #ff4444; }
-</style>
+    /* Utility */
+    .hidden { display:none !important; }
+    .link-text { color:#3b82f6; text-decoration:underline; cursor:pointer; font-weight:700; }
+    .text-center { text-align:center; }
+    .mt-10 { margin-top:10px; }
+    .mb-10 { margin-bottom:10px; }
+  </style>
 </head>
 <body>
 
-<!-- ТОСТ УВЕДОМЛЕНИЕ -->
-<div class="toast" id="toast"></div>
+<!-- SPLASH -->
+<div id="splash"><span>by washedout</span></div>
 
-<!-- ===== ЭКРАН 1: ЧЕРНЫЙ ===== -->
-<div class="screen active" id="screen-black"></div>
-
-<!-- ===== ЭКРАН 2: BY WASHEDOUT ===== -->
-<div class="screen" id="screen-washedout">
-  <div class="washedout-text">by washedout</div>
-</div>
-
-<!-- ===== ЭКРАН 3: ЗАГРУЗКА ===== -->
-<div class="screen" id="screen-loading">
-  <div class="logo-container">
-    <span class="logo-fell">Fell</span>
-    <span class="logo-brawl">Brawl</span>
+<!-- LOADING -->
+<div id="loading">
+  <div class="loader-logo">
+    <span class="red">Mell</span>
+    <span class="white">Brawl</span>
   </div>
-  <div class="loading-bar-container">
-    <div class="loading-percent" id="loading-percent">0%</div>
-    <div class="loading-bar-bg">
-      <div class="loading-bar-fill" id="loading-bar-fill"></div>
-    </div>
+  <div class="progress-container">
+    <div class="progress-text" id="progress-text">0%</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
   </div>
 </div>
 
-<!-- ===== ЭКРАН 4: АВТОРИЗАЦИЯ ===== -->
-<div class="screen" id="screen-auth">
-  <div class="auth-bg" id="auth-bg"></div>
+<!-- AUTH / REGISTRATION / LOGIN -->
+<div id="auth">
+  <div class="skull-bg" id="skull-bg"></div>
   <div class="auth-container">
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuthTab('register')">Регистрация</button>
-      <button class="auth-tab" onclick="switchAuthTab('login')">Вход</button>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="reg">Регистрация</button>
+      <button class="tab-btn" data-tab="login">Вход</button>
     </div>
 
-    <!-- РЕГИСТРАЦИЯ -->
-    <div id="auth-register">
-      <!-- Шаг 1: Почта -->
-      <div class="auth-step active" id="reg-step-1">
-        <div class="auth-title">Добро пожаловать в Fell Brawl!</div>
-        <div class="auth-info">Введите вашу электронную почту</div>
-        <input type="email" class="auth-input" id="reg-email" placeholder="example@mail.com">
-        <div class="auth-error" id="reg-email-error"></div>
-        <button class="auth-btn" onclick="regStep1()">Далее</button>
-      </div>
-
-      <!-- Шаг 2: Код -->
-      <div class="auth-step" id="reg-step-2">
-        <div class="auth-title">Подтверждение почты</div>
-        <div class="auth-info">На вашу почту отправлен код подтверждения.<br>Введите его ниже.</div>
-        <input type="text" class="auth-input" id="reg-code" placeholder="Введите код" maxlength="6">
-        <div class="auth-error" id="reg-code-error"></div>
-        <button class="auth-btn" onclick="regStep2()">Подтвердить</button>
-        <div class="auth-info" style="margin-top:10px;font-size:12px;color:#888;">
-          (Демо: код всегда <b style="color:#ffcc00;">123456</b>)
+    <!-- REGISTRATION STEPS -->
+    <div id="reg-flow">
+      <div class="step active" data-step="1">
+        <h2>Добро пожаловать в<br><span style="color:var(--btn-bg)">Mell Brawl</span></h2>
+        <div class="input-group">
+          <label>Введите вашу почту</label>
+          <input type="email" id="reg-email" placeholder="example@mail.com">
         </div>
+        <div class="error" id="email-error"></div>
+        <button class="btn" id="reg-next-1">Далее</button>
       </div>
 
-      <!-- Шаг 3: Никнейм -->
-      <div class="auth-step" id="reg-step-3">
-        <div class="auth-title">Придумайте никнейм</div>
-        <div class="auth-info">Ваш никнейм будет виден другим игрокам</div>
-        <input type="text" class="auth-input" id="reg-nickname" placeholder="Введите никнейм" maxlength="16">
-        <div class="auth-error" id="reg-nick-error"></div>
-        <button class="auth-btn" onclick="regStep3()">Далее</button>
+      <!-- Email confirmation step (appears after email entered) -->
+      <div class="step" data-step="1b">
+        <h2>📧 Подтвердите почту</h2>
+        <p class="text-center">Мы отправили ссылку подтверждения на:<br><strong id="confirm-email-display" style="color:var(--btn-bg)"></strong></p>
+        <p class="text-center" style="font-size:0.85rem;color:#aaa;margin-top:10px;">
+          🔹 Откройте письмо → нажмите "Подтвердить"<br>
+          🔹 Вернитесь в игру — аккаунт активируется автоматически
+        </p>
+        <div class="email-hint" id="demo-link-display"></div>
+        <p class="success" id="email-verified-msg" style="display:none">✅ Почта подтверждена!</p>
+        <button class="btn" id="check-verification-btn">Я подтвердил почту</button>
+        <button class="btn secondary mt-10" id="resend-email-btn">Отправить ссылку ещё раз</button>
       </div>
 
-      <!-- Шаг 4: Возраст -->
-      <div class="auth-step" id="reg-step-4">
-        <div class="auth-title">Укажите возраст</div>
-        <input type="number" class="auth-input" id="reg-age" placeholder="Ваш возраст" min="1" max="120">
-        <div class="auth-error" id="reg-age-error"></div>
-        <button class="auth-btn" onclick="regStep4()">Далее</button>
+      <div class="step" data-step="2">
+        <h2>Придумайте никнейм</h2>
+        <div class="input-group">
+          <label>Никнейм (3-16 символов)</label>
+          <input type="text" id="reg-nick" placeholder="Ваш игровой ник" maxlength="16">
+        </div>
+        <div class="error" id="nick-error"></div>
+        <button class="btn" id="reg-next-2">Далее</button>
       </div>
 
-      <!-- Шаг 5: Согласие -->
-      <div class="auth-step" id="reg-step-5">
-        <div class="auth-title">Согласие на обработку данных</div>
-        <div class="checkbox-container">
+      <div class="step" data-step="3">
+        <h2>Укажите возраст</h2>
+        <div class="input-group">
+          <label>Ваш возраст</label>
+          <input type="number" id="reg-age" placeholder="Например: 14" min="5" max="99">
+        </div>
+        <div class="error" id="age-error"></div>
+        <button class="btn" id="reg-next-3">Далее</button>
+      </div>
+
+      <div class="step" data-step="4">
+        <h2>Согласие на обработку данных</h2>
+        <div class="checkbox-group">
           <input type="checkbox" id="reg-consent">
-          <label for="reg-consent">Я соглашаюсь на обработку моих персональных данных в соответствии с политикой конфиденциальности Fell Brawl. Я подтверждаю, что ознакомлен с правилами игры.</label>
+          <label for="reg-consent">Я соглашаюсь с обработкой персональных данных</label>
         </div>
-        <div class="auth-error" id="reg-consent-error"></div>
-        <button class="auth-btn" onclick="regStep5()">Принять и продолжить</button>
+        <div class="error" id="consent-error"></div>
+        <button class="btn" id="reg-next-4">Продолжить</button>
       </div>
 
-      <!-- Шаг 6: ID -->
-      <div class="auth-step" id="reg-step-6">
-        <div class="auth-title">Ваш уникальный ID</div>
-        <div class="auth-info">Запомните этот ID! Он нужен для входа в аккаунт.</div>
-        <div class="auth-id-display" id="reg-id-display"></div>
-        <div class="auth-info" style="color:#ffcc00;">⚠️ Сохраните этот ID!</div>
-        <button class="auth-btn" onclick="regStep6()">Войти в игру</button>
+      <div class="step" data-step="5">
+        <h2>✅ Аккаунт создан!</h2>
+        <p class="text-center mb-10">Ваш уникальный ID для входа (сохраните!):</p>
+        <div class="id-display" id="generated-id">---</div>
+        <p class="text-center" style="font-size:0.8rem;color:#aaa;margin:15px 0;">
+          🔐 Этот ID виден только вам и админам
+        </p>
+        <button class="btn" id="reg-finish">Войти в игру</button>
       </div>
     </div>
 
-    <!-- ВХОД -->
-    <div id="auth-login" style="display:none;">
-      <!-- Шаг 1: ID + Почта -->
-      <div class="auth-step active" id="login-step-1">
-        <div class="auth-title">Вход в аккаунт</div>
-        <input type="text" class="auth-input" id="login-id" placeholder="Ваш уникальный ID">
-        <input type="email" class="auth-input" id="login-email" placeholder="Ваша электронная почта">
-        <div class="auth-error" id="login-error"></div>
-        <button class="auth-btn" onclick="loginStep1()">Войти</button>
+    <!-- LOGIN FLOW -->
+    <div id="login-flow" class="hidden">
+      <div class="step active" data-step="l1">
+        <h2>Вход в аккаунт</h2>
+        <div class="input-group">
+          <label>Почта</label>
+          <input type="email" id="login-email" placeholder="example@mail.com">
+        </div>
+        <div class="input-group">
+          <label>Уникальный ID</label>
+          <input type="text" id="login-id" placeholder="FB-xxxxxx-xxxxxx">
+        </div>
+        <div class="error" id="login-error"></div>
+        <button class="btn" id="login-next">Найти аккаунт</button>
       </div>
 
-      <!-- Шаг 2: Подтверждение аккаунта -->
-      <div class="auth-step" id="login-step-2">
-        <div class="auth-title">Это ваш аккаунт?</div>
-        <div class="account-confirm-card">
-          <div class="account-nick" id="login-confirm-nick"></div>
-          <div class="account-trophies">🏆 Кубки: <span id="login-confirm-trophies">0</span></div>
+      <div class="step" data-step="l2">
+        <h2>Это ваш аккаунт?</h2>
+        <div class="text-center" style="padding:15px 0;">
+          <div style="font-size:2.5rem;">👤</div>
+          <div style="font-weight:900;font-size:1.2rem;margin:5px 0;" id="confirm-nick">---</div>
+          <div style="color:#ffd700;">🏆 <span id="confirm-trophies">0</span> кубков</div>
         </div>
-        <div class="confirm-buttons">
-          <button class="auth-btn btn-yes" onclick="loginConfirm(true)">Да, это мой аккаунт</button>
-          <button class="auth-btn btn-no" onclick="loginConfirm(false)">Нет, это не мой аккаунт</button>
+        <div style="display:flex;gap:10px;">
+          <button class="btn" id="login-yes">Да, это мой</button>
+          <button class="btn secondary" id="login-no">Нет</button>
         </div>
       </div>
 
-      <!-- Шаг 3: Ошибка -->
-      <div class="auth-step" id="login-step-3">
-        <div class="auth-title">Аккаунт не найден</div>
-        <div class="error-message-box">
-          1. Перепроверьте действительную почту от аккаунта и ваш уникальный ID аккаунта.<br><br>
-          2. Если все данные верны, но вы не можете найти свой аккаунт — <span class="support-link" onclick="openSupport()">обратитесь в поддержку</span>
+      <div class="step" data-step="l3">
+        <h2>❌ Не удалось войти</h2>
+        <div style="font-size:0.95rem;line-height:1.5;margin-bottom:20px;">
+          1. Перепроверьте действительную почту от аккаунта и ваш уникальный ID.<br><br>
+          2. Если данные верны, но аккаунт не найден — <span class="link-text" id="open-support">обратитесь в поддержку</span>.
         </div>
-        <button class="auth-btn" onclick="goToLoginStep(1)" style="margin-top:10px;">Вернуться ко входу</button>
+        <button class="btn secondary" onclick="showScreen('login')">Назад ко входу</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===== ЭКРАН 5: ПОДДЕРЖКА ===== -->
-<div class="screen" id="screen-support">
-  <div class="auth-bg"></div>
-  <div class="support-container">
-    <div class="support-header">
-      <button class="support-back-btn" onclick="closeSupport()">←</button>
-      <span>Поддержка</span>
-    </div>
-    <div class="support-messages" id="support-messages">
-      <div class="support-msg bot">Здравствуйте! Чем можем помочь? Опишите вашу проблему.</div>
-    </div>
-    <div class="support-input-area">
-      <input type="text" class="support-input" id="support-input" placeholder="Введите сообщение...">
-      <button class="support-send-btn" onclick="sendSupportMsg()">➤</button>
-    </div>
+<!-- EMAIL CONFIRMATION MODAL (for demo) -->
+<div class="modal-overlay" id="email-modal">
+  <div class="modal">
+    <h3>🔗 Ссылка для подтверждения</h3>
+    <p>Для демо-режима скопируйте эту ссылку и откройте в новой вкладке:</p>
+    <div class="email-hint" id="modal-link" style="cursor:pointer" title="Нажмите чтобы скопировать"></div>
+    <p style="font-size:0.8rem;color:#aaa">После открытия ссылки вернитесь сюда и нажмите "Я подтвердил"</p>
+    <button class="btn" onclick="closeEmailModal()">Понятно</button>
   </div>
 </div>
 
-<!-- ===== ЭКРАН 6: ГЛАВНОЕ МЕНЮ ===== -->
-<div class="screen" id="screen-menu">
-  <div class="menu-bg"></div>
-  <div class="menu-container">
-    <div class="menu-logo">
-      <span class="fell">Fell</span> <span class="brawl">Brawl</span>
-    </div>
-    <div class="menu-player-info">
-      <div class="menu-player-nick" id="menu-nick">Player</div>
-      <div class="menu-player-id" id="menu-id">ID: 000000</div>
-      <div class="menu-player-trophies">🏆 Кубки: <span id="menu-trophies">0</span></div>
-    </div>
-    <br>
-    <button class="menu-play-btn" onclick="showToast('Игра скоро будет доступна!', 'success')">ИГРАТЬ</button>
+<!-- SUPPORT CHAT -->
+<div id="support-chat">
+  <div class="chat-header">
+    <span style="font-weight:900;font-size:1.2rem;">🛡️ Поддержка</span>
+    <button class="btn secondary" style="width:auto;padding:8px 12px;" onclick="closeSupport()">Назад</button>
   </div>
-  <div class="menu-footer">Fell Brawl © 2026 | by washedout</div>
+  <div class="chat-messages" id="chat-msgs"></div>
+  <div class="chat-input">
+    <input type="text" id="chat-input" placeholder="Введите сообщение...">
+    <button onclick="sendMessage()">➤</button>
+  </div>
 </div>
 
-<!-- ===== FIREBASE SDK ===== -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<!-- MAIN MENU -->
+<div id="main-menu">
+  <h1>MELL BRAWL</h1>
+</div>
 
-<script>
-// =============================================
-// ⚠️ ВСТАВЬ СЮДА СВОИ ДАННЫЕ FIREBASE!
-// Зайди в Firebase Console → создай проект →
-// Realtime Database → скопируй конфиг
-// =============================================
-const firebaseConfig = {
-  apiKey: "ВСТАВЬ_API_KEY",
-  authDomain: "ПРОЕКТ.firebaseapp.com",
-  databaseURL: "https://ПРОЕКТ-default-rtdb.firebaseio.com",
-  projectId: "ПРОЕКТ",
-  storageBucket: "ПРОЕКТ.appspot.com",
-  messagingSenderId: "000000000",
-  appId: "ВСТАВЬ_APP_ID"
+<!-- FIREBASE SDK -->
+<script type="module">
+  // =========================================================
+  // 🔥 FIREBASE CONFIG — ВСТАВЬТЕ СВОИ ДАННЫЕ
+  // =========================================================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { 
+    getAuth, createUserWithEmailAndPassword, sendEmailVerification, 
+    signInWithEmailAndPassword, onAuthStateChanged, applyActionCode, 
+    checkActionCode 
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { 
+    getFirestore, doc, setDoc, getDoc, collection, addDoc, 
+    onSnapshot, query, orderBy, updateDoc 
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  // 🔹 ВСТАВЬТЕ СВОЙ FIREBASE CONFIG НИЖЕ:
+ const firebaseConfig = {
+  apiKey: "AIzaSyChKHSF7LqqDYJp5MokCbCMn9gdoSDdXgA",
+  authDomain: "jopa-2e821.firebaseapp.com",
+  databaseURL: "https://jopa-2e821-default-rtdb.firebaseio.com",
+  projectId: "jopa-2e821",
+  storageBucket: "jopa-2e821.firebasestorage.app",
+  messagingSenderId: "468429851250",
+  appId: "1:468429851250:web:e0e7f7e7eeff0643bb90eb"
 };
 
-// Инициализация Firebase
-let db;
-try {
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.database();
-  console.log("Firebase подключён!");
-} catch(e) {
-  console.warn("Firebase не настроен. Использую localStorage для демо.", e);
-  db = null;
-}
+  // 🔹 ВСТАВЬТЕ ССЫЛКУ НА ФОН ДЛЯ ЭКРАНА ЗАГРУЗКИ:
+  const bgImageUrl = 'https://github.com/lookup-mrktplce/brawlstars/blob/main/photo_2026-05-09_05-06-06.jpg';
 
-// =============================================
-// ВСТАВЬ ССЫЛКУ НА ФОН ЭКРАНА ЗАГРУЗКИ:
-// =============================================
-const LOADING_BG_URL = "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920";
-document.getElementById('screen-loading').style.backgroundImage = `url('${LOADING_BG_URL}')`;
-
-// =============================================
-// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
-// =============================================
-let currentUser = null;
-let regData = {};
-
-// =============================================
-// МАТ-ФИЛЬТР (расширенный)
-// =============================================
-const badWords = [
-  "хуй","хуе","хуйн","пизд","пизд","ебат","ебан","ебл","блять","бляд",
-  "сука","сукa","fuck","shit","bitch","ass","dick","pussy","cock",
-  "пидор","пидр","геи","гей","мудак","мудил","залуп","херн","хер",
-  "жопа","жоп","задниц","долбоёб","долбоеб","ёбан","ебуч","нахуй",
-  "похуй","пиздец","бля","суки","пизд","ебать","трах","член","сиськ",
-  "шлюх","проститут","порн","секс","18+","нагиб","ублюд","пидарас",
-  "пидорас","малафья","херня","говно","дерьм","отсос","минет","анал",
-  "орал","ипать","ёб","выблядок","конча","сперм","залупа","пизда"
-];
-
-function cleanString(str) {
-  // Удаляем пробелы, дефисы, точки, подчеркивания, и другие разделители между буквами
-  return str.toLowerCase()
-    .replace(/[\s\-\_\.\,\!\?\@\#\$\%\^\&\*\(\)\+\=\~\`\|\\\/\{\}\[\]]/g, '')
-    .replace(/ё/g, 'е')
-    .replace(/[aа]/g, 'a') // базовая нормализация
-    .trim();
-}
-
-function hasBadWords(text) {
-  const cleaned = cleanString(text);
-  for (let word of badWords) {
-    const cleanWord = word.replace(/ё/g, 'е');
-    if (cleaned.includes(cleanWord)) {
-      return true;
+  // Инициализация Firebase
+  let auth, db;
+  let isFirebaseReady = false;
+  try {
+    if (firebaseConfig.apiKey !== "ВСТАВЬТЕ_API_KEY") {
+      const app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      isFirebaseReady = true;
+      console.log("✅ Firebase подключен");
     }
-  }
-  return false;
-}
-
-// =============================================
-// ГЕНЕРАТОР ID
-// =============================================
-function generateUniqueId() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let id = 'FB-';
-  for (let i = 0; i < 8; i++) {
-    id += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return id;
-}
-
-// =============================================
-// TOAST УВЕДОМЛЕНИЯ
-// =============================================
-function showToast(msg, type = '') {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.className = 'toast show ' + type;
-  setTimeout(() => { toast.className = 'toast'; }, 3000);
-}
-
-// =============================================
-// ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ
-// =============================================
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// =============================================
-// ЭКРАН ЗАГРУЗКИ
-// =============================================
-function startLoading() {
-  showScreen('screen-loading');
-
-  const percentEl = document.getElementById('loading-percent');
-  const barEl = document.getElementById('loading-bar-fill');
-
-  const milestones = [
-    { percent: 3, delay: 600 },
-    { percent: 8, delay: 800 },
-    { percent: 15, delay: 700 },
-    { percent: 25, delay: 900 }
-  ];
-
-  let i = 0;
-  let currentPercent = 0;
-
-  function nextMilestone() {
-    if (i < milestones.length) {
-      currentPercent = milestones[i].percent;
-      percentEl.textContent = currentPercent + '%';
-      barEl.style.width = currentPercent + '%';
-      i++;
-      setTimeout(nextMilestone, milestones[i-1].delay);
-    } else {
-      // Показываем "Подключение к серверу..."
-      percentEl.textContent = '';
-      barEl.style.width = '25%';
-      const serverText = document.createElement('div');
-      serverText.className = 'loading-server-text';
-      serverText.textContent = 'Подключение к серверу...';
-      serverText.id = 'server-text';
-      document.querySelector('.loading-bar-container').appendChild(serverText);
-
-      setTimeout(() => {
-        serverText.remove();
-        // Продолжаем до 100%
-        let p = 25;
-        const interval = setInterval(() => {
-          p += Math.floor(Math.random() * 4) + 1;
-          if (p >= 100) {
-            p = 100;
-            clearInterval(interval);
-            percentEl.textContent = '100%';
-            barEl.style.width = '100%';
-            setTimeout(() => {
-              showScreen('screen-auth');
-              createSkulls();
-            }, 600);
-          } else {
-            percentEl.textContent = p + '%';
-            barEl.style.width = p + '%';
-          }
-        }, 120);
-      }, 3000);
-    }
+  } catch(e) { 
+    console.warn("⚠️ Firebase не подключен, работает демо-режим"); 
   }
 
-  setTimeout(nextMilestone, 500);
-}
-
-// =============================================
-// ЧЕРЕПКИ НА ФОНЕ
-// =============================================
-function createSkulls() {
-  const bg = document.getElementById('auth-bg');
-  if (!bg) return;
-
-  for (let i = 0; i < 15; i++) {
-    const skull = document.createElement('div');
-    skull.className = 'skull';
-    skull.textContent = '💀';
-    skull.style.left = Math.random() * 100 + '%';
-    skull.style.fontSize = (20 + Math.random() * 30) + 'px';
-    skull.style.animationDuration = (8 + Math.random() * 12) + 's';
-    skull.style.animationDelay = Math.random() * 10 + 's';
-    bg.appendChild(skull);
-  }
-}
-
-// =============================================
-// ВКЛАДКИ АВТОРИЗАЦИИ
-// =============================================
-function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-  if (tab === 'register') {
-    document.querySelectorAll('.auth-tab')[0].classList.add('active');
-    document.getElementById('auth-register').style.display = 'block';
-    document.getElementById('auth-login').style.display = 'none';
-  } else {
-    document.querySelectorAll('.auth-tab')[1].classList.add('active');
-    document.getElementById('auth-register').style.display = 'none';
-    document.getElementById('auth-login').style.display = 'block';
-  }
-}
-
-// =============================================
-// ШАГИ РЕГИСТРАЦИИ
-// =============================================
-function showRegStep(num) {
-  document.querySelectorAll('#auth-register .auth-step').forEach(s => s.classList.remove('active'));
-  document.getElementById('reg-step-' + num).classList.add('active');
-}
-
-// Шаг 1: Почта
-function regStep1() {
-  const email = document.getElementById('reg-email').value.trim();
-  const errEl = document.getElementById('reg-email-error');
-
-  if (!email) {
-    errEl.textContent = 'Введите электронную почту';
-    return;
-  }
-  if (!email.includes('@') || !email.includes('.')) {
-    errEl.textContent = 'Некорректный формат почты';
-    return;
-  }
-
-  // Проверяем, есть ли уже аккаунт с такой почтой
-  if (db) {
-    db.ref('users').orderByChild('email').equalTo(email).once('value')
-      .then(snapshot => {
-        if (snapshot.exists()) {
-          errEl.textContent = 'Эта почта уже зарегистрирована';
-          return;
-        }
-        errEl.textContent = '';
-        regData.email = email;
-        showRegStep(2);
-      });
-  } else {
-    errEl.textContent = '';
-    regData.email = email;
-    showRegStep(2);
-  }
-}
-
-// Шаг 2: Код
-function regStep2() {
-  const code = document.getElementById('reg-code').value.trim();
-  const errEl = document.getElementById('reg-code-error');
-
-  if (!code) {
-    errEl.textContent = 'Введите код';
-    return;
-  }
-  // Демо: код всегда 123456
-  if (code !== '123456') {
-    errEl.textContent = 'Неверный код. Попробуйте ещё раз';
-    return;
-  }
-
-  errEl.textContent = '';
-  showRegStep(3);
-}
-
-// Шаг 3: Никнейм
-function regStep3() {
-  const nick = document.getElementById('reg-nickname').value.trim();
-  const errEl = document.getElementById('reg-nick-error');
-
-  if (!nick) {
-    errEl.textContent = 'Введите никнейм';
-    return;
-  }
-  if (nick.length < 2) {
-    errEl.textContent = 'Никнейм слишком короткий (мин. 2 символа)';
-    return;
-  }
-  if (nick.length > 16) {
-    errEl.textContent = 'Никнейм слишком длинный (макс. 16 символов)';
-    return;
-  }
-  if (hasBadWords(nick)) {
-    errEl.textContent = 'Этот никнейм содержит недопустимые слова';
-    return;
-  }
-
-  // Проверяем уникальность ника
-  if (db) {
-    db.ref('users').orderByChild('nickname').equalTo(nick).once('value')
-      .then(snapshot => {
-        if (snapshot.exists()) {
-          errEl.textContent = 'Этот никнейм уже занят';
-          return;
-        }
-        errEl.textContent = '';
-        regData.nickname = nick;
-        showRegStep(4);
-      });
-  } else {
-    errEl.textContent = '';
-    regData.nickname = nick;
-    showRegStep(4);
-  }
-}
-
-// Шаг 4: Возраст
-function regStep4() {
-  const age = parseInt(document.getElementById('reg-age').value);
-  const errEl = document.getElementById('reg-age-error');
-
-  if (!age || age < 1 || age > 120) {
-    errEl.textContent = 'Введите корректный возраст';
-    return;
-  }
-
-  errEl.textContent = '';
-  regData.age = age;
-  showRegStep(5);
-}
-
-// Шаг 5: Согласие
-function regStep5() {
-  const consent = document.getElementById('reg-consent').checked;
-  const errEl = document.getElementById('reg-consent-error');
-
-  if (!consent) {
-    errEl.textContent = 'Необходимо принять соглашение';
-    return;
-  }
-
-  errEl.textContent = '';
-
-  // Генерируем ID
-  const uniqueId = generateUniqueId();
-  regData.id = uniqueId;
-  regData.trophies = 0;
-  regData.avatar = '';
-  regData.createdAt = Date.now();
-
-  document.getElementById('reg-id-display').textContent = uniqueId;
-
-  // Сохраняем в Firebase
-  if (db) {
-    db.ref('users/' + uniqueId).set({
-      email: regData.email,
-      nickname: regData.nickname,
-      age: regData.age,
-      id: uniqueId,
-      trophies: 0,
-      avatar: '',
-      createdAt: regData.createdAt
-    }).then(() => {
-      showRegStep(6);
-    }).catch(err => {
-      console.error(err);
-      errEl.textContent = 'Ошибка сохранения. Попробуйте позже.';
+  // =========================================================
+  // 🌐 ГЛОБАЛЬНЫЕ ФУНКЦИИ
+  // =========================================================
+  window.showScreen = (id) => {
+    ['splash','loading','auth','main-menu','support-chat'].forEach(s => {
+      const el = document.getElementById(s);
+      if(!el) return;
+      el.style.display = (s === id || (id==='auth' && s==='auth') || (id==='loading' && s==='loading')) ? 'flex' : 'none';
     });
-  } else {
-    // Демо: localStorage
-    const users = JSON.parse(localStorage.getItem('fb_users') || '{}');
-    users[uniqueId] = { ...regData };
-    localStorage.setItem('fb_users', JSON.stringify(users));
-    showRegStep(6);
-  }
-}
+  };
 
-// Шаг 6: Вход в игру
-function regStep6() {
-  currentUser = { ...regData };
-  if (db) {
-    localStorage.setItem('fb_currentUser', JSON.stringify(currentUser));
-  } else {
-    localStorage.setItem('fb_currentUser', JSON.stringify(currentUser));
-  }
-  enterMenu();
-}
+  window.generatePlayerId = () => {
+    const ts = Date.now().toString(36);
+    const rand = Math.random().toString(36).substring(2, 8);
+    return `FB-${ts}-${rand}`.toUpperCase();
+  };
 
-// =============================================
-// ШАГИ ВХОДА
-// =============================================
-function goToLoginStep(num) {
-  document.querySelectorAll('#auth-login .auth-step').forEach(s => s.classList.remove('active'));
-  document.getElementById('login-step-' + num).classList.add('active');
-}
-
-function loginStep1() {
-  const id = document.getElementById('login-id').value.trim().toUpperCase();
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const errEl = document.getElementById('login-error');
-
-  if (!id || !email) {
-    errEl.textContent = 'Заполните все поля';
-    return;
+  // Фильтр мата (с обходом пробелов и символов)
+  const badWords = ['бля','сука','хуй','пизд','ебат','муд','жоп','даун','ебан','пидор','лох','чмо','нах','долб','трах'];
+  function containsProfanity(text) {
+    if(!text) return false;
+    const clean = text.toLowerCase().replace(/[\s_\-\.\/\\|\(\)\[\]]/g, '');
+    return badWords.some(w => clean.includes(w));
   }
 
-  // Ищем аккаунт
-  if (db) {
-    db.ref('users/' + id).once('value')
-      .then(snapshot => {
-        if (snapshot.exists()) {
-          const user = snapshot.val();
-          if (user.email.toLowerCase() === email) {
-            errEl.textContent = '';
-            currentUser = user;
-            document.getElementById('login-confirm-nick').textContent = user.nickname;
-            document.getElementById('login-confirm-trophies').textContent = user.trophies || 0;
-            goToLoginStep(2);
-          } else {
-            errEl.textContent = 'Почта не совпадает с ID';
-          }
-        } else {
-          errEl.textContent = 'Аккаунт не найден';
-        }
-      });
-  } else {
-    // Демо: localStorage
-    const users = JSON.parse(localStorage.getItem('fb_users') || '{}');
-    if (users[id] && users[id].email.toLowerCase() === email) {
-      errEl.textContent = '';
-      currentUser = users[id];
-      document.getElementById('login-confirm-nick').textContent = currentUser.nickname;
-      document.getElementById('login-confirm-trophies').textContent = currentUser.trophies || 0;
-      goToLoginStep(2);
-    } else {
-      errEl.textContent = 'Аккаунт не найден. Проверьте ID и почту.';
+  // Анимация черепов
+  function createSkulls() {
+    const container = document.getElementById('skull-bg');
+    if(!container) return;
+    container.innerHTML = '';
+    for(let i=0; i<15; i++) {
+      const s = document.createElement('div');
+      s.className = 'skull';
+      s.textContent = '💀';
+      s.style.left = Math.random()*100 + '%';
+      s.style.animationDuration = (10 + Math.random()*10) + 's';
+      s.style.animationDelay = (Math.random()*5) + 's';
+      container.appendChild(s);
     }
   }
-}
+  createSkulls();
 
-function loginConfirm(isYes) {
-  if (isYes) {
-    localStorage.setItem('fb_currentUser', JSON.stringify(currentUser));
-    enterMenu();
-  } else {
-    goToLoginStep(3);
+  // =========================================================
+  // 🔄 ЗАГРУЗКА
+  // =========================================================
+  async function runLoadingSequence() {
+    const fill = document.getElementById('progress-fill');
+    const text = document.getElementById('progress-text');
+    
+    // 🔹 ФОН ЗАГРУЗКИ — МЕНЯЙТЕ ЗДЕСЬ:
+    document.getElementById('loading').style.backgroundImage = `url('${bgImageUrl}')`;
+
+    const steps = [{p:3,d:400},{p:8,d:500},{p:15,d:600},{p:25,d:700}];
+    for(let s of steps) {
+      fill.style.width = s.p + '%';
+      text.textContent = s.p + '%';
+      await sleep(s.d);
+    }
+
+    text.textContent = 'Подключение к серверу...';
+    await sleep(3000);
+
+    for(let i=26; i<=100; i+=2) {
+      fill.style.width = i + '%';
+      text.textContent = i + '%';
+      await sleep(35);
+    }
+    await sleep(400);
+    window.showScreen('auth');
   }
-}
 
-// =============================================
-// ПОДДЕРЖКА
-// =============================================
-function openSupport() {
-  showScreen('screen-support');
-  document.getElementById('support-messages').innerHTML =
-    '<div class="support-msg bot">Здравствуйте! Чем можем помочь? Опишите вашу проблему.</div>';
-}
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-function closeSupport() {
-  showScreen('screen-auth');
-  switchAuthTab('login');
-  goToLoginStep(1);
-}
-
-function sendSupportMsg() {
-  const input = document.getElementById('support-input');
-  const msg = input.value.trim();
-  if (!msg) return;
-
-  const messagesEl = document.getElementById('support-messages');
-
-  // Сообщение пользователя
-  const userMsg = document.createElement('div');
-  userMsg.className = 'support-msg user';
-  userMsg.textContent = msg;
-  messagesEl.appendChild(userMsg);
-
-  input.value = '';
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-
-  // Автоответ
+  // Запуск последовательности
   setTimeout(() => {
-    const botMsg = document.createElement('div');
-    botMsg.className = 'support-msg bot';
+    document.getElementById('splash').classList.add('hidden');
+    setTimeout(runLoadingSequence, 500);
+  }, 2200);
 
-    const responses = [
-      'Спасибо за обращение! Мы рассмотрим вашу проблему в ближайшее время.',
-      'Понял вас. Наш специалист свяжется с вами. Обычно ответ занимает до 24 часов.',
-      'Попробуйте перезагрузить игру. Если проблема сохраняется — напишите нам подробнее.',
-      'Ваш запрос принят! ID тикета: #SUP-' + Math.floor(Math.random() * 90000 + 10000),
-      'Спасибо за обращение в поддержку Fell Brawl! Мы ценим каждого игрока.'
-    ];
-    botMsg.textContent = responses[Math.floor(Math.random() * responses.length)];
-    messagesEl.appendChild(botMsg);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }, 1000 + Math.random() * 2000);
-}
+  // =========================================================
+  // 📧 EMAIL CONFIRMATION LOGIC (FIREBASE + DEMO)
+  // =========================================================
+  let regData = {};
+  let pendingEmail = '';
 
-// Enter для отправки
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    const supportInput = document.getElementById('support-input');
-    if (document.activeElement === supportInput) {
-      sendSupportMsg();
-    }
-  }
-});
-
-// =============================================
-// ГЛАВНОЕ МЕНЮ
-// =============================================
-function enterMenu() {
-  showScreen('screen-menu');
-  document.getElementById('menu-nick').textContent = currentUser.nickname;
-  document.getElementById('menu-id').textContent = 'ID: ' + currentUser.id;
-  document.getElementById('menu-trophies').textContent = currentUser.trophies || 0;
-
-  // Создаём черепки для меню
-  const menuBg = document.querySelector('.menu-bg');
-  for (let i = 0; i < 12; i++) {
-    const skull = document.createElement('div');
-    skull.className = 'skull';
-    skull.textContent = '💀';
-    skull.style.left = Math.random() * 100 + '%';
-    skull.style.fontSize = (20 + Math.random() * 30) + 'px';
-    skull.style.animationDuration = (8 + Math.random() * 12) + 's';
-    skull.style.animationDelay = Math.random() * 10 + 's';
-    menuBg.appendChild(skull);
-  }
-}
-
-// =============================================
-// ПРОВЕРКА АВТО-ВХОДА
-// =============================================
-function checkAutoLogin() {
-  const saved = localStorage.getItem('fb_currentUser');
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      if (currentUser && currentUser.id) {
-        // Проверяем аккаунт в Firebase
-        if (db) {
-          db.ref('users/' + currentUser.id).once('value')
-            .then(snapshot => {
-              if (snapshot.exists()) {
-                currentUser = snapshot.val();
-                enterMenu();
-                return;
-              }
-              // Если нет — идём через загрузку
-              startLoadingSequence();
-            });
-        } else {
-          enterMenu();
-          return;
+  // Проверка URL на наличие actionCode (для реальной верификации)
+  async function checkUrlForVerification() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const oobCode = urlParams.get('oobCode');
+    const mode = urlParams.get('mode');
+    
+    if (mode === 'verifyEmail' && oobCode && isFirebaseReady) {
+      try {
+        await applyActionCode(auth, oobCode);
+        // Убираем параметры из URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Показываем успех
+        alert('✅ Почта подтверждена! Можете продолжить регистрацию.');
+        // Если есть ожидающая регистрация — продолжаем
+        if(pendingEmail && document.querySelector('[data-step="1b"]')) {
+          document.getElementById('email-verified-msg').style.display = 'block';
+          setTimeout(() => goToStep('reg-flow', '2'), 1500);
         }
+      } catch(e) {
+        console.error("Ошибка верификации:", e);
+        alert('❌ Ссылка недействительна или истекла');
       }
-    } catch(e) {
-      startLoadingSequence();
     }
-  } else {
-    startLoadingSequence();
   }
-}
+  // Запускаем проверку при загрузке
+  checkUrlForVerification();
 
-function startLoadingSequence() {
-  showScreen('screen-black');
+  // Шаг 1: Ввод почты
+  document.getElementById('reg-next-1').onclick = async () => {
+    const email = document.getElementById('reg-email').value.trim();
+    const err = document.getElementById('email-error');
+    
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      err.textContent = 'Введите корректную почту';
+      return;
+    }
+    err.textContent = '';
+    pendingEmail = email;
+    regData.email = email;
+    document.getElementById('confirm-email-display').textContent = email;
 
-  setTimeout(() => {
-    showScreen('screen-washedout');
-  }, 1500);
+    // === РЕАЛЬНЫЙ FIREBASE (раскомментируйте при подключении) ===
+    /
+    if(isFirebaseReady) {
+      try {
+        // Создаём пользователя без пароля (анонимно) или с временным паролем
+        const userCred = await createUserWithEmailAndPassword(auth, email, 'temp_'+Math.random().toString(36).slice(2));
+        await sendEmailVerification(userCred.user, {
+          url: window.location.href.split('?')[0] // куда вернуться после подтверждения
+        });
+        // Показываем модал с инструкцией
+        showEmailModal(email);
+        return;
+      } catch(e) {
+        if(e.code === 'auth/email-already-in-use') {
+          err.textContent = 'Эта почта уже зарегистрирована';
+        } else {
+          err.textContent = 'Ошибка: ' + e.message;
+        }
+        return;
+      }
+    }
+    /
 
-  setTimeout(() => {
-    startLoading();
-  }, 4000);
-}
+    // === ДЕМО-РЕЖИМ (работает сразу) ===
+    // Генерируем демо-ссылку
+    const demoLink = `${window.location.origin}${window.location.pathname}?mode=verifyEmail&oobCode=DEMO_${btoa(email)}`;
+    document.getElementById('demo-link-display').textContent = demoLink;
+    document.getElementById('modal-link').textContent = demoLink;
+    document.getElementById('modal-link').onclick = () => {
+      navigator.clipboard.writeText(demoLink);
+      alert('📋 Ссылка скопирована!');
+    };
+    
+    showEmailModal(email);
+    goToStep('reg-flow', '1b');
+  };
 
-// =============================================
-// ЗАПУСК
-// =============================================
-window.addEventListener('load', () => {
-  checkAutoLogin();
-});
+  // Кнопка "Я подтвердил почту"
+  document.getElementById('check-verification-btn').onclick = async () => {
+    // В демо-режиме просто проверяем, открыл ли пользователь ссылку
+    const urlParams = new URLSearchParams(window.location.search);
+    const oobCode = urlParams.get('oobCode');
+    
+    if(oobCode && oobCode.startsWith('DEMO_')) {
+      // Демо-подтверждение
+      document.getElementById('email-verified-msg').style.display = 'block';
+      await sleep(800);
+      goToStep('reg-flow', '2');
+      return;
+    }
+    
+    // В реальном Firebase проверяем статус
+    if(isFirebaseReady && auth.currentUser) {
+      try {
+        await auth.currentUser.reload();
+        if(auth.currentUser.emailVerified) {
+          document.getElementById('email-verified-msg').style.display = 'block';
+          await sleep(800);
+          goToStep('reg-flow', '2');
+        } else {
+          alert('⏳ Почта ещё не подтверждена. Проверьте письмо.');
+        }
+      } catch(e) {
+        alert('Ошибка проверки: ' + e.message);
+      }
+    } else {
+      alert('🔗 Сначала откройте ссылку из письма, затем нажмите эту кнопку');
+    }
+  };
+
+  // Повторная отправка
+  document.getElementById('resend-email-btn').onclick = () => {
+    alert('📧 Ссылка отправлена повторно (демо)');
+    // Здесь можно вызвать resend verification email в Firebase
+  };
+
+  function showEmailModal(email) {
+    document.getElementById('email-modal').classList.add('active');
+  }
+  window.closeEmailModal = () => {
+    document.getElementById('email-modal').classList.remove('active');
+  };
+
+  // =========================================================
+  // 📝 ОСТАЛЬНЫЕ ШАГИ РЕГИСТРАЦИИ
+  // =========================================================
+  document.getElementById('reg-next-2').onclick = () => {
+    const nick = document.getElementById('reg-nick').value.trim();
+    const err = document.getElementById('nick-error');
+    if(nick.length < 3) return err.textContent = 'Минимум 3 символа';
+    if(containsProfanity(nick)) return err.textContent = '❌ Запрещённые слова или 18+';
+    err.textContent = '';
+    regData.nick = nick;
+    goToStep('reg-flow', '3');
+  };
+
+  document.getElementById('reg-next-3').onclick = () => {
+    const age = parseInt(document.getElementById('reg-age').value);
+    const err = document.getElementById('age-error');
+    if(!age || age < 5 || age > 99) return err.textContent = 'Укажите возраст 5-99';
+    err.textContent = '';
+    regData.age = age;
+    goToStep('reg-flow', '4');
+  };
+
+  document.getElementById('reg-next-4').onclick = () => {
+    if(!document.getElementById('reg-consent').checked) {
+      return document.getElementById('consent-error').textContent = 'Требуется согласие';
+    }
+    document.getElementById('consent-error').textContent = '';
+    
+    // Генерируем и сохраняем аккаунт
+    regData.id = window.generatePlayerId();
+    regData.trophies = 0;
+    regData.avatar = 'default';
+    regData.createdAt = new Date().toISOString();
+    
+    document.getElementById('generated-id').textContent = regData.id;
+    goToStep('reg-flow', '5');
+
+    // Сохранение в Firestore
+    if(isFirebaseReady) {
+      setDoc(doc(db, "users", regData.id), regData).catch(console.error);
+    } else {
+      localStorage.setItem('mellbrawl_user_'+regData.id, JSON.stringify(regData));
+    }
+  };
+
+  document.getElementById('reg-finish').onclick = () => {
+    localStorage.setItem('mellbrawl_current_user', regData.id);
+    window.showScreen('main-menu');
+  };
+
+  // =========================================================
+  // 🔑 ВХОД
+  // =========================================================
+  document.getElementById('login-next').onclick = async () => {
+    const email = document.getElementById('login-email').value.trim();
+    const id = document.getElementById('login-id').value.trim().toUpperCase();
+    const err = document.getElementById('login-error');
+
+    if(!email || !id) return err.textContent = 'Заполните оба поля';
+
+    let userData = null;
+    
+    if(isFirebaseReady) {
+      const snap = await getDoc(doc(db, "users", id));
+      if(snap.exists() && snap.data().email.toLowerCase() === email.toLowerCase()) {
+        userData = snap.data();
+      }
+    } else {
+      const saved = JSON.parse(localStorage.getItem('mellbrawl_user_'+id));
+      if(saved && saved.email.toLowerCase() === email.toLowerCase()) {
+        userData = saved;
+      }
+    }
+
+    if(!userData) return err.textContent = '❌ Аккаунт не найден';
+    if(!userData.emailVerified && isFirebaseReady) {
+      return err.textContent = '⚠️ Подтвердите почту перед входом';
+    }
+
+    document.getElementById('confirm-nick').textContent = userData.nick;
+    document.getElementById('confirm-trophies').textContent = userData.trophies;
+    err.textContent = '';
+    goToStep('login-flow', 'l2');
+  };
+
+  document.getElementById('login-yes').onclick = () => {
+    localStorage.setItem('mellbrawl_current_user', document.getElementById('login-id').value.trim().toUpperCase());
+    window.showScreen('main-menu');
+  };
+
+  document.getElementById('login-no').onclick = () => goToStep('login-flow', 'l3');
+
+  // =========================================================
+  // 💬 ПОДДЕРЖКА
+  // =========================================================
+  document.getElementById('open-support').onclick = () => {
+    window.showScreen('support-chat');
+    document.getElementById('support-chat').style.display = 'flex';
+    loadChat();
+  };
+
+  window.closeSupport = () => {
+    document.getElementById('support-chat').style.display = 'none';
+    showScreen('login');
+  };
+
+  window.sendMessage = async () => {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if(!text) return;
+
+    addMessage(text, 'user');
+    input.value = '';
+
+    const userId = localStorage.getItem('mellbrawl_current_user') || 'guest';
+    if(isFirebaseReady) {
+      await addDoc(collection(db, "support_chats"), {
+        text, user: userId, isSupport: false, ts: new Date()
+      });
+    }
+  };
+
+  function addMessage(text, type) {
+    const div = document.createElement('div');
+    div.className = `msg ${type === 'user' ? 'user' : 'support'}`;
+    div.textContent = text;
+    document.getElementById('chat-msgs').appendChild(div);
+    div.scrollIntoView({behavior:'smooth'});
+  }
+
+  async function loadChat() {
+    const container = document.getElementById('chat-msgs');
+    container.innerHTML = '<div class="msg support">👋 Здравствуйте! Чем можем помочь?</div>';
+
+    if(isFirebaseReady) {
+      const q = query(collection(db, "support_chats"), orderBy("ts"));
+      onSnapshot(q, (snap) => {
+        container.innerHTML = '<div class="msg support">👋 Здравствуйте! Чем можем помочь?</div>';
+        snap.forEach(d => {
+          const data = d.data();
+          addMessage(data.text, data.isSupport ? 'support' : 'user');
+        });
+      });
+    }
+  }
+
+  // =========================================================
+  // 🎛️ НАВИГАЦИЯ
+  // =========================================================
+  function goToStep(flowId, stepNum) {
+    document.querySelectorAll(`#${flowId} .step`).forEach(s => s.classList.remove('active'));
+    document.querySelector(`#${flowId} .step[data-step="${stepNum}"]`)?.classList.add('active');
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      document.getElementById('reg-flow').classList.toggle('hidden', tab !== 'reg');
+      document.getElementById('login-flow').classList.toggle('hidden', tab !== 'login');
+    };
+  });
+
 </script>
 </body>
 </html>
