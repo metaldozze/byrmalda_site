@@ -453,9 +453,8 @@
       tempUser = userCred.user;
       
       // Отправляем письмо с подтверждением
-      await sendEmailVerification(tempUser, {
-        url: window.location.href.split('?')[0] // Куда вернуться после подтверждения
-      });
+      await sendEmailVerification(tempUser);
+        
       
       regData.email = email;
       regData.tempPass = tempPass; // Сохраняем для последующего входа
