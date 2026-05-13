@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudLu Shop</title>
-    
-    <!-- 🔧 Favicon fix (чтобы не было 404) -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
     
     <!-- Firebase SDK v9 compat -->
@@ -13,239 +11,112 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         :root {
             --primary: #4361ee; --secondary: #3f37c9; --success: #4cc9f0;
             --warning: #f72585; --dark: #1e293b; --light: #f8f9fa; --gray: #64748b;
-            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-            --border-radius: 12px;
+            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); --border-radius: 12px;
         }
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: var(--dark); }
         
-        header { 
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
-            padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 1000; box-shadow: var(--card-shadow);
-        }
+        header { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: var(--card-shadow); flex-wrap: wrap; gap: 0.5rem; }
         .logo { font-size: 1.8rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
-        .logo-icon { font-size: 2rem; }
-        
         .nav-menu { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-        .nav-btn {
-            background: var(--light); border: none; padding: 0.7rem 1.2rem;
-            border-radius: var(--border-radius); cursor: pointer;
-            display: flex; align-items: center; gap: 0.4rem;
-            transition: all 0.3s; font-weight: 500; box-shadow: var(--card-shadow);
-            font-size: 0.95rem;
-        }
+        .nav-btn { background: var(--light); border: none; padding: 0.7rem 1.2rem; border-radius: var(--border-radius); cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.3s; font-weight: 500; box-shadow: var(--card-shadow); font-size: 0.9rem; white-space: nowrap; }
         .nav-btn:hover { transform: translateY(-2px); background: var(--primary); color: white; }
         .nav-btn.active { background: var(--primary); color: white; }
         .nav-btn.premium-btn { background: linear-gradient(135deg, #f72585, #b5179e); color: white; }
-        .nav-btn.premium-btn:hover { opacity: 0.9; }
         .nav-btn.danger { background: #ef4444; color: white; }
         
         .user-info { display: flex; align-items: center; gap: 0.8rem; margin-left: 1rem; }
-        .avatar { 
-            width: 40px; height: 40px; border-radius: 50%; 
-            background: var(--primary); color: white; 
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; cursor: pointer; overflow: hidden;
-            border: 3px solid var(--success);
-        }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; overflow: hidden; border: 3px solid var(--success); }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .avatar.pending { border-color: var(--warning); opacity: 0.7; }
         
         .container { max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem; }
-        
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .products-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 1.5rem; margin-top: 1rem;
-        }
-        .product-card {
-            background: white; border-radius: var(--border-radius);
-            overflow: hidden; box-shadow: var(--card-shadow);
-            cursor: pointer; transition: transform 0.3s;
-        }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+        .product-card { background: white; border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--card-shadow); cursor: pointer; transition: transform 0.3s; }
         .product-card:hover { transform: translateY(-5px); }
-        .product-img { 
-            width: 100%; height: 200px; object-fit: cover; 
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 3rem;
-        }
+        .product-img { width: 100%; height: 200px; object-fit: cover; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; }
         .product-img img { width: 100%; height: 100%; object-fit: cover; }
         .product-info { padding: 1.2rem; }
         .product-title { font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem; }
         .product-price { color: var(--primary); font-weight: 700; font-size: 1.3rem; }
         .product-rating { display: flex; gap: 2px; margin: 0.5rem 0; font-size: 0.9rem; }
-        .product-user-badge { 
-            background: #22c55e; color: white; padding: 0.2rem 0.5rem; 
-            border-radius: 20px; font-size: 0.75rem; margin-top: 0.5rem;
-            display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;
-        }
+        .product-user-badge { background: #22c55e; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.75rem; margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; }
         
-        .modal {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.6);
-            z-index: 2000; align-items: center; justify-content: center; padding: 1rem;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
         .modal.active { display: flex; }
-        .modal-content {
-            background: white; border-radius: var(--border-radius);
-            max-width: 600px; width: 100%; max-height: 90vh;
-            overflow-y: auto; padding: 2rem; position: relative;
-            animation: slideUp 0.3s ease;
-        }
+        .modal-content { background: white; border-radius: var(--border-radius); max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-close {
-            position: absolute; top: 1rem; right: 1rem;
-            background: none; border: none; font-size: 1.5rem;
-            cursor: pointer; color: var(--gray);
-        }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray); }
         
         .auth-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
-        .auth-tab { 
-            flex: 1; padding: 0.8rem; border: none; 
-            background: var(--light); border-radius: 8px;
-            cursor: pointer; font-weight: 500;
-        }
+        .auth-tab { flex: 1; padding: 0.8rem; border: none; background: var(--light); border-radius: 8px; cursor: pointer; font-weight: 500; }
         .auth-tab.active { background: var(--primary); color: white; }
         .auth-form { display: none; }
         .auth-form.active { display: block; }
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 500; }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%; padding: 0.8rem; border: 2px solid #e2e8f0;
-            border-radius: 8px; font-size: 1rem; transition: border-color 0.3s;
-        }
-        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); outline: none; }
-        .btn {
-            background: var(--primary); color: white; border: none;
-            padding: 0.9rem 1.5rem; border-radius: 8px;
-            cursor: pointer; font-weight: 600; width: 100%;
-            transition: background 0.3s; font-size: 1rem;
-        }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; }
+        .form-group input:focus { border-color: var(--primary); outline: none; }
+        .btn { background: var(--primary); color: white; border: none; padding: 0.9rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: background 0.3s; font-size: 1rem; }
         .btn:hover { background: var(--secondary); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn-google {
-            background: white; color: var(--dark); border: 2px solid #e2e8f0;
-            display: flex; align-items: center; justify-content: center;
-            gap: 0.5rem; margin-top: 1rem;
-        }
+        .btn-google { background: white; color: var(--dark); border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 1rem; }
         .btn-google:hover { border-color: var(--primary); }
         
-        .product-detail { 
-            background: white; border-radius: var(--border-radius);
-            padding: 2rem; box-shadow: var(--card-shadow);
-            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
-        }
+        .product-detail { background: white; border-radius: var(--border-radius); padding: 2rem; box-shadow: var(--card-shadow); display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
         @media (max-width: 768px) { .product-detail { grid-template-columns: 1fr; } }
-        .product-detail-img { 
-            width: 100%; height: 400px; border-radius: var(--border-radius);
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 4rem; overflow: hidden;
-        }
+        .product-detail-img { width: 100%; height: 400px; border-radius: var(--border-radius); background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem; overflow: hidden; }
         .product-detail-img img { width: 100%; height: 100%; object-fit: contain; }
         .product-detail-info h1 { font-size: 1.8rem; margin-bottom: 1rem; }
         .product-detail-price { font-size: 2rem; color: var(--primary); font-weight: 700; margin: 1rem 0; }
         .product-detail-section { margin: 1.5rem 0; }
         .product-detail-section h3 { margin-bottom: 0.5rem; color: var(--gray); }
-        .contact-seller-btn {
-            background: var(--success); color: white; border: none;
-            padding: 0.8rem 1.5rem; border-radius: 8px;
-            cursor: pointer; font-weight: 600; margin-top: 1rem;
-            display: flex; align-items: center; gap: 0.5rem;
-        }
+        .contact-seller-btn { background: var(--success); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; }
         
-        .profile-header { 
-            background: white; border-radius: var(--border-radius);
-            padding: 2rem; box-shadow: var(--card-shadow);
-            display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;
-        }
-        .profile-avatar-large {
-            width: 100px; height: 100px; border-radius: 50%;
-            background: var(--primary); color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2.5rem; font-weight: bold; cursor: pointer;
-            border: 4px solid var(--success); overflow: hidden;
-        }
+        .profile-header { background: white; border-radius: var(--border-radius); padding: 2rem; box-shadow: var(--card-shadow); display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .profile-avatar-large { width: 100px; height: 100px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; cursor: pointer; border: 4px solid var(--success); overflow: hidden; }
         .profile-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
         .profile-avatar-large.pending { border-color: var(--warning); }
-        .profile-nickname { font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .profile-nickname { font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
         .edit-icon { cursor: pointer; color: var(--gray); font-size: 1.2rem; }
-        .premium-badge { 
-            background: linear-gradient(135deg, #f72585, #b5179e); 
-            color: white; padding: 0.3rem 0.8rem; 
-            border-radius: 20px; font-size: 0.85rem; font-weight: 600;
-        }
-        .profile-stats { display: flex; gap: 2rem; margin-top: 1rem; color: var(--gray); }
+        .premium-badge { background: linear-gradient(135deg, #f72585, #b5179e); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .profile-stats { display: flex; gap: 2rem; margin-top: 1rem; color: var(--gray); flex-wrap: wrap; }
         
-        .orders-section h3 { margin: 1.5rem 0 1rem; }
-        .order-card {
-            background: white; border-radius: var(--border-radius);
-            padding: 1.2rem; margin-bottom: 1rem;
-            box-shadow: var(--card-shadow); cursor: pointer;
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .order-card { background: white; border-radius: var(--border-radius); padding: 1.2rem; margin-bottom: 1rem; box-shadow: var(--card-shadow); cursor: pointer; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
         .order-status { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
         .status-created { background: #fef3c7; color: #92400e; }
         .status-processing { background: #dbeafe; color: #1e40af; }
         .status-completed { background: #dcfce7; color: #166534; }
         .status-cancelled { background: #fee2e2; color: #991b1b; }
         
-        .chat-container { 
-            background: white; border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow); display: flex;
-            flex-direction: column; height: 600px;
-        }
-        .chat-header { 
-            padding: 1rem 1.5rem; border-bottom: 1px solid #e2e8f0;
-            font-weight: 600; display: flex; justify-content: space-between;
-        }
-        .chat-messages { 
-            flex: 1; padding: 1.5rem; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 1rem;
-        }
-        .message { max-width: 75%; padding: 0.8rem 1.2rem; border-radius: 18px; position: relative; }
+        .chat-container { background: white; border-radius: var(--border-radius); box-shadow: var(--card-shadow); display: flex; flex-direction: column; height: 600px; }
+        .chat-header { padding: 1rem 1.5rem; border-bottom: 1px solid #e2e8f0; font-weight: 600; display: flex; justify-content: space-between; }
+        .chat-messages { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+        .message { max-width: 75%; padding: 0.8rem 1.2rem; border-radius: 18px; position: relative; word-wrap: break-word; }
         .message.sent { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .message.received { background: var(--light); align-self: flex-start; border-bottom-left-radius: 4px; }
         .message-meta { font-size: 0.75rem; opacity: 0.8; margin-top: 0.3rem; display: block; }
         .chat-input { padding: 1rem; border-top: 1px solid #e2e8f0; display: flex; gap: 0.8rem; }
-        .chat-input input { 
-            flex: 1; padding: 0.8rem 1.2rem; border: 2px solid #e2e8f0;
-            border-radius: 25px; font-size: 1rem;
-        }
-        .chat-input button { 
-            background: var(--primary); color: white; border: none;
-            padding: 0.8rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600;
-        }
+        .chat-input input { flex: 1; padding: 0.8rem 1.2rem; border: 2px solid #e2e8f0; border-radius: 25px; font-size: 1rem; }
+        .chat-input button { background: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 600; }
         
         .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .category-btn {
-            background: var(--light); border: 2px solid #e2e8f0;
-            padding: 1.2rem; border-radius: var(--border-radius);
-            cursor: pointer; text-align: center; font-weight: 500; transition: all 0.3s;
-        }
+        .category-btn { background: var(--light); border: 2px solid #e2e8f0; padding: 1.2rem; border-radius: var(--border-radius); cursor: pointer; text-align: center; font-weight: 500; transition: all 0.3s; }
         .category-btn:hover, .category-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         
         .moderation-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-        .mod-tab { 
-            padding: 0.6rem 1.2rem; border: none; background: var(--light); 
-            border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 0.9rem;
-        }
+        .mod-tab { padding: 0.6rem 1.2rem; border: none; background: var(--light); border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 0.9rem; }
         .mod-tab.active { background: var(--warning); color: white; }
-        .moderation-item {
-            background: white; border-radius: var(--border-radius);
-            padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--card-shadow);
-        }
+        .moderation-item { background: white; border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--card-shadow); }
         .moderation-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
         .btn-approve { background: #22c55e; }
         .btn-reject { background: #ef4444; }
@@ -256,13 +127,6 @@
         .stars { display: flex; gap: 2px; font-size: 1.2rem; }
         .star { color: #cbd5e1; cursor: pointer; }
         .star.filled { color: #fbbf24; }
-        .review-card {
-            background: white; border-radius: var(--border-radius);
-            padding: 1rem; margin: 0.5rem 0; box-shadow: var(--card-shadow);
-        }
-        .review-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
-        .review-author { font-weight: 600; }
-        .review-stars { color: #fbbf24; }
         
         .hidden { display: none !important; }
         .text-center { text-align: center; }
@@ -276,33 +140,23 @@
         .loading { text-align: center; padding: 3rem; color: var(--gray); }
         .empty-state { text-align: center; padding: 3rem; color: var(--gray); background: white; border-radius: var(--border-radius); }
         
-        .toast {
-            position: fixed; bottom: 2rem; right: 2rem;
-            background: var(--dark); color: white;
-            padding: 1rem 1.5rem; border-radius: var(--border-radius);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            z-index: 3000; animation: slideIn 0.3s ease; max-width: 350px;
-        }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--dark); color: white; padding: 1rem 1.5rem; border-radius: var(--border-radius); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 3000; animation: slideIn 0.3s ease; max-width: 350px; }
         @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast.success { background: #22c55e; }
         .toast.error { background: #ef4444; }
         .toast.warning { background: #f59e0b; }
         
-        .index-helper { 
-            background: #fef3c7; border-left: 4px solid #f59e0b; 
-            padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0;
-        }
+        .index-helper { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
         .index-helper a { color: var(--primary); font-weight: 600; }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="logo"><span class="logo-icon">🛍️</span> CloudLu Shop</div>
         <nav class="nav-menu">
             <button class="nav-btn active" data-page="home" onclick="showPage('home')">🏠 Главная</button>
-            <button class="nav-btn" data-page="catalog" onclick="toggleCatalog()">📁 Каталог</button>
-            <button class="nav-btn" data-page="profile" onclick="showProfile()">👤 Профиль</button>
+            <button class="nav-btn" onclick="toggleCatalog()">📁 Каталог</button>
+            <button class="nav-btn" onclick="showProfile()">👤 Профиль</button>
             <button class="nav-btn" onclick="openSupportChat()">💬 Поддержка</button>
             <button class="nav-btn premium-btn" onclick="checkPremiumAndSuggest()">✨ Предложить товар</button>
             <button class="nav-btn" onclick="openChatsPage()">💬 Чаты</button>
@@ -320,18 +174,15 @@
         <button class="nav-btn" id="loginBtn" onclick="openAuthModal()">🔐 Войти</button>
     </header>
 
-    <!-- Main Container -->
     <div class="container">
         <!-- Home Page -->
         <div id="homePage" class="page active">
             <h2 style="color:white; margin-bottom:1rem">🔥 Популярные товары</h2>
             <div id="indexWarning" class="index-helper hidden">
                 ⚠️ <strong>Требуется индекс Firestore!</strong><br>
-                <a href="https://console.firebase.google.com/project/jopa-2e821/firestore/indexes" target="_blank">🔗 Создать индекс автоматически</a>
+                <a href="https://console.firebase.google.com/project/jopa-2e821/firestore/indexes" target="_blank">🔗 Создать индекс</a>
             </div>
-            <div class="products-grid" id="productsGrid">
-                <div class="loading">Загрузка товаров...</div>
-            </div>
+            <div class="products-grid" id="productsGrid"><div class="loading">Загрузка товаров...</div></div>
         </div>
 
         <!-- Catalog Modal -->
@@ -356,22 +207,12 @@
                     <span id="profileAvatarText">U</span><img id="profileAvatarImg" src="" alt="" style="display:none">
                 </div>
                 <div>
-                    <div class="profile-nickname">
-                        <span id="profileNickname">Загрузка...</span>
-                        <span class="edit-icon" onclick="editNickname()">✏️</span>
-                        <span id="profilePremiumBadge" class="premium-badge hidden">PREMIUM</span>
-                    </div>
+                    <div class="profile-nickname"><span id="profileNickname">Загрузка...</span><span class="edit-icon" onclick="editNickname()">✏️</span><span id="profilePremiumBadge" class="premium-badge hidden">PREMIUM</span></div>
                     <div style="color:var(--gray); margin-top:0.3rem">ID: <span id="profileUserId">...</span></div>
-                    <div class="profile-stats">
-                        <span>📅 Регистрация: <span id="profileRegDate">...</span></span>
-                        <span>🛒 Покупок: <span id="profileOrdersCount">0</span></span>
-                    </div>
+                    <div class="profile-stats"><span>📅 Регистрация: <span id="profileRegDate">...</span></span><span>🛒 Покупок: <span id="profileOrdersCount">0</span></span></div>
                 </div>
             </div>
-            <div class="orders-section">
-                <h3>📦 Мои заказы</h3>
-                <div id="ordersList"><div class="loading">Загрузка заказов...</div></div>
-            </div>
+            <div class="orders-section"><h3>📦 Мои заказы</h3><div id="ordersList"><div class="loading">Загрузка заказов...</div></div></div>
         </div>
 
         <!-- Support Chat Modal -->
@@ -380,13 +221,8 @@
                 <button class="modal-close" onclick="closeSupportChat()">×</button>
                 <div class="chat-container">
                     <div class="chat-header"><span>💬 Поддержка CloudLu</span><span style="font-size:0.9rem;color:var(--gray)">Онлайн</span></div>
-                    <div class="chat-messages" id="supportMessages">
-                        <div class="message received">Здравствуйте! Чем могу помочь? 🤝<span class="message-meta">Поддержка • Сейчас</span></div>
-                    </div>
-                    <div class="chat-input">
-                        <input type="text" id="supportInput" placeholder="Напишите ваш вопрос..." onkeypress="if(event.key==='Enter')sendSupportMessage()">
-                        <button onclick="sendSupportMessage()">➤</button>
-                    </div>
+                    <div class="chat-messages" id="supportMessages"><div class="message received">Здравствуйте! Чем могу помочь? 🤝<span class="message-meta">Поддержка • Сейчас</span></div></div>
+                    <div class="chat-input"><input type="text" id="supportInput" placeholder="Напишите ваш вопрос..." onkeypress="if(event.key==='Enter')sendSupportMessage()"><button onclick="sendSupportMessage()">➤</button></div>
                 </div>
             </div>
         </div>
@@ -396,10 +232,7 @@
             <div class="modal-content" style="max-width:450px">
                 <button class="modal-close" onclick="closeAuthModal()">×</button>
                 <h2 class="text-center mb-2">🔐 Авторизация</h2>
-                <div class="auth-tabs">
-                    <button class="auth-tab active" onclick="switchAuthTab('login')">Вход</button>
-                    <button class="auth-tab" onclick="switchAuthTab('register')">Регистрация</button>
-                </div>
+                <div class="auth-tabs"><button class="auth-tab active" onclick="switchAuthTab('login')">Вход</button><button class="auth-tab" onclick="switchAuthTab('register')">Регистрация</button></div>
                 <div id="loginForm" class="auth-form active">
                     <div class="form-group"><label>📧 Email</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
                     <div class="form-group"><label>🔑 Пароль</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
@@ -435,11 +268,7 @@
                 <h2>🛒 Оформление заказа</h2>
                 <div id="orderProductInfo" style="margin:1rem 0;padding:1rem;background:var(--light);border-radius:8px"></div>
                 <div class="form-group"><label>Количество (мин. <span id="orderMinQty">1</span>)</label><input type="number" id="orderQty" min="1" value="1" onchange="calculateOrderTotal()"></div>
-                <div class="order-summary">
-                    <div class="flex justify-between"><span>Цена за единицу:</span><span id="orderUnitPrice">0 ₽</span></div>
-                    <div class="flex justify-between" style="margin-top:0.5rem"><span>Количество:</span><span id="orderQtyDisplay">1</span></div>
-                    <div class="order-total">Итого: <span id="orderTotal">0 ₽</span></div>
-                </div>
+                <div class="order-summary"><div class="flex justify-between"><span>Цена за единицу:</span><span id="orderUnitPrice">0 ₽</span></div><div class="flex justify-between" style="margin-top:0.5rem"><span>Количество:</span><span id="orderQtyDisplay">1</span></div><div class="order-total">Итого: <span id="orderTotal">0 ₽</span></div></div>
                 <button class="btn" onclick="confirmOrder()">📦 Оформить заказ</button>
                 <p style="font-size:0.85rem;color:var(--gray);margin-top:1rem;text-align:center">После оформления вы получите токен заказа для отслеживания статуса</p>
             </div>
@@ -450,9 +279,7 @@
             <div class="modal-content" style="text-align:center;max-width:450px">
                 <h3 style="color:#22c55e">✅ Заказ оформлен!</h3>
                 <p style="margin:1.5rem 0">Ваш токен заказа: <strong id="orderToken" style="font-family:monospace;background:var(--light);padding:0.3rem 0.6rem;border-radius:4px">ORD-XXXXXX</strong></p>
-                <div style="background:#fef3c7;padding:1rem;border-radius:8px;margin:1rem 0;text-align:left">
-                    <strong>ℹ️ Важно:</strong><br>Сайт находится на ранней стадии разработки. Оплата и получение товара осуществляются через поддержку.
-                </div>
+                <div style="background:#fef3c7;padding:1rem;border-radius:8px;margin:1rem 0;text-align:left"><strong>ℹ️ Важно:</strong><br>Сайт находится на ранней стадии разработки. Оплата и получение товара осуществляются через поддержку.</div>
                 <p style="color:var(--gray);font-size:0.9rem">Используйте токен заказа в чате поддержки для отслеживания статуса</p>
                 <button class="btn" onclick="closeOrderConfirmModal()">Понял</button>
             </div>
@@ -464,10 +291,7 @@
                 <h3>✨ Premium Доступ</h3>
                 <p style="margin:1.5rem 0;color:var(--gray)">Функция "Предложить товар" доступна только пользователям с Premium</p>
                 <div style="background:linear-gradient(135deg,#f72585,#b5179e);color:white;padding:1.2rem;border-radius:8px;margin:1rem 0">
-                    <strong>Преимущества Premium:</strong>
-                    <ul style="text-align:left;margin-top:0.5rem;padding-left:1.2rem">
-                        <li>Предлагать свои товары</li><li>Приоритетная поддержка</li><li>Эксклюзивные значки</li>
-                    </ul>
+                    <strong>Преимущества Premium:</strong><ul style="text-align:left;margin-top:0.5rem;padding-left:1.2rem"><li>Предлагать свои товары</li><li>Приоритетная поддержка</li><li>Эксклюзивные значки</li></ul>
                 </div>
                 <button class="btn" onclick="contactForPremium()">💳 Купить Premium</button>
                 <p style="font-size:0.85rem;color:var(--gray);margin-top:1rem">Нажимая "Купить", вы будете перенаправлены в чат поддержки</p>
@@ -479,14 +303,8 @@
             <div class="modal-content">
                 <button class="modal-close" onclick="closeSuggestModal()">×</button>
                 <h2>✨ Предложить новый товар</h2>
-                <div id="suggestStep1">
-                    <div class="form-group"><label>📛 Название товара *</label><input type="text" id="suggestName" placeholder="Введите название"></div>
-                    <button class="btn" onclick="nextSuggestStep(2)">Далее →</button>
-                </div>
-                <div id="suggestStep2" class="hidden">
-                    <div class="form-group"><label>📷 Фотографии товара *</label><input type="file" id="suggestImages" accept="image/*" multiple><p style="font-size:0.85rem;color:var(--gray)">Можно выбрать несколько изображений</p></div>
-                    <div class="flex gap-1"><button class="btn" style="background:var(--gray)" onclick="nextSuggestStep(1)">← Назад</button><button class="btn" onclick="nextSuggestStep(3)">Далее →</button></div>
-                </div>
+                <div id="suggestStep1"><div class="form-group"><label>📛 Название товара *</label><input type="text" id="suggestName" placeholder="Введите название"></div><button class="btn" onclick="nextSuggestStep(2)">Далее →</button></div>
+                <div id="suggestStep2" class="hidden"><div class="form-group"><label>📷 Фотографии товара *</label><input type="file" id="suggestImages" accept="image/*" multiple><p style="font-size:0.85rem;color:var(--gray)">Можно выбрать несколько изображений</p></div><div class="flex gap-1"><button class="btn" style="background:var(--gray)" onclick="nextSuggestStep(1)">← Назад</button><button class="btn" onclick="nextSuggestStep(3)">Далее →</button></div></div>
                 <div id="suggestStep3" class="hidden">
                     <div class="form-group"><label>📝 Описание *</label><textarea id="suggestDescription" rows="3" placeholder="Подробное описание товара"></textarea></div>
                     <div class="form-group"><label>📁 Категория *</label><select id="suggestCategory"><option value="">Выберите категорию</option><option value="electronics">Электроника</option><option value="clothing">Одежда</option><option value="home">Для дома</option><option value="games">Игры</option><option value="other">Другое</option></select></div>
@@ -536,50 +354,20 @@
         <div id="chatsPage" class="page"><h2 style="margin-bottom:1rem">💬 Мои чаты</h2><div id="chatsList"><div class="empty-state"><p>У вас пока нет активных чатов</p><p style="font-size:0.9rem;color:var(--gray);margin-top:0.5rem">Чаты появляются после покупки товара или обращения в поддержку</p></div></div></div>
     </div>
 
-    <!-- Toast Container -->
     <div id="toastContainer"></div>
 
     <script>
-        // ============================================
-        // 🔥 FIREBASE CONFIGURATION
-        // ============================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyChKHSF7LqqDYJp5MokCbCMn9gdoSDdXgA",
-            authDomain: "jopa-2e821.firebaseapp.com",
-            databaseURL: "https://jopa-2e821-default-rtdb.firebaseio.com",
-            projectId: "jopa-2e821",
-            storageBucket: "jopa-2e821.firebasestorage.app",
-            messagingSenderId: "468429851250",
-            appId: "1:468429851250:web:e0e7f7e7eeff0643bb90eb"
-        };
-
+        // 🔥 FIREBASE CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyChKHSF7LqqDYJp5MokCbCMn9gdoSDdXgA", authDomain: "jopa-2e821.firebaseapp.com", databaseURL: "https://jopa-2e821-default-rtdb.firebaseio.com", projectId: "jopa-2e821", storageBucket: "jopa-2e821.firebasestorage.app", messagingSenderId: "468429851250", appId: "1:468429851250:web:e0e7f7e7eeff0643bb90eb" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-        const database = firebase.database();
-
-        // 🖼️ ImgBB API Key (твой ключ)
+        const auth = firebase.auth(), db = firebase.firestore(), storage = firebase.storage();
         const IMGBB_API_KEY = "d3e0d626da4b69b9cadd392fe36efeac";
 
-        // ============================================
-        // 🌍 GLOBAL STATE
-        // ============================================
-        let currentUser = null;
-        let currentProduct = null;
-        let reviewRating = 0;
-        let suggestStep = 1;
-        let catalogOpen = false;
+        // 🌍 STATE
+        let currentUser = null, currentProduct = null, reviewRating = 0, suggestStep = 1, catalogOpen = false;
 
-        // ============================================
-        // 🚀 INITIALIZATION
-        // ============================================
+        // 🚀 INIT
         document.addEventListener('DOMContentLoaded', async () => {
-            // Настройка домена для OAuth (автоматически для GitHub Pages)
-            if (location.hostname.includes('github.io')) {
-                auth.useEmulator = false; // Использовать продакшен
-            }
-            
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     currentUser = user;
@@ -587,10 +375,7 @@
                     document.getElementById('loginBtn').style.display = 'none';
                     document.getElementById('logoutBtn').style.display = 'flex';
                     document.getElementById('userInfo').style.display = 'flex';
-                    
-                    if (user.email === 'sobakastalina123@gmail.com') {
-                        document.getElementById('moderationBtn').style.display = 'flex';
-                    }
+                    if (user.email === 'sobakastalina123@gmail.com') document.getElementById('moderationBtn').style.display = 'flex';
                     showToast('Добро пожаловать! 👋', 'success');
                 } else {
                     currentUser = null;
@@ -599,644 +384,291 @@
                     document.getElementById('userInfo').style.display = 'none';
                     document.getElementById('moderationBtn').style.display = 'none';
                 }
-                loadProducts();
-                loadCategories();
+                loadProducts(); loadCategories();
             });
             setupReviewStars();
         });
 
-        // ============================================
-        // 📄 PAGE NAVIGATION
-        // ============================================
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId + 'Page').classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`.nav-btn[data-page="${pageId}"]`)?.classList.add('active');
-            if (catalogOpen) toggleCatalog();
-        }
+        // 📄 NAVIGATION
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id+'Page').classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.querySelector(`.nav-btn[data-page="${id}"]`)?.classList.add('active'); if(catalogOpen) toggleCatalog(); }
+        function toggleCatalog() { const m = document.getElementById('catalogModal'); catalogOpen = !catalogOpen; m.classList.toggle('active', catalogOpen); }
 
-        function toggleCatalog() {
-            const modal = document.getElementById('catalogModal');
-            catalogOpen = !catalogOpen;
-            modal.classList.toggle('active', catalogOpen);
-        }
-
-        // ============================================
-        // 🔐 AUTHENTICATION
-        // ============================================
+        // 🔐 AUTH
         function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
         function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
-        
-        function switchAuthTab(tab) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tab + 'Form').classList.add('active');
-        }
+        function switchAuthTab(tab) { document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active')); event.target.classList.add('active'); document.getElementById(tab+'Form').classList.add('active'); }
 
         async function signInWithGoogle() {
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
-                // Для GitHub Pages может потребоваться signInWithRedirect вместо popup
                 let result;
-                if (location.hostname.includes('github.io')) {
-                    await auth.signInWithRedirect(provider);
-                    return; // Redirect перезагрузит страницу
-                } else {
-                    result = await auth.signInWithPopup(provider);
-                }
+                if (location.hostname.includes('github.io')) { await auth.signInWithRedirect(provider); return; }
+                else result = await auth.signInWithPopup(provider);
                 await handleGoogleAuth(result.user);
-            } catch (error) {
-                console.error('Google sign-in error:', error);
-                if (error.code === 'auth/unauthorized-domain') {
-                    showToast('❌ Домен не авторизован! Добавь ' + location.hostname + ' в Firebase Console → Authentication → Settings → Authorized domains', 'error');
-                } else {
-                    showToast('Ошибка входа: ' + error.message, 'error');
-                }
+            } catch (e) {
+                console.error(e);
+                if (e.code === 'auth/unauthorized-domain') showToast('❌ Добавь '+location.hostname+' в Firebase → Authentication → Settings → Authorized domains', 'error');
+                else showToast('Ошибка: '+e.message, 'error');
             }
         }
-
-        // Обработка после редиректа
-        auth.getRedirectResult().then(async (result) => {
-            if (result?.user) {
-                await handleGoogleAuth(result.user);
-            }
-        }).catch((error) => {
-            console.error('Redirect result error:', error);
-            showToast('Ошибка авторизации: ' + error.message, 'error');
-        });
+        auth.getRedirectResult().then(r => r?.user && handleGoogleAuth(r.user)).catch(e => showToast('Ошибка: '+e.message, 'error'));
 
         async function handleGoogleAuth(user) {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if (!userDoc.exists) {
-                const genUsername = 'user_' + Math.random().toString(36).substr(2, 8);
-                const genPassword = generateSecurePassword();
-                await db.collection('users').doc(user.uid).set({
-                    uid: user.uid, email: user.email, displayName: genUsername,
-                    password: genPassword, avatar: user.photoURL || null,
-                    avatarStatus: 'approved', nicknameStatus: 'approved',
-                    premium: false, premiumUntil: null,
-                    registrationDate: firebase.firestore.FieldValue.serverTimestamp(),
-                    orders: [], suggestedProducts: []
-                });
-                document.getElementById('genUsername').textContent = genUsername;
-                document.getElementById('genPassword').textContent = genPassword;
-                closeAuthModal();
-                document.getElementById('credentialsModal').classList.add('active');
+            const doc = await db.collection('users').doc(user.uid).get();
+            if (!doc.exists) {
+                const nick = 'user_'+Math.random().toString(36).substr(2,8), pass = generatePassword();
+                await db.collection('users').doc(user.uid).set({ uid:user.uid, email:user.email, displayName:nick, password:pass, avatar:user.photoURL||null, avatarStatus:'approved', nicknameStatus:'approved', premium:false, premiumUntil:null, registrationDate:firebase.firestore.FieldValue.serverTimestamp(), orders:[], suggestedProducts:[] });
+                document.getElementById('genUsername').textContent = nick;
+                document.getElementById('genPassword').textContent = pass;
+                closeAuthModal(); document.getElementById('credentialsModal').classList.add('active');
             }
-            closeAuthModal();
-            showToast('Успешный вход! 🎉', 'success');
+            closeAuthModal(); showToast('Успешный вход! 🎉', 'success');
         }
-
-        function generateSecurePassword() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-            let password = '';
-            for (let i = 0; i < 8; i++) password += chars.charAt(Math.floor(Math.random() * chars.length));
-            return password;
-        }
-
+        function generatePassword() { const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*'; let p=''; for(let i=0;i<8;i++) p+=c.charAt(Math.floor(Math.random()*c.length)); return p; }
         function closeCredentialsModal() { document.getElementById('credentialsModal').classList.remove('active'); }
 
         async function loginWithEmail() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            if (!email || !password) { showToast('Заполните все поля', 'warning'); return; }
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (error) {
-                const usersRef = db.collection('users');
-                const query = await usersRef.where('email', '==', email).get();
-                if (query.empty) { showToast('Пользователь не найден', 'error'); return; }
-                const userData = query.docs[0].data();
-                if (userData.password !== password) { showToast('Неверный пароль', 'error'); return; }
-                showToast('Вход выполнен!', 'success');
+            const e=document.getElementById('loginEmail').value, p=document.getElementById('loginPassword').value;
+            if(!e||!p) { showToast('Заполните поля','warning'); return; }
+            try { await auth.signInWithEmailAndPassword(e,p); }
+            catch(err) {
+                const q=await db.collection('users').where('email','==',e).get();
+                if(q.empty||q.docs[0].data().password!==p) { showToast('Неверные данные','error'); return; }
+                showToast('Вход выполнен!','success');
             }
         }
+        async function logout() { await auth.signOut(); currentUser=null; showToast('Вы вышли 👋','success'); showPage('home'); }
 
-        async function logout() {
-            await auth.signOut();
-            currentUser = null;
-            showToast('Вы вышли из аккаунта 👋', 'success');
-            showPage('home');
-        }
-
-        // ============================================
-        // 👤 USER PROFILE
-        // ============================================
+        // 👤 PROFILE
         async function loadUserProfile() {
-            if (!currentUser) return;
+            if(!currentUser) return;
             try {
-                const doc = await db.collection('users').doc(currentUser.uid).get();
-                const data = doc.data();
-                document.getElementById('profileUserId').textContent = currentUser.uid.substr(0, 8) + '...';
-                document.getElementById('profileNickname').textContent = data.displayName || 'Пользователь';
-                document.getElementById('headerUsername').textContent = data.displayName?.substr(0, 12) || 'User';
-                
-                if (data.avatar) {
-                    document.getElementById('profileAvatarImg').src = data.avatar;
-                    document.getElementById('profileAvatarImg').style.display = 'block';
-                    document.getElementById('profileAvatarText').style.display = 'none';
-                    document.getElementById('headerAvatarImg').src = data.avatar;
-                    document.getElementById('headerAvatarImg').style.display = 'block';
-                    document.getElementById('headerAvatarText').style.display = 'none';
-                    if (data.avatarStatus === 'pending') {
-                        document.getElementById('profileAvatar').classList.add('pending');
-                        document.getElementById('headerAvatar').classList.add('pending');
-                    }
+                const d=(await db.collection('users').doc(currentUser.uid).get()).data();
+                document.getElementById('profileUserId').textContent=currentUser.uid.substr(0,8)+'...';
+                document.getElementById('profileNickname').textContent=d.displayName||'Пользователь';
+                document.getElementById('headerUsername').textContent=(d.displayName||'User').substr(0,12);
+                if(d.avatar) {
+                    document.getElementById('profileAvatarImg').src=d.avatar; document.getElementById('profileAvatarImg').style.display='block'; document.getElementById('profileAvatarText').style.display='none';
+                    document.getElementById('headerAvatarImg').src=d.avatar; document.getElementById('headerAvatarImg').style.display='block'; document.getElementById('headerAvatarText').style.display='none';
+                    if(d.avatarStatus==='pending') { document.getElementById('profileAvatar').classList.add('pending'); document.getElementById('headerAvatar').classList.add('pending'); }
                 }
-                
-                const isPremium = data.premium && (!data.premiumUntil || new Date(data.premiumUntil?.toDate?.() || data.premiumUntil) > new Date());
-                document.getElementById('profilePremiumBadge').classList.toggle('hidden', !isPremium);
-                document.getElementById('headerPremiumBadge').classList.toggle('hidden', !isPremium);
-                
-                if (data.registrationDate?.toDate) {
-                    document.getElementById('profileRegDate').textContent = data.registrationDate.toDate().toLocaleDateString('ru-RU');
-                }
-                loadUserOrders(data.orders || []);
-            } catch (error) {
-                console.error('Error loading profile:', error);
-                showToast('Ошибка загрузки профиля', 'error');
-            }
+                const isPrem=d.premium&&(!d.premiumUntil||new Date(d.premiumUntil?.toDate?.()||d.premiumUntil)>new Date());
+                document.getElementById('profilePremiumBadge').classList.toggle('hidden',!isPrem);
+                document.getElementById('headerPremiumBadge').classList.toggle('hidden',!isPrem);
+                if(d.registrationDate?.toDate) document.getElementById('profileRegDate').textContent=d.registrationDate.toDate().toLocaleDateString('ru-RU');
+                loadUserOrders(d.orders||[]);
+            } catch(e) { console.error(e); showToast('Ошибка профиля','error'); }
         }
-
-        function showProfile() {
-            if (!currentUser) { openAuthModal(); return; }
-            showPage('profile');
-            loadUserProfile();
-        }
+        function showProfile() { if(!currentUser) { openAuthModal(); return; } showPage('profile'); loadUserProfile(); }
 
         async function loadUserOrders(orders) {
-            const container = document.getElementById('ordersList');
-            if (orders.length === 0) { container.innerHTML = '<div class="empty-state">У вас пока нет заказов</div>'; return; }
-            let html = '';
-            for (const orderId of orders) {
+            const c=document.getElementById('ordersList');
+            if(!orders.length) { c.innerHTML='<div class="empty-state">Нет заказов</div>'; return; }
+            let h='';
+            for(const oid of orders) {
                 try {
-                    const orderDoc = await db.collection('orders').doc(orderId).get();
-                    const order = orderDoc.data();
-                    if (!order) continue;
-                    const productDoc = await db.collection('products').doc(order.productId).get();
-                    const product = productDoc.data();
-                    const statusClass = { 'created': 'status-created', 'processing': 'status-processing', 'completed': 'status-completed', 'cancelled': 'status-cancelled' }[order.status] || 'status-created';
-                    const statusText = { 'created': '📝 Создан', 'processing': '⚙️ Выполняется', 'completed': '✅ Завершен', 'cancelled': '❌ Отменен' }[order.status] || order.status;
-                    html += `<div class="order-card" onclick="viewOrderDetails('${orderId}')"><div><strong>${product?.title || 'Товар удален'}</strong><br><small style="color:var(--gray)">Токен: ${orderId.substr(0, 12)}...</small></div><span class="order-status ${statusClass}">${statusText}</span></div>`;
-                    if (order.status === 'completed' && !order.reviewed) {
-                        html += `<button class="btn" style="margin:0.5rem 0;padding:0.5rem 1rem;font-size:0.9rem" onclick="openReviewModal('${orderId}', '${order.productId}')">⭐ Оставить отзыв</button>`;
-                    }
-                } catch (e) { console.error('Error loading order:', e); }
+                    const o=(await db.collection('orders').doc(oid).get()).data(); if(!o) continue;
+                    const p=(await db.collection('products').doc(o.productId).get()).data();
+                    const sc={'created':'status-created','processing':'status-processing','completed':'status-completed','cancelled':'status-cancelled'}[o.status]||'status-created';
+                    const st={'created':'📝 Создан','processing':'⚙️ Выполняется','completed':'✅ Завершен','cancelled':'❌ Отменен'}[o.status]||o.status;
+                    h+=`<div class="order-card" onclick="viewOrder('${oid}')"><div><strong>${p?.title||'Товар'}</strong><br><small>Токен: ${oid.substr(0,12)}...</small></div><span class="order-status ${sc}">${st}</span></div>`;
+                    if(o.status==='completed'&&!o.reviewed) h+=`<button class="btn" style="margin:0.5rem 0;padding:0.5rem 1rem;font-size:0.9rem" onclick="openReviewModal('${oid}','${o.productId}')">⭐ Оставить отзыв</button>`;
+                } catch(e) {}
             }
-            container.innerHTML = html || '<div class="empty-state">Нет данных о заказах</div>';
+            c.innerHTML=h||'<div class="empty-state">Нет данных</div>';
         }
+        function editNickname() { if(!currentUser) return; const n=prompt('Новый ник:',document.getElementById('profileNickname').textContent); if(n&&n.length>=3) { db.collection('users').doc(currentUser.uid).update({displayName:n,nicknameStatus:'pending'}); showToast('Ник на модерации ✏️','success'); document.getElementById('profileNickname').textContent=n+' (на модерации)'; } }
 
-        function editNickname() {
-            if (!currentUser) return;
-            const newNick = prompt('Введите новый никнейм:', document.getElementById('profileNickname').textContent);
-            if (newNick && newNick.length >= 3) {
-                db.collection('users').doc(currentUser.uid).update({ displayName: newNick, nicknameStatus: 'pending' }).then(() => {
-                    showToast('Ник отправлен на модерацию ✏️', 'success');
-                    document.getElementById('profileNickname').textContent = newNick + ' (на модерации)';
-                });
-            }
-        }
-
-        async function handleAvatarChange(event) {
-            if (!currentUser || !event.target.files[0]) return;
-            const file = event.target.files[0];
-            showToast('Загрузка аватарки...', 'success');
+        async function handleAvatarChange(e) {
+            if(!currentUser||!e.target.files[0]) return;
+            const f=e.target.files[0]; showToast('Загрузка...','success');
             try {
-                const formData = new FormData();
-                formData.append('image', file);
-                formData.append('key', IMGBB_API_KEY);
-                const response = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
-                const result = await response.json();
-                if (result.success) {
-                    await db.collection('users').doc(currentUser.uid).update({ avatar: result.data.url, avatarStatus: 'pending' });
-                    document.getElementById('profileAvatarImg').src = result.data.url;
-                    document.getElementById('headerAvatarImg').src = result.data.url;
-                    document.getElementById('profileAvatar').classList.add('pending');
-                    document.getElementById('headerAvatar').classList.add('pending');
-                    showToast('Аватарка отправлена на модерацию 🖼️', 'success');
+                const fd=new FormData(); fd.append('image',f); fd.append('key',IMGBB_API_KEY);
+                const r=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd}).then(x=>x.json());
+                if(r.success) {
+                    await db.collection('users').doc(currentUser.uid).update({avatar:r.data.url,avatarStatus:'pending'});
+                    document.getElementById('profileAvatarImg').src=r.data.url; document.getElementById('headerAvatarImg').src=r.data.url;
+                    document.getElementById('profileAvatar').classList.add('pending'); document.getElementById('headerAvatar').classList.add('pending');
+                    showToast('Аватарка на модерации 🖼️','success');
                 }
-            } catch (error) {
-                console.error('Avatar upload error:', error);
-                showToast('Ошибка загрузки аватарки', 'error');
-            }
+            } catch(err) { console.error(err); showToast('Ошибка загрузки','error'); }
         }
 
-        // ============================================
-        // 🛍️ PRODUCTS & CATALOG - ИСПРАВЛЕНО ДЛЯ ИНДЕКСОВ
-        // ============================================
-        async function loadProducts(category = null) {
-            const grid = document.getElementById('productsGrid');
-            grid.innerHTML = '<div class="loading">Загрузка товаров...</div>';
-            
+        // 🛍️ PRODUCTS (✅ РАБОТАЕТ БЕЗ ИНДЕКСОВ!)
+        async function loadProducts(cat=null) {
+            const g=document.getElementById('productsGrid'); g.innerHTML='<div class="loading">Загрузка...</div>';
             try {
-                // 🔧 ИСПРАВЛЕНИЕ: Сначала фильтруем по статусу, потом по категории (если есть)
-                // Это требует составного индекса: status + category + createdAt
-                let query = db.collection('products').where('status', '==', 'approved');
-                
-                if (category && category !== 'all') {
-                    query = query.where('category', '==', category);
-                }
-                
-                const snapshot = await query.orderBy('createdAt', 'desc').limit(20).get();
-                
-                if (snapshot.empty) { grid.innerHTML = '<div class="empty-state">Товары не найдены</div>'; return; }
-                
-                let html = '';
-                snapshot.forEach(doc => {
-                    const p = doc.data();
-                    const rating = calculateRating(p.reviews || {});
-                    html += `<div class="product-card" onclick="openProduct('${doc.id}')"><div class="product-img">${p.image ? `<img src="${p.image}" alt="${p.title}">` : '📦'}</div><div class="product-info"><div class="product-title">${p.title}</div><div class="product-price">${p.price} ₽</div><div class="product-rating">${renderStars(rating.avg, rating.count)}</div>${p.createdByUser ? `<div class="product-user-badge" onclick="event.stopPropagation();showUserBadge('${p.createdBy}')">👤 От пользователя</div>` : ''}</div></div>`;
+                // 🔧 ПРОСТОЙ ЗАПРОС - только где по статусу, без orderBy (не требует индекса!)
+                const snap=await db.collection('products').where('status','==','approved').get();
+                let prods=[];
+                snap.forEach(doc=>{ 
+                    const p=doc.data(); 
+                    if(cat&&cat!=='all'&&p.category!==cat) return; 
+                    prods.push({id:doc.id,...p}); 
                 });
-                grid.innerHTML = html;
-                
-            } catch (error) {
-                console.error('Error loading products:', error);
-                // 🔧 ПОКАЗАТЬ ПОМОЩЬ ПО ИНДЕКСАМ
-                if (error.code === 'failed-precondition' && error.message.includes('index')) {
+                // 🔧 Сортировка на клиенте по дате
+                prods.sort((a,b)=>{
+                    const da=a.createdAt?.toDate?.()?a.createdAt.toDate().getTime():0;
+                    const db=b.createdAt?.toDate?.()?b.createdAt.toDate().getTime():0;
+                    return db-da;
+                });
+                prods=prods.slice(0,20); // лимит 20
+                if(!prods.length) { g.innerHTML='<div class="empty-state">Товары не найдены</div>'; return; }
+                let h='';
+                prods.forEach(p=>{
+                    const rt=calcRating(p.reviews||{});
+                    h+=`<div class="product-card" onclick="openProduct('${p.id}')"><div class="product-img">${p.image?`<img src="${p.image}" alt="${p.title}">`:'📦'}</div><div class="product-info"><div class="product-title">${p.title}</div><div class="product-price">${p.price} ₽</div><div class="product-rating">${renderStars(rt.avg,rt.count)}</div>${p.createdByUser?`<div class="product-user-badge" onclick="event.stopPropagation();showUserBadge()">👤 От пользователя</div>`:''}</div></div>`;
+                });
+                g.innerHTML=h;
+            } catch(err) {
+                console.error(err);
+                if(err.code==='failed-precondition'&&err.message.includes('index')) {
                     document.getElementById('indexWarning').classList.remove('hidden');
-                    grid.innerHTML = `<div class="empty-state">⚠️ Требуется индекс Firestore<br><small><a href="${error.message.match(/https[^\s]+/)?.[0] || 'https://console.firebase.google.com/project/jopa-2e821/firestore/indexes'}" target="_blank" style="color:var(--primary)">🔗 Создать индекс (кликни сюда)</a></small></div>`;
-                } else {
-                    grid.innerHTML = '<div class="empty-state">Ошибка загрузки товаров</div>';
-                }
+                    g.innerHTML=`<div class="empty-state">⚠️ Требуется индекс <a href="${err.message.match(/https[^\s]+/)?.[0]||'https://console.firebase.google.com/project/jopa-2e821/firestore/indexes'}" target="_blank" style="color:var(--primary)">🔗 Создать</a></div>`;
+                } else g.innerHTML='<div class="empty-state">Ошибка загрузки</div>';
             }
         }
+        function calcRating(r) { const s=[1,2,3,4,5].map(i=>r[i]||0), t=s.reduce((a,b)=>a+b,0); return {avg:t?s.reduce((a,c,i)=>a+c*(i+1),0)/t:0,count:t}; }
+        function renderStars(avg,cnt) { let h='',f=Math.floor(avg); for(let i=1;i<=5;i++) h+=i<=f?'⭐':'☆'; h+=` <small style="color:var(--gray)">(${cnt})</small>`; return h; }
+        function showUserBadge() { showToast('⚠️ Товар от пользователя. Проверяйте перед покупкой!','warning'); }
 
-        function calculateRating(reviews) {
-            const stars = [1,2,3,4,5].map(s => reviews[s] || 0);
-            const total = stars.reduce((a,b) => a+b, 0);
-            const sum = stars.reduce((acc, count, idx) => acc + count * (idx+1), 0);
-            return { avg: total ? sum/total : 0, count: total };
-        }
-
-        function renderStars(avg, count) {
-            const full = Math.floor(avg);
-            let html = '';
-            for (let i = 1; i <= 5; i++) html += i <= full ? '⭐' : '☆';
-            html += `<small style="margin-left:0.3rem;color:var(--gray)">(${count})</small>`;
-            return html;
-        }
-
-        function showUserBadge(userId) { showToast('⚠️ Товар создан пользователем. Проверяйте информацию перед покупкой!', 'warning'); }
-
-        async function openProduct(productId) {
+        async function openProduct(id) {
             try {
-                const doc = await db.collection('products').doc(productId).get();
-                const p = doc.data();
-                if (!p) return;
-                currentProduct = { id: productId, ...p };
-                const rating = calculateRating(p.reviews || {});
-                const container = document.getElementById('productDetail');
-                container.innerHTML = `<div class="product-detail-img">${p.image ? `<img src="${p.image}" alt="${p.title}">` : '📦'}</div><div class="product-detail-info"><h1>${p.title}</h1><div class="product-detail-price">${p.price} ₽</div><div class="product-detail-section"><h3>⭐ Рейтинг</h3><div style="font-size:1.3rem">${renderStars(rating.avg, rating.count)}</div></div><div class="product-detail-section"><h3>📝 Описание</h3><p>${p.description || 'Описание отсутствует'}</p></div>${p.instruction ? `<div class="product-detail-section"><h3>📋 Инструкция</h3><p>${p.instruction}</p></div>` : ''}<div class="product-detail-section"><h3>📁 Категория</h3><p>${getCategoryName(p.category)}</p></div>${p.createdByUser ? `<div class="product-detail-section"><button class="contact-seller-btn" onclick="openSellerChat('${p.createdBy}')">💬 Связаться с продавцом</button></div>` : ''}<button class="btn" onclick="openOrderModal()" style="margin-top:1.5rem">🛒 Купить</button></div>`;
+                const p=(await db.collection('products').doc(id).get()).data(); if(!p) return;
+                currentProduct={id,...p};
+                const rt=calcRating(p.reviews||{});
+                document.getElementById('productDetail').innerHTML=`<div class="product-detail-img">${p.image?`<img src="${p.image}" alt="${p.title}">`:'📦'}</div><div class="product-detail-info"><h1>${p.title}</h1><div class="product-detail-price">${p.price} ₽</div><div class="product-detail-section"><h3>⭐ Рейтинг</h3><div style="font-size:1.3rem">${renderStars(rt.avg,rt.count)}</div></div><div class="product-detail-section"><h3>📝 Описание</h3><p>${p.description||'Нет описания'}</p></div>${p.instruction?`<div class="product-detail-section"><h3>📋 Инструкция</h3><p>${p.instruction}</p></div>`:''}<div class="product-detail-section"><h3>📁 Категория</h3><p>${catName(p.category)}</p></div>${p.createdByUser?`<div class="product-detail-section"><button class="contact-seller-btn" onclick="openSellerChat('${p.createdBy}')">💬 Связаться с продавцом</button></div>`:''}<button class="btn" onclick="openOrderModal()" style="margin-top:1.5rem">🛒 Купить</button></div>`;
                 showPage('product');
-            } catch (error) {
-                console.error('Error opening product:', error);
-                showToast('Ошибка загрузки товара', 'error');
-            }
+            } catch(e) { console.error(e); showToast('Ошибка','error'); }
         }
-
-        function getCategoryName(cat) {
-            const cats = { 'electronics': '🔌 Электроника', 'clothing': '👕 Одежда', 'home': '🏠 Для дома', 'games': '🎮 Игры', 'other': '📦 Другое' };
-            return cats[cat] || cat;
-        }
+        function catName(c) { return {electronics:'🔌 Электроника',clothing:'👕 Одежда',home:'🏠 Для дома',games:'🎮 Игры',other:'📦 Другое'}[c]||c; }
 
         async function loadCategories() {
-            const grid = document.getElementById('categoriesGrid');
-            const categories = [{id: 'all', name: '🔥 Все товары'}, {id: 'electronics', name: '🔌 Электроника'}, {id: 'clothing', name: '👕 Одежда'}, {id: 'home', name: '🏠 Для дома'}, {id: 'games', name: '🎮 Игры'}, {id: 'other', name: '📦 Другое'}];
-            grid.innerHTML = categories.map(c => `<button class="category-btn" onclick="filterByCategory('${c.id}')">${c.name}</button>`).join('');
+            const g=document.getElementById('categoriesGrid'), cats=[{id:'all',n:'🔥 Все товары'},{id:'electronics',n:'🔌 Электроника'},{id:'clothing',n:'👕 Одежда'},{id:'home',n:'🏠 Для дома'},{id:'games',n:'🎮 Игры'},{id:'other',n:'📦 Другое'}];
+            g.innerHTML=cats.map(c=>`<button class="category-btn" onclick="filterCat('${c.id}')">${c.n}</button>`).join('');
         }
+        function filterCat(id) { toggleCatalog(); loadProducts(id==='all'?null:id); showPage('home'); }
 
-        function filterByCategory(catId) {
-            toggleCatalog();
-            loadProducts(catId === 'all' ? null : catId);
-            showPage('home');
-        }
-
-        // ============================================
-        // 🛒 ORDER SYSTEM
-        // ============================================
-        function openOrderModal() {
-            if (!currentUser) { openAuthModal(); return; }
-            if (!currentProduct) return;
-            document.getElementById('orderMinQty').textContent = currentProduct.minQuantity || 1;
-            document.getElementById('orderUnitPrice').textContent = `${currentProduct.price} ₽`;
-            document.getElementById('orderProductInfo').innerHTML = `<strong>${currentProduct.title}</strong><br>Цена: ${currentProduct.price} ₽`;
-            document.getElementById('orderModal').classList.add('active');
-            calculateOrderTotal();
+        // 🛒 ORDERS
+        function openOrderModal() { if(!currentUser){openAuthModal();return;} if(!currentProduct)return;
+            document.getElementById('orderMinQty').textContent=currentProduct.minQuantity||1;
+            document.getElementById('orderUnitPrice').textContent=`${currentProduct.price} ₽`;
+            document.getElementById('orderProductInfo').innerHTML=`<strong>${currentProduct.title}</strong><br>Цена: ${currentProduct.price} ₽`;
+            document.getElementById('orderModal').classList.add('active'); calcOrderTotal();
         }
         function closeOrderModal() { document.getElementById('orderModal').classList.remove('active'); }
-        
-        function calculateOrderTotal() {
-            const qty = parseInt(document.getElementById('orderQty').value) || 1;
-            const min = currentProduct.minQuantity || 1;
-            if (qty < min) { document.getElementById('orderQty').value = min; showToast(`Минимальное количество: ${min}`, 'warning'); return; }
-            const total = qty * currentProduct.price;
-            document.getElementById('orderQtyDisplay').textContent = qty;
-            document.getElementById('orderTotal').textContent = `${total} ₽`;
+        function calcOrderTotal() {
+            const q=parseInt(document.getElementById('orderQty').value)||1, min=currentProduct.minQuantity||1;
+            if(q<min) { document.getElementById('orderQty').value=min; showToast(`Минимум: ${min}`,'warning'); return; }
+            document.getElementById('orderQtyDisplay').textContent=q; document.getElementById('orderTotal').textContent=`${q*currentProduct.price} ₽`;
         }
-
         async function confirmOrder() {
-            if (!currentUser || !currentProduct) return;
-            const qty = parseInt(document.getElementById('orderQty').value);
-            const total = qty * currentProduct.price;
-            const token = 'ORD-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            if(!currentUser||!currentProduct) return;
+            const q=parseInt(document.getElementById('orderQty').value), tot=q*currentProduct.price, tok='ORD-'+Math.random().toString(36).substr(2,6).toUpperCase();
             try {
-                const orderRef = await db.collection('orders').add({
-                    token, userId: currentUser.uid, productId: currentProduct.id,
-                    quantity: qty, total, status: 'created',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(), reviewed: false
-                });
-                await db.collection('users').doc(currentUser.uid).update({ orders: firebase.firestore.FieldValue.arrayUnion(orderRef.id) });
-                closeOrderModal();
-                document.getElementById('orderToken').textContent = token;
-                document.getElementById('orderConfirmModal').classList.add('active');
-                showToast('Заказ оформлен! 🎉', 'success');
-            } catch (error) {
-                console.error('Order error:', error);
-                showToast('Ошибка оформления заказа', 'error');
-            }
+                const ref=await db.collection('orders').add({token:tok,userId:currentUser.uid,productId:currentProduct.id,quantity:q,total:tot,status:'created',createdAt:firebase.firestore.FieldValue.serverTimestamp(),reviewed:false});
+                await db.collection('users').doc(currentUser.uid).update({orders:firebase.firestore.FieldValue.arrayUnion(ref.id)});
+                closeOrderModal(); document.getElementById('orderToken').textContent=tok; document.getElementById('orderConfirmModal').classList.add('active'); showToast('Заказ оформлен! 🎉','success');
+            } catch(e) { console.error(e); showToast('Ошибка заказа','error'); }
         }
         function closeOrderConfirmModal() { document.getElementById('orderConfirmModal').classList.remove('active'); showPage('profile'); }
-        function viewOrderDetails(orderId) { showToast(`Заказ ${orderId.substr(0,12)}...`, 'success'); }
+        function viewOrder(oid) { showToast(`Заказ: ${oid}`,'success'); }
 
-        // ============================================
-        // 💬 CHAT & SUPPORT
-        // ============================================
-        function openSupportChat() { document.getElementById('supportChatModal').classList.add('active'); loadSupportMessages(); }
+        // 💬 CHAT
+        function openSupportChat() { document.getElementById('supportChatModal').classList.add('active'); }
         function closeSupportChat() { document.getElementById('supportChatModal').classList.remove('active'); }
-        async function loadSupportMessages() { /* Загрузка из Firestore */ }
-        
         async function sendSupportMessage() {
-            const input = document.getElementById('supportInput');
-            const text = input.value.trim();
-            if (!text || !currentUser) return;
-            const container = document.getElementById('supportMessages');
-            container.insertAdjacentHTML('beforeend', `<div class="message sent">${escapeHtml(text)}<span class="message-meta">${currentUser.displayName || 'Вы'} • ${new Date().toLocaleTimeString('ru-RU')}</span></div>`);
-            container.scrollTop = container.scrollHeight;
-            input.value = '';
-            try {
-                await db.collection('supportMessages').add({
-                    userId: currentUser.uid, userNick: currentUser.displayName, text,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(), isSupport: false
-                });
-            } catch (e) { console.error('Save message error:', e); }
-            setTimeout(() => {
-                container.insertAdjacentHTML('beforeend', `<div class="message received">Спасибо за обращение! Наш оператор ответит в ближайшее время. 🤝<br><small>Ваш токен: <strong>${'SUP-' + Math.random().toString(36).substr(2,6).toUpperCase()}</strong></small><span class="message-meta">Поддержка • Сейчас</span></div>`);
-                container.scrollTop = container.scrollHeight;
-            }, 1000);
+            const i=document.getElementById('supportInput'), t=i.value.trim();
+            if(!t||!currentUser) return;
+            const c=document.getElementById('supportMessages');
+            c.insertAdjacentHTML('beforeend',`<div class="message sent">${escapeHtml(t)}<span class="message-meta">${currentUser.displayName||'Вы'} • ${new Date().toLocaleTimeString('ru-RU')}</span></div>`);
+            c.scrollTop=c.scrollHeight; i.value='';
+            try { await db.collection('supportMessages').add({userId:currentUser.uid,userNick:currentUser.displayName,text:t,timestamp:firebase.firestore.FieldValue.serverTimestamp(),isSupport:false}); } catch(e){}
+            setTimeout(()=>{ c.insertAdjacentHTML('beforeend',`<div class="message received">Спасибо! Оператор ответит скоро 🤝<br><small>Токен: <strong>${'SUP-'+Math.random().toString(36).substr(2,6).toUpperCase()}</strong></small><span class="message-meta">Поддержка • Сейчас</span></div>`); c.scrollTop=c.scrollHeight; },800);
         }
+        function openSellerChat(sid) { if(!currentUser){openAuthModal();return;} showToast('Чат с продавцом...','success'); }
+        function openChatsPage() { if(!currentUser){openAuthModal();return;} showPage('chats'); }
 
-        function openSellerChat(sellerId) { if (!currentUser) { openAuthModal(); return; } showToast(`Открытие чата с продавцом...`, 'success'); }
-        function openChatsPage() { if (!currentUser) { openAuthModal(); return; } showPage('chats'); }
-
-        // ============================================
-        // ✨ PREMIUM & PRODUCT SUGGESTION
-        // ============================================
+        // ✨ PREMIUM
         function checkPremiumAndSuggest() {
-            if (!currentUser) { openAuthModal(); return; }
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
-                const data = doc.data();
-                const isPremium = data.premium && (!data.premiumUntil || new Date(data.premiumUntil?.toDate?.() || data.premiumUntil) > new Date());
-                if (isPremium) { openSuggestModal(); } else { document.getElementById('premiumModal').classList.add('active'); }
+            if(!currentUser){openAuthModal();return;}
+            db.collection('users').doc(currentUser.uid).get().then(d=>{
+                const data=d.data(), isP=data.premium&&(!data.premiumUntil||new Date(data.premiumUntil?.toDate?.()||data.premiumUntil)>new Date());
+                if(isP) openSuggestModal(); else document.getElementById('premiumModal').classList.add('active');
             });
         }
-
         function contactForPremium() {
-            document.getElementById('premiumModal').classList.remove('active');
-            openSupportChat();
-            setTimeout(() => {
-                const container = document.getElementById('supportMessages');
-                container.insertAdjacentHTML('beforeend', `<div class="message received">💎 <strong>Для покупки Premium свяжитесь с администратором в телеграм:</strong><br><a href="https://t.me/fueum" target="_blank" style="color:var(--primary);text-decoration:none">@fueum</a><br><br>После оплаты премиум будет активирован автоматически! ✨<span class="message-meta">Поддержка • Сейчас</span></div>`);
-                container.scrollTop = container.scrollHeight;
-            }, 500);
+            document.getElementById('premiumModal').classList.remove('active'); openSupportChat();
+            setTimeout(()=>{ const c=document.getElementById('supportMessages'); c.insertAdjacentHTML('beforeend',`<div class="message received">💎 <strong>Для покупки Premium:</strong><br><a href="https://t.me/fueum" target="_blank" style="color:var(--primary)">@fueum</a><br><small>После оплаты премиум активируется автоматически ✨</small><span class="message-meta">Поддержка • Сейчас</span></div>`); c.scrollTop=c.scrollHeight; },400);
         }
 
-        function openSuggestModal() {
-            suggestStep = 1;
-            document.getElementById('suggestStep1').classList.remove('hidden');
-            document.getElementById('suggestStep2').classList.add('hidden');
-            document.getElementById('suggestStep3').classList.add('hidden');
-            document.getElementById('suggestModal').classList.add('active');
-        }
+        // 📦 SUGGEST PRODUCT
+        function openSuggestModal() { suggestStep=1; document.getElementById('suggestStep1').classList.remove('hidden'); [2,3].forEach(n=>document.getElementById('suggestStep'+n).classList.add('hidden')); document.getElementById('suggestModal').classList.add('active'); }
         function closeSuggestModal() { document.getElementById('suggestModal').classList.remove('active'); }
-        function nextSuggestStep(step) {
-            [1,2,3].forEach(n => document.getElementById('suggestStep'+n).classList.add('hidden'));
-            document.getElementById('suggestStep'+step).classList.remove('hidden');
-            suggestStep = step;
-        }
-
+        function nextSuggestStep(s) { [1,2,3].forEach(n=>document.getElementById('suggestStep'+n).classList.add('hidden')); document.getElementById('suggestStep'+s).classList.remove('hidden'); suggestStep=s; }
         async function submitProductSuggestion() {
-            if (!currentUser) return;
-            const name = document.getElementById('suggestName').value.trim();
-            const category = document.getElementById('suggestCategory').value;
-            const price = parseFloat(document.getElementById('suggestPrice').value);
-            const description = document.getElementById('suggestDescription').value.trim();
-            if (!name || !category || !price || !description) { showToast('Заполните все обязательные поля', 'warning'); return; }
-            showToast('Отправка на модерацию...', 'success');
+            if(!currentUser) return;
+            const nm=document.getElementById('suggestName').value.trim(), cat=document.getElementById('suggestCategory').value, pr=parseFloat(document.getElementById('suggestPrice').value), desc=document.getElementById('suggestDescription').value.trim();
+            if(!nm||!cat||!pr||!desc) { showToast('Заполните все поля *','warning'); return; }
+            showToast('Отправка...','success');
             try {
-                let imageUrl = null;
-                const imageInput = document.getElementById('suggestImages');
-                if (imageInput.files[0]) {
-                    const formData = new FormData();
-                    formData.append('image', imageInput.files[0]);
-                    formData.append('key', IMGBB_API_KEY);
-                    const response = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
-                    const result = await response.json();
-                    if (result.success) imageUrl = result.data.url;
-                }
-                await db.collection('productSuggestions').add({
-                    title: name, category, price, description,
-                    instruction: document.getElementById('suggestInstruction').value.trim(),
-                    image: imageUrl, createdBy: currentUser.uid,
-                    creatorNick: currentUser.displayName, status: 'pending',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                await db.collection('users').doc(currentUser.uid).update({ suggestedProducts: firebase.firestore.FieldValue.arrayUnion('pending') });
-                closeSuggestModal();
-                showToast('Товар отправлен на модерацию! ✅', 'success');
-            } catch (error) {
-                console.error('Suggestion error:', error);
-                showToast('Ошибка отправки', 'error');
-            }
+                let img=null; const fi=document.getElementById('suggestImages');
+                if(fi.files[0]) { const fd=new FormData(); fd.append('image',fi.files[0]); fd.append('key',IMGBB_API_KEY); const r=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd}).then(x=>x.json()); if(r.success) img=r.data.url; }
+                await db.collection('productSuggestions').add({title:nm,category:cat,price:pr,description:desc,instruction:document.getElementById('suggestInstruction').value.trim(),image:img,createdBy:currentUser.uid,creatorNick:currentUser.displayName,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+                await db.collection('users').doc(currentUser.uid).update({suggestedProducts:firebase.firestore.FieldValue.arrayUnion('pending')});
+                closeSuggestModal(); showToast('Отправлено на модерацию! ✅','success');
+            } catch(e) { console.error(e); showToast('Ошибка','error'); }
         }
 
-        // ============================================
-        // ⭐ REVIEWS SYSTEM
-        // ============================================
-        function setupReviewStars() {
-            document.querySelectorAll('#reviewStars .star').forEach(star => {
-                star.addEventListener('click', function() {
-                    reviewRating = parseInt(this.dataset.value);
-                    document.querySelectorAll('#reviewStars .star').forEach((s, i) => {
-                        s.textContent = i < reviewRating ? '★' : '☆';
-                        s.classList.toggle('filled', i < reviewRating);
-                    });
-                });
-            });
-        }
+        // ⭐ REVIEWS
+        function setupReviewStars() { document.querySelectorAll('#reviewStars .star').forEach(st=>st.addEventListener('click',function(){ reviewRating=parseInt(this.dataset.value); document.querySelectorAll('#reviewStars .star').forEach((s,i)=>{s.textContent=i<reviewRating?'★':'☆';s.classList.toggle('filled',i<reviewRating);}); })); }
+        function openReviewModal(oid,pid) { if(!currentUser) return; document.getElementById('reviewProductName').textContent='Загрузка...'; document.getElementById('reviewModal').classList.add('active'); db.collection('products').doc(pid).get().then(d=>{if(d.exists)document.getElementById('reviewProductName').textContent=d.data().title;}); }
+        function closeReviewModal() { document.getElementById('reviewModal').classList.remove('active'); reviewRating=0; document.getElementById('reviewText').value=''; document.querySelectorAll('#reviewStars .star').forEach(s=>{s.textContent='☆';s.classList.remove('filled');}); }
+        async function submitReview() { if(!currentUser||reviewRating===0){showToast('Выберите оценку','warning');return;} const t=document.getElementById('reviewText').value.trim(); if(!t){showToast('Напишите отзыв','warning');return;} showToast('Отправка...','success'); try{await db.collection('reviews').add({userId:currentUser.uid,userName:currentUser.displayName,rating:reviewRating,text:t,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()}); closeReviewModal(); showToast('Отзыв отправлен! ⭐','success');}catch(e){console.error(e);showToast('Ошибка','error');}}
 
-        function openReviewModal(orderId, productId) {
-            if (!currentUser) return;
-            document.getElementById('reviewProductName').textContent = 'Загрузка...';
-            document.getElementById('reviewModal').classList.add('active');
-            db.collection('products').doc(productId).get().then(doc => {
-                if (doc.exists) document.getElementById('reviewProductName').textContent = doc.data().title;
-            });
-        }
-        function closeReviewModal() {
-            document.getElementById('reviewModal').classList.remove('active');
-            reviewRating = 0;
-            document.getElementById('reviewText').value = '';
-            document.querySelectorAll('#reviewStars .star').forEach(s => { s.textContent = '☆'; s.classList.remove('filled'); });
-        }
-
-        async function submitReview() {
-            if (!currentUser || reviewRating === 0) { showToast('Выберите оценку', 'warning'); return; }
-            const text = document.getElementById('reviewText').value.trim();
-            if (!text) { showToast('Напишите подробности отзыва', 'warning'); return; }
-            showToast('Отправка отзыва на модерацию...', 'success');
-            try {
-                await db.collection('reviews').add({
-                    userId: currentUser.uid, userName: currentUser.displayName,
-                    rating: reviewRating, text, status: 'pending',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                closeReviewModal();
-                showToast('Отзыв отправлен! После одобрения он появится на странице товара ⭐', 'success');
-            } catch (error) {
-                console.error('Review error:', error);
-                showToast('Ошибка отправки отзыва', 'error');
-            }
-        }
-
-        // ============================================
-        // ⚙️ ADMIN MODERATION PANEL
-        // ============================================
-        function showModeration() {
-            if (!currentUser || currentUser.email !== 'sobakastalina123@gmail.com') { showToast('Доступ только для администратора', 'error'); return; }
-            showPage('moderation');
-            loadModerationData();
-        }
-
-        function switchModTab(tab) {
-            document.querySelectorAll('.mod-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.moderation-section').forEach(s => s.classList.add('hidden'));
-            event.target.classList.add('active');
-            document.getElementById('mod' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
-        }
+        // ⚙️ ADMIN MODERATION
+        function showModeration() { if(!currentUser||currentUser.email!=='sobakastalina123@gmail.com'){showToast('Только админ','error');return;} showPage('moderation'); loadModerationData(); }
+        function switchModTab(t) { document.querySelectorAll('.mod-tab').forEach(x=>x.classList.remove('active')); document.querySelectorAll('.moderation-section').forEach(x=>x.classList.add('hidden')); event.target.classList.add('active'); document.getElementById('mod'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden'); }
 
         async function loadModerationData() {
-            const suggestionsRef = db.collection('productSuggestions').where('status', '==', 'pending');
-            const snapshot = await suggestionsRef.get();
-            const list = document.getElementById('modProductsList');
-            if (snapshot.empty) { list.innerHTML = '<div class="empty-state">Нет заявок на модерацию</div>'; return; }
-            let html = '';
-            snapshot.forEach(doc => {
-                const s = doc.data();
-                html += `<div class="moderation-item"><strong>📦 ${s.title}</strong><br><small>Категория: ${getCategoryName(s.category)} | Цена: ${s.price} ₽</small><br><small>От: ${s.creatorNick} (ID: ${s.createdBy?.substr?.(0,8) || '???'}...)</small><br><p style="margin:0.5rem 0">${s.description}</p>${s.image ? `<img src="${s.image}" style="max-width:200px;border-radius:8px">` : ''}<div class="moderation-actions"><button class="btn btn-approve" onclick="approveProduct('${doc.id}')">✅ Одобрить</button><button class="btn btn-reject" onclick="rejectProduct('${doc.id}')">❌ Отклонить</button></div></div>`;
-            });
-            list.innerHTML = html;
+            const snap=await db.collection('productSuggestions').where('status','==','pending').get();
+            const l=document.getElementById('modProductsList');
+            if(snap.empty){l.innerHTML='<div class="empty-state">Нет заявок</div>';return;}
+            let h=''; snap.forEach(doc=>{const s=doc.data(); h+=`<div class="moderation-item"><strong>📦 ${s.title}</strong><br><small>Категория: ${catName(s.category)} | ${s.price} ₽</small><br><small>От: ${s.creatorNick}</small><p style="margin:0.5rem 0">${s.description}</p>${s.image?`<img src="${s.image}" style="max-width:200px;border-radius:8px">`:''}<div class="moderation-actions"><button class="btn btn-approve" onclick="approveProduct('${doc.id}')">✅ Одобрить</button><button class="btn btn-reject" onclick="rejectProduct('${doc.id}')">❌ Отклонить</button></div></div>`;});
+            l.innerHTML=h;
         }
-
-        async function approveProduct(suggestionId) {
-            try {
-                const doc = await db.collection('productSuggestions').doc(suggestionId).get();
-                const s = doc.data();
-                await db.collection('products').add({
-                    title: s.title, category: s.category, price: s.price,
-                    description: s.description, instruction: s.instruction,
-                    image: s.image, createdBy: s.createdBy, creatorNick: s.creatorNick,
-                    createdByUser: true, status: 'approved', minQuantity: 1,
-                    reviews: {}, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                await db.collection('productSuggestions').doc(suggestionId).update({ status: 'approved' });
-                showToast('Товар одобрен и опубликован! 🎉', 'success');
-                loadModerationData();
-            } catch (e) { console.error('Approve error:', e); showToast('Ошибка одобрения', 'error'); }
-        }
-
-        async function rejectProduct(suggestionId) {
-            await db.collection('productSuggestions').doc(suggestionId).update({ status: 'rejected' });
-            showToast('Заявка отклонена', 'success');
-            loadModerationData();
-        }
+        async function approveProduct(sid) { try{const s=(await db.collection('productSuggestions').doc(sid).get()).data(); await db.collection('products').add({title:s.title,category:s.category,price:s.price,description:s.description,instruction:s.instruction,image:s.image,createdBy:s.createdBy,creatorNick:s.creatorNick,createdByUser:true,status:'approved',minQuantity:1,reviews:{},createdAt:firebase.firestore.FieldValue.serverTimestamp()}); await db.collection('productSuggestions').doc(sid).update({status:'approved'}); showToast('Одобрено! 🎉','success'); loadModerationData();}catch(e){showToast('Ошибка','error');}}
+        async function rejectProduct(sid) { await db.collection('productSuggestions').doc(sid).update({status:'rejected'}); showToast('Отклонено','success'); loadModerationData(); }
 
         async function togglePremium(grant) {
-            const userId = document.getElementById('modPremiumUserId').value.trim();
-            const days = parseInt(document.getElementById('modPremiumDays').value) || 0;
-            if (!userId) { showToast('Введите ID пользователя', 'warning'); return; }
-            try {
-                const updateData = {
-                    premium: grant,
-                    premiumUntil: grant && days > 0 ? firebase.firestore.Timestamp.fromDate(new Date(Date.now() + days * 24 * 60 * 60 * 1000)) : null
-                };
-                await db.collection('users').doc(userId).update(updateData);
-                showToast(`Premium ${grant ? 'выдан' : 'забран'} ✅`, 'success');
-            } catch (e) { console.error('Premium toggle error:', e); showToast('Пользователь не найден', 'error'); }
+            const uid=document.getElementById('modPremiumUserId').value.trim(), days=parseInt(document.getElementById('modPremiumDays').value)||0;
+            if(!uid){showToast('Введите ID','warning');return;}
+            try { await db.collection('users').doc(uid).update({premium:grant,premiumUntil:grant&&days>0?firebase.firestore.Timestamp.fromDate(new Date(Date.now()+days*864e5)):null}); showToast(`Premium ${grant?'выдан':'забран'} ✅`,'success'); } catch(e){ showToast('Пользователь не найден','error'); }
         }
 
         async function createAdminProduct() {
-            const title = document.getElementById('adminProductName').value.trim();
-            const category = document.getElementById('adminProductCategory').value;
-            const price = parseFloat(document.getElementById('adminProductPrice').value);
-            const description = document.getElementById('adminProductDescription').value.trim();
-            if (!title || !category || !price || !description) { showToast('Заполните обязательные поля', 'warning'); return; }
-            showToast('Публикация товара...', 'success');
+            const t=document.getElementById('adminProductName').value.trim(), c=document.getElementById('adminProductCategory').value, p=parseFloat(document.getElementById('adminProductPrice').value), d=document.getElementById('adminProductDescription').value.trim();
+            if(!t||!c||!p||!d){showToast('Заполните * поля','warning');return;}
+            showToast('Публикация...','success');
             try {
-                let imageUrl = null;
-                const imageInput = document.getElementById('adminProductImage');
-                if (imageInput.files[0]) {
-                    const formData = new FormData();
-                    formData.append('image', imageInput.files[0]);
-                    formData.append('key', IMGBB_API_KEY);
-                    const response = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
-                    const result = await response.json();
-                    if (result.success) imageUrl = result.data.url;
-                }
-                await db.collection('products').add({
-                    title, category, price, description,
-                    instruction: document.getElementById('adminProductInstruction').value.trim(),
-                    image: imageUrl, createdBy: 'admin', creatorNick: 'Администратор',
-                    createdByUser: false, status: 'approved',
-                    minQuantity: parseInt(document.getElementById('adminProductMinQty').value) || 1,
-                    reviews: {}, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                showToast('Товар опубликован! 🚀', 'success');
-                document.getElementById('adminProductName').value = '';
-                document.getElementById('adminProductDescription').value = '';
-            } catch (e) { console.error('Create product error:', e); showToast('Ошибка публикации', 'error'); }
+                let img=null; const fi=document.getElementById('adminProductImage');
+                if(fi.files[0]){const fd=new FormData();fd.append('image',fi.files[0]);fd.append('key',IMGBB_API_KEY);const r=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd}).then(x=>x.json());if(r.success)img=r.data.url;}
+                await db.collection('products').add({title:t,category:c,price:p,description:d,instruction:document.getElementById('adminProductInstruction').value.trim(),image:img,createdBy:'admin',creatorNick:'Администратор',createdByUser:false,status:'approved',minQuantity:parseInt(document.getElementById('adminProductMinQty').value)||1,reviews:{},createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+                showToast('Опубликовано! 🚀','success'); document.getElementById('adminProductName').value=''; document.getElementById('adminProductDescription').value='';
+            } catch(e){ showToast('Ошибка','error'); }
         }
 
         async function updateOrderStatus() {
-            const token = document.getElementById('modOrderToken').value.trim();
-            const status = document.getElementById('modOrderStatus').value;
-            const comment = document.getElementById('modOrderComment').value.trim();
-            if (!token) { showToast('Введите токен заказа', 'warning'); return; }
-            try {
-                const query = await db.collection('orders').where('token', '==', token).limit(1).get();
-                if (query.empty) { showToast('Заказ не найден', 'error'); return; }
-                const orderRef = query.docs[0].ref;
-                await orderRef.update({ status, statusComment: comment, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-                showToast('Статус заказа обновлен! ✅', 'success');
-            } catch (e) { console.error('Update order error:', e); showToast('Ошибка обновления', 'error'); }
+            const tok=document.getElementById('modOrderToken').value.trim(), st=document.getElementById('modOrderStatus').value, cm=document.getElementById('modOrderComment').value.trim();
+            if(!tok){showToast('Введите токен','warning');return;}
+            try { const q=await db.collection('orders').where('token','==',tok).limit(1).get(); if(q.empty){showToast('Не найден','error');return;} await q.docs[0].ref.update({status:st,statusComment:cm,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}); showToast('Обновлено! ✅','success'); } catch(e){ showToast('Ошибка','error'); }
         }
 
-        // ============================================
-        // 🧰 UTILITIES
-        // ============================================
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
-        }
-        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-        
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active')); });
-        document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); }); });
+        // 🧰 UTILS
+        function showToast(msg, type='info') { const c=document.getElementById('toastContainer'), t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg; c.appendChild(t); setTimeout(()=>{t.style.animation='slideIn 0.3s ease reverse'; setTimeout(()=>t.remove(),300);},3000); }
+        function escapeHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+        document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active'));});
+        document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('active');});});
     </script>
 </body>
 </html>
