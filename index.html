@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudLu Shop</title>
-    <link rel="icon" href="image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+    
+    <!-- Firebase SDK v9 compat -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
         :root{--primary:#4361ee;--secondary:#3f37c9;--success:#4cc9f0;--warning:#f72585;--dark:#1e293b;--light:#f8f9fa;--gray:#64748b;--card-shadow:0 4px 6px -1px rgba(0,0,0,0.1);--border-radius:12px}
@@ -301,343 +304,960 @@
     </div>
     <div id="toastContainer"></div>
     <script>
-        const firebaseConfig={apiKey:"AIzaSyChKHSF7LqqDYJp5MokCbCMn9gdoSDdXgA",authDomain:"jopa-2e821.firebaseapp.com",databaseURL:"https://jopa-2e821-default-rtdb.firebaseio.com",projectId:"jopa-2e821",storageBucket:"jopa-2e821.firebasestorage.app",messagingSenderId:"468429851250",appId:"1:468429851250:web:e0e7f7e7eeff0643bb90eb"};
-        firebase.initializeApp(firebaseConfig);
-        const auth=firebase.auth(),db=firebase.firestore(),storage=firebase.storage();
-        const IMGBB_API_KEY="d3e0d626da4b69b9cadd392fe36efeac";
-        let currentUser=null,currentProduct=null,reviewRating=0,suggestStep=1,catalogOpen=false;
+        // 🔥 FIREBASE CONFIG - ИСПРАВЛЕНО
+        const firebaseConfig = {
+            apiKey: "AIzaSyChKHSF7LqqDYJp5MokCbCMn9gdoSDdXgA",
+            authDomain: "jopa-2e821.firebaseapp.com",
+            projectId: "jopa-2e821",
+            storageBucket: "jopa-2e821.appspot.com",
+            messagingSenderId: "468429851250",
+            appId: "1:468429851250:web:e0e7f7e7eeff0643bb90eb"
+        };
 
-        // 🔧 ИНИЦИАЛИЗАЦИЯ - ВАЖНЫЙ ПОРЯДОК
-        document.addEventListener('DOMContentLoaded',function(){
-            // 1. Сначала проверяем, не вернулся ли пользователь после редиректа
-            auth.getRedirectResult().then(function(result){
-                if(result&&result.user){handleGoogleAuth(result.user,true);}
-            }).catch(function(error){console.error('Redirect error:',error);});
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
+        // 🖼️ ImgBB API Key
+        const IMGBB_API_KEY = "d3e0d626da4b69b9cadd392fe36efeac";
+
+        // 🌍 GLOBAL STATE
+        let currentUser = null;
+        let currentProduct = null;
+        let reviewRating = 0;
+        let suggestStep = 1;
+        let catalogOpen = false;
+
+        // 🚀 INIT - ИСПРАВЛЕН ПОРЯДОК
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔥 Initializing Firebase...');
             
-            // 2. Вешаем слушатель на изменения авторизации
-            auth.onAuthStateChanged(function(user){
-                if(user){
-                    currentUser=user;
-                    // 🔧 СРАЗУ обновляем UI при входе
-                    document.getElementById('loginBtn').style.display='none';
-                    document.getElementById('logoutBtn').style.display='flex';
-                    document.getElementById('userInfo').style.display='flex';
-                    if(user.email==='sobakastalina123@gmail.com'){document.getElementById('moderationBtn').style.display='flex';}
-                    loadUserProfile();
-                }else{
-                    currentUser=null;
-                    document.getElementById('loginBtn').style.display='flex';
-                    document.getElementById('logoutBtn').style.display='none';
-                    document.getElementById('userInfo').style.display='none';
-                    document.getElementById('moderationBtn').style.display='none';
+            // 1. Сначала проверяем redirect result
+            auth.getRedirectResult().then(function(result) {
+                if (result && result.user) {
+                    console.log('✅ Redirect result:', result.user.email);
+                    handleGoogleAuth(result.user, true);
                 }
+            }).catch(function(error) {
+                console.error('❌ Redirect error:', error);
+                showToast('Ошибка авторизации: ' + error.message, 'error');
+            });
+
+            // 2. Вешаем listener на изменения auth
+            auth.onAuthStateChanged(function(user) {
+                console.log('👤 Auth state changed:', user ? user.email : 'null');
+                
+                if (user) {
+                    currentUser = user;
+                    // 🔧 СРАЗУ обновляем UI
+                    document.getElementById('loginBtn').style.display = 'none';
+                    document.getElementById('logoutBtn').style.display = 'flex';
+                    document.getElementById('userInfo').style.display = 'flex';
+                    
+                    if (user.email === 'sobakastalina123@gmail.com') {
+                        document.getElementById('moderationBtn').style.display = 'flex';
+                    }
+                    
+                    loadUserProfile();
+                    showToast('Добро пожаловать! 👋', 'success');
+                } else {
+                    currentUser = null;
+                    document.getElementById('loginBtn').style.display = 'flex';
+                    document.getElementById('logoutBtn').style.display = 'none';
+                    document.getElementById('userInfo').style.display = 'none';
+                    document.getElementById('moderationBtn').style.display = 'none';
+                }
+                
                 loadProducts();
                 loadCategories();
             });
+            
             setupReviewStars();
         });
 
-        function showPage(id){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});document.getElementById(id+'Page').classList.add('active');document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});var ab=document.querySelector('.nav-btn[data-page="'+id+'"]');if(ab)ab.classList.add('active');if(catalogOpen)toggleCatalog();}
-        function toggleCatalog(){var m=document.getElementById('catalogModal');catalogOpen=!catalogOpen;m.classList.toggle('active',catalogOpen);}
-        function openAuthModal(){document.getElementById('authModal').classList.add('active');}
-        function closeAuthModal(){document.getElementById('authModal').classList.remove('active');}
-        function switchAuthTab(tab){document.querySelectorAll('.auth-tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.auth-form').forEach(function(f){f.classList.remove('active');});event.target.classList.add('active');document.getElementById(tab+'Form').classList.add('active');}
+        // 📄 NAVIGATION
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+            document.getElementById(id + 'Page').classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+            var ab = document.querySelector('.nav-btn[data-page="' + id + '"]');
+            if (ab) ab.classList.add('active');
+            if (catalogOpen) toggleCatalog();
+        }
+        
+        function toggleCatalog() {
+            var m = document.getElementById('catalogModal');
+            catalogOpen = !catalogOpen;
+            m.classList.toggle('active', catalogOpen);
+        }
+        
+        function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
+        
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.auth-form').forEach(function(f) { f.classList.remove('active'); });
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Form').classList.add('active');
+        }
 
         // 🔵 GOOGLE SIGN-IN - ИСПРАВЛЕНО
-        function signInWithGoogle(){
-            var provider=new firebase.auth.GoogleAuthProvider();
-            provider.setCustomParameters({prompt:'select_account'});
+        function signInWithGoogle() {
+            console.log('🔵 Starting Google sign-in...');
+            var provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            
             // Для GitHub Pages ТОЛЬКО redirect
-            if(location.hostname.includes('github.io')||location.protocol==='https:'){
-                auth.signInWithRedirect(provider).then(function(){showToast('Перенаправление...','success');}).catch(function(e){console.error(e);showToast('Ошибка: '+e.message,'error');});
-            }else{
-                auth.signInWithPopup(provider).then(function(result){handleGoogleAuth(result.user,true);}).catch(function(e){console.error(e);showToast('Ошибка: '+e.message,'error');});
+            if (location.hostname.includes('github.io') || location.protocol === 'https:') {
+                console.log('🔄 Using redirect for GitHub Pages...');
+                auth.signInWithRedirect(provider).catch(function(e) {
+                    console.error('❌ Redirect error:', e);
+                    showToast('Ошибка: ' + e.message, 'error');
+                });
+            } else {
+                console.log('🪟 Using popup for localhost...');
+                auth.signInWithPopup(provider).then(function(result) {
+                    console.log('✅ Popup success:', result.user.email);
+                    handleGoogleAuth(result.user, true);
+                }).catch(function(e) {
+                    console.error('❌ Popup error:', e);
+                    showToast('Ошибка: ' + e.message, 'error');
+                });
             }
         }
 
         // 🔧 ОБРАБОТКА ВХОДА - ИСПРАВЛЕНО
-        function handleGoogleAuth(user,isNewPossible){
-            db.collection('users').doc(user.uid).get().then(function(doc){
-                if(!doc.exists&&isNewPossible){
-                    var nick='user_'+Math.random().toString(36).substr(2,8),pass=generatePassword();
-                    db.collection('users').doc(user.uid).set({uid:user.uid,email:user.email,displayName:nick,password:pass,avatar:user.photoURL||null,avatarStatus:'approved',nicknameStatus:'approved',premium:false,premiumUntil:null,registrationDate:firebase.firestore.FieldValue.serverTimestamp(),orders:[],suggestedProducts:[]}).then(function(){
-                        document.getElementById('genUsername').textContent=nick;
-                        document.getElementById('genPassword').textContent=pass;
+        function handleGoogleAuth(user, isNewPossible) {
+            console.log('📝 Handling Google auth for:', user.email);
+            
+            db.collection('users').doc(user.uid).get().then(function(doc) {
+                if (!doc.exists && isNewPossible) {
+                    // 🔹 НОВЫЙ пользователь
+                    var nick = 'user_' + Math.random().toString(36).substr(2, 8);
+                    var pass = generatePassword();
+                    
+                    console.log('💾 Creating new user:', nick);
+                    
+                    db.collection('users').doc(user.uid).set({
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: nick,
+                        password: pass,
+                        avatar: user.photoURL || null,
+                        avatarStatus: 'approved',
+                        nicknameStatus: 'approved',
+                        premium: false,
+                        premiumUntil: null,
+                        registrationDate: firebase.firestore.FieldValue.serverTimestamp(),
+                        orders: [],
+                        suggestedProducts: []
+                    }).then(function() {
+                        console.log('✅ User saved to Firestore');
+                        document.getElementById('genUsername').textContent = nick;
+                        document.getElementById('genPassword').textContent = pass;
                         closeAuthModal();
                         document.getElementById('credentialsModal').classList.add('active');
-                        showToast('Регистрация успешна! 🎉','success');
-                    }).catch(function(e){console.error('Save user error:',e);showToast('Ошибка сохранения: '+e.message,'error');});
-                }else{
+                        showToast('Регистрация успешна! 🎉', 'success');
+                    }).catch(function(e) {
+                        console.error('❌ Save error:', e);
+                        showToast('Ошибка сохранения: ' + e.message, 'error');
+                    });
+                } else {
+                    // 🔹 СУЩЕСТВУЮЩИЙ пользователь
+                    console.log('✅ Existing user logged in');
                     closeAuthModal();
-                    showToast('Добро пожаловать! 👋','success');
+                    showToast('Добро пожаловать! 👋', 'success');
+                    // Обновляем профиль
+                    if (currentUser) loadUserProfile();
                 }
-            }).catch(function(e){console.error('Get user error:',e);showToast('Ошибка: '+e.message,'error');});
-        }
-
-        function generatePassword(){var c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*',p='';for(var i=0;i<8;i++)p+=c.charAt(Math.floor(Math.random()*c.length));return p;}
-        function closeCredentialsModal(){document.getElementById('credentialsModal').classList.remove('active');if(currentUser)loadUserProfile();}
-
-        function loginWithEmail(){
-            var e=document.getElementById('loginEmail').value,p=document.getElementById('loginPassword').value;
-            if(!e||!p){showToast('Заполните поля','warning');return;}
-            auth.signInWithEmailAndPassword(e,p).then(function(){showToast('Вход выполнен! 🎉','success');closeAuthModal();}).catch(function(err){
-                db.collection('users').where('email','==',e).get().then(function(q){
-                    if(q.empty||q.docs[0].data().password!==p){showToast('Неверные данные','error');return;}
-                    showToast('Вход выполнен! 🎉','success');closeAuthModal();
-                    currentUser={uid:q.docs[0].id,email:e,displayName:q.docs[0].data().displayName};
-                    loadUserProfile();
-                    document.getElementById('loginBtn').style.display='none';
-                    document.getElementById('logoutBtn').style.display='flex';
-                    document.getElementById('userInfo').style.display='flex';
-                }).catch(function(){showToast('Ошибка: '+err.message,'error');});
+            }).catch(function(e) {
+                console.error('❌ Get user error:', e);
+                showToast('Ошибка: ' + e.message, 'error');
             });
         }
 
-        function logout(){auth.signOut().then(function(){currentUser=null;showToast('Вы вышли 👋','success');showPage('home');});}
-
-        // 👤 PROFILE
-        function loadUserProfile(){
-            if(!currentUser)return;
-            db.collection('users').doc(currentUser.uid).get().then(function(doc){
-                if(!doc.exists){
-                    db.collection('users').doc(currentUser.uid).set({uid:currentUser.uid,email:currentUser.email,displayName:currentUser.displayName||currentUser.email?currentUser.email.split('@')[0]:'Пользователь',avatar:currentUser.photoURL||null,avatarStatus:'approved',nicknameStatus:'approved',premium:false,registrationDate:firebase.firestore.FieldValue.serverTimestamp(),orders:[]}).then(function(){loadUserProfile();});
-                    return;
-                }
-                var d=doc.data();
-                document.getElementById('profileUserId').textContent=currentUser.uid.substr(0,8)+'...';
-                document.getElementById('profileNickname').textContent=d.displayName||'Пользователь';
-                document.getElementById('headerUsername').textContent=(d.displayName||'User').substr(0,12);
-                if(d.avatar){
-                    document.getElementById('profileAvatarImg').src=d.avatar;document.getElementById('profileAvatarImg').style.display='block';document.getElementById('profileAvatarText').style.display='none';
-                    document.getElementById('headerAvatarImg').src=d.avatar;document.getElementById('headerAvatarImg').style.display='block';document.getElementById('headerAvatarText').style.display='none';
-                    if(d.avatarStatus==='pending'){document.getElementById('profileAvatar').classList.add('pending');document.getElementById('headerAvatar').classList.add('pending');}
-                }
-                var isPrem=d.premium&&(!d.premiumUntil||new Date(d.premiumUntil?.toDate?.()||d.premiumUntil)>new Date());
-                document.getElementById('profilePremiumBadge').classList.toggle('hidden',!isPrem);
-                document.getElementById('headerPremiumBadge').classList.toggle('hidden',!isPrem);
-                if(d.registrationDate?.toDate)document.getElementById('profileRegDate').textContent=d.registrationDate.toDate().toLocaleDateString('ru-RU');
-                loadUserOrders(d.orders||[]);
-            }).catch(function(e){console.error('Profile error:',e);});
+        function generatePassword() {
+            var c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            var p = '';
+            for (var i = 0; i < 8; i++) p += c.charAt(Math.floor(Math.random() * c.length));
+            return p;
+        }
+        
+        function closeCredentialsModal() {
+            document.getElementById('credentialsModal').classList.remove('active');
+            if (currentUser) loadUserProfile();
         }
 
-        function showProfile(){if(!currentUser){openAuthModal();return;}showPage('profile');loadUserProfile();}
+        function loginWithEmail() {
+            var e = document.getElementById('loginEmail').value;
+            var p = document.getElementById('loginPassword').value;
+            if (!e || !p) { showToast('Заполните поля', 'warning'); return; }
+            
+            auth.signInWithEmailAndPassword(e, p).then(function() {
+                showToast('Вход выполнен! 🎉', 'success');
+                closeAuthModal();
+            }).catch(function(err) {
+                console.error('Login error:', err);
+                showToast('Ошибка: ' + err.message, 'error');
+            });
+        }
 
-        function loadUserOrders(orders){
-            var c=document.getElementById('ordersList');
-            if(!orders||orders.length===0){c.innerHTML='<div class="empty-state">Нет заказов</div>';return;}
-            var h='';
-            for(var i=0;i<orders.length;i++){
-                (function(oid){
-                    db.collection('orders').doc(oid).get().then(function(od){
-                        var o=od.data();if(!o)return;
-                        db.collection('products').doc(o.productId).get().then(function(pd){
-                            var p=pd.data();
-                            var sc={'created':'status-created','processing':'status-processing','completed':'status-completed','cancelled':'status-cancelled'}[o.status]||'status-created';
-                            var st={'created':'📝 Создан','processing':'⚙️ Выполняется','completed':'✅ Завершен','cancelled':'❌ Отменен'}[o.status]||o.status;
-                            h+='<div class="order-card" onclick="viewOrder(\''+oid+'\')"><div><strong>'+(p?.title||'Товар')+'</strong><br><small style="color:var(--gray)">Токен: '+oid.substr(0,12)+'...</small></div><span class="order-status '+sc+'">'+st+'</span></div>';
-                            if(o.status==='completed'&&!o.reviewed)h+='<button class="btn" style="margin:0.5rem 0;padding:0.5rem 1rem;font-size:0.9rem" onclick="openReviewModal(\''+oid+'\',\''+o.productId+'\')">⭐ Оставить отзыв</button>';
-                            c.innerHTML=h||'<div class="empty-state">Нет данных</div>';
+        function logout() {
+            auth.signOut().then(function() {
+                currentUser = null;
+                showToast('Вы вышли 👋', 'success');
+                showPage('home');
+            });
+        }
+
+        // 👤 PROFILE
+        function loadUserProfile() {
+            if (!currentUser) return;
+            
+            db.collection('users').doc(currentUser.uid).get().then(function(doc) {
+                if (!doc.exists) {
+                    // Создаём минимальный профиль
+                    db.collection('users').doc(currentUser.uid).set({
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        displayName: currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Пользователь'),
+                        avatar: currentUser.photoURL || null,
+                        avatarStatus: 'approved',
+                        nicknameStatus: 'approved',
+                        premium: false,
+                        registrationDate: firebase.firestore.FieldValue.serverTimestamp(),
+                        orders: []
+                    }).then(function() { loadUserProfile(); });
+                    return;
+                }
+                
+                var d = doc.data();
+                document.getElementById('profileUserId').textContent = currentUser.uid.substr(0, 8) + '...';
+                document.getElementById('profileNickname').textContent = d.displayName || 'Пользователь';
+                document.getElementById('headerUsername').textContent = (d.displayName || 'User').substr(0, 12);
+                
+                if (d.avatar) {
+                    document.getElementById('profileAvatarImg').src = d.avatar;
+                    document.getElementById('profileAvatarImg').style.display = 'block';
+                    document.getElementById('profileAvatarText').style.display = 'none';
+                    document.getElementById('headerAvatarImg').src = d.avatar;
+                    document.getElementById('headerAvatarImg').style.display = 'block';
+                    document.getElementById('headerAvatarText').style.display = 'none';
+                    if (d.avatarStatus === 'pending') {
+                        document.getElementById('profileAvatar').classList.add('pending');
+                        document.getElementById('headerAvatar').classList.add('pending');
+                    }
+                }
+                
+                var isPrem = d.premium && (!d.premiumUntil || new Date(d.premiumUntil?.toDate?.() || d.premiumUntil) > new Date());
+                document.getElementById('profilePremiumBadge').classList.toggle('hidden', !isPrem);
+                document.getElementById('headerPremiumBadge').classList.toggle('hidden', !isPrem);
+                
+                if (d.registrationDate?.toDate) {
+                    document.getElementById('profileRegDate').textContent = d.registrationDate.toDate().toLocaleDateString('ru-RU');
+                }
+                
+                loadUserOrders(d.orders || []);
+            }).catch(function(e) {
+                console.error('Profile error:', e);
+            });
+        }
+
+        function showProfile() {
+            if (!currentUser) { openAuthModal(); return; }
+            showPage('profile');
+            loadUserProfile();
+        }
+
+        function loadUserOrders(orders) {
+            var c = document.getElementById('ordersList');
+            if (!orders || orders.length === 0) {
+                c.innerHTML = '<div class="empty-state">Нет заказов</div>';
+                return;
+            }
+            
+            var h = '';
+            for (var i = 0; i < orders.length; i++) {
+                (function(oid) {
+                    db.collection('orders').doc(oid).get().then(function(od) {
+                        var o = od.data();
+                        if (!o) return;
+                        
+                        db.collection('products').doc(o.productId).get().then(function(pd) {
+                            var p = pd.data();
+                            var sc = {
+                                'created': 'status-created',
+                                'processing': 'status-processing',
+                                'completed': 'status-completed',
+                                'cancelled': 'status-cancelled'
+                            }[o.status] || 'status-created';
+                            
+                            var st = {
+                                'created': '📝 Создан',
+                                'processing': '⚙️ Выполняется',
+                                'completed': '✅ Завершен',
+                                'cancelled': '❌ Отменен'
+                            }[o.status] || o.status;
+                            
+                            h += '<div class="order-card" onclick="viewOrder(\'' + oid + '\')">';
+                            h += '<div><strong>' + (p?.title || 'Товар') + '</strong><br>';
+                            h += '<small style="color:var(--gray)">Токен: ' + oid.substr(0, 12) + '...</small></div>';
+                            h += '<span class="order-status ' + sc + '">' + st + '</span></div>';
+                            
+                            if (o.status === 'completed' && !o.reviewed) {
+                                h += '<button class="btn" style="margin:0.5rem 0;padding:0.5rem 1rem;font-size:0.9rem" onclick="openReviewModal(\'' + oid + '\',\'' + o.productId + '\')">⭐ Оставить отзыв</button>';
+                            }
+                            
+                            c.innerHTML = h || '<div class="empty-state">Нет данных</div>';
                         });
                     });
                 })(orders[i]);
             }
         }
 
-        function editNickname(){if(!currentUser)return;var n=prompt('Новый ник:',document.getElementById('profileNickname').textContent);if(n&&n.length>=3){db.collection('users').doc(currentUser.uid).update({displayName:n,nicknameStatus:'pending'});showToast('Ник на модерации ✏️','success');document.getElementById('profileNickname').textContent=n+' (на модерации)';}}
+        function editNickname() {
+            if (!currentUser) return;
+            var n = prompt('Новый ник:', document.getElementById('profileNickname').textContent);
+            if (n && n.length >= 3) {
+                db.collection('users').doc(currentUser.uid).update({
+                    displayName: n,
+                    nicknameStatus: 'pending'
+                });
+                showToast('Ник на модерации ✏️', 'success');
+                document.getElementById('profileNickname').textContent = n + ' (на модерации)';
+            }
+        }
 
-        function handleAvatarChange(e){
-            if(!currentUser||!e.target.files||!e.target.files[0])return;
-            var f=e.target.files[0];showToast('Загрузка...','success');
-            var fd=new FormData();fd.append('image',f);fd.append('key',IMGBB_API_KEY);
-            fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){
-                if(res.success){
-                    db.collection('users').doc(currentUser.uid).update({avatar:res.data.url,avatarStatus:'pending'});
-                    document.getElementById('profileAvatarImg').src=res.data.url;document.getElementById('headerAvatarImg').src=res.data.url;
-                    document.getElementById('profileAvatar').classList.add('pending');document.getElementById('headerAvatar').classList.add('pending');
-                    showToast('Аватарка на модерации 🖼️','success');
-                }
-            }).catch(function(err){console.error(err);showToast('Ошибка загрузки','error');});
+        function handleAvatarChange(e) {
+            if (!currentUser || !e.target.files || !e.target.files[0]) return;
+            
+            var f = e.target.files[0];
+            showToast('Загрузка...', 'success');
+            
+            var fd = new FormData();
+            fd.append('image', f);
+            fd.append('key', IMGBB_API_KEY);
+            
+            fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                    if (res.success) {
+                        db.collection('users').doc(currentUser.uid).update({
+                            avatar: res.data.url,
+                            avatarStatus: 'pending'
+                        });
+                        document.getElementById('profileAvatarImg').src = res.data.url;
+                        document.getElementById('headerAvatarImg').src = res.data.url;
+                        document.getElementById('profileAvatar').classList.add('pending');
+                        document.getElementById('headerAvatar').classList.add('pending');
+                        showToast('Аватарка на модерации 🖼️', 'success');
+                    }
+                })
+                .catch(function(err) {
+                    console.error(err);
+                    showToast('Ошибка загрузки', 'error');
+                });
         }
 
         // 🛍️ PRODUCTS
-        function loadProducts(cat){
-            var g=document.getElementById('productsGrid');g.innerHTML='<div class="loading">Загрузка...</div>';
-            db.collection('products').where('status','==','approved').get().then(function(snap){
-                var prods=[];
-                snap.forEach(function(doc){
-                    var p=doc.data();
-                    if(cat&&cat!=='all'&&p.category!==cat)return;
-                    prods.push({id:doc.id,data:p});
+        function loadProducts(cat) {
+            var g = document.getElementById('productsGrid');
+            g.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            db.collection('products').where('status', '==', 'approved').get().then(function(snap) {
+                var prods = [];
+                snap.forEach(function(doc) {
+                    var p = doc.data();
+                    if (cat && cat !== 'all' && p.category !== cat) return;
+                    prods.push({ id: doc.id, p: p });
                 });
-                prods.sort(function(a,b){var da=a.data.createdAt?.toDate?.()?a.data.createdAt.toDate().getTime():0;var db=b.data.createdAt?.toDate?.()?b.data.createdAt.toDate().getTime():0;return db-da;});
-                prods=prods.slice(0,20);
-                if(!prods.length){g.innerHTML='<div class="empty-state">Товары не найдены</div>';return;}
-                var h='';
-                for(var i=0;i<prods.length;i++){
-                    var prod=prods[i],p=prod.data,rt=calcRating(p.reviews||{});
-                    h+='<div class="product-card" onclick="openProduct(\''+prod.id+'\')"><div class="product-img">'+(p.image?'<img src="'+p.image+'" alt="'+p.title+'">':'📦')+'</div><div class="product-info"><div class="product-title">'+p.title+'</div><div class="product-price">'+p.price+' ₽</div><div class="product-rating">'+renderStars(rt.avg,rt.count)+'</div>'+(p.createdByUser?'<div class="product-user-badge" onclick="event.stopPropagation();showUserBadge()">👤 От пользователя</div>':'')+'</div></div>';
+                
+                prods.sort(function(a, b) {
+                    var da = a.p.createdAt?.toDate?.() ? a.p.createdAt.toDate().getTime() : 0;
+                    var db = b.p.createdAt?.toDate?.() ? b.p.createdAt.toDate().getTime() : 0;
+                    return db - da;
+                });
+                
+                prods = prods.slice(0, 20);
+                
+                if (!prods.length) {
+                    g.innerHTML = '<div class="empty-state">Товары не найдены</div>';
+                    return;
                 }
-                g.innerHTML=h;
-            }).catch(function(err){console.error(err);g.innerHTML='<div class="empty-state">Ошибка загрузки</div>';});
+                
+                var h = '';
+                for (var i = 0; i < prods.length; i++) {
+                    var prod = prods[i];
+                    var p = prod.p;
+                    var rt = calcRating(p.reviews || {});
+                    
+                    h += '<div class="product-card" onclick="openProduct(\'' + prod.id + '\')">';
+                    h += '<div class="product-img">' + (p.image ? '<img src="' + p.image + '" alt="' + p.title + '">' : '📦') + '</div>';
+                    h += '<div class="product-info">';
+                    h += '<div class="product-title">' + p.title + '</div>';
+                    h += '<div class="product-price">' + p.price + ' ₽</div>';
+                    h += '<div class="product-rating">' + renderStars(rt.avg, rt.count) + '</div>';
+                    if (p.createdByUser) {
+                        h += '<div class="product-user-badge" onclick="event.stopPropagation();showUserBadge()">👤 От пользователя</div>';
+                    }
+                    h += '</div></div>';
+                }
+                
+                g.innerHTML = h;
+            }).catch(function(err) {
+                console.error(err);
+                g.innerHTML = '<div class="empty-state">Ошибка загрузки</div>';
+            });
         }
 
-        function calcRating(r){var s=[1,2,3,4,5].map(function(i){return r[i]||0;}),t=s.reduce(function(a,b){return a+b;},0);return{avg:t?s.reduce(function(a,c,i){return a+c*(i+1);},0)/t:0,count:t};}
-        function renderStars(avg,cnt){var h='',f=Math.floor(avg);for(var i=1;i<=5;i++)h+=i<=f?'⭐':'☆';h+=' <small style="color:var(--gray)">('+cnt+')</small>';return h;}
-        function showUserBadge(){showToast('⚠️ Товар от пользователя. Проверяйте перед покупкой!','warning');}
+        function calcRating(r) {
+            var s = [1, 2, 3, 4, 5].map(function(i) { return r[i] || 0; });
+            var t = s.reduce(function(a, b) { return a + b; }, 0);
+            return {
+                avg: t ? s.reduce(function(a, c, i) { return a + c * (i + 1); }, 0) / t : 0,
+                count: t
+            };
+        }
 
-        function openProduct(id){
-            db.collection('products').doc(id).get().then(function(doc){
-                var p=doc.data();if(!p)return;
-                currentProduct={id:id,data:p};
-                var rt=calcRating(p.reviews||{});
-                var c=document.getElementById('productDetail');
-                c.innerHTML='<div class="product-detail-img">'+(p.image?'<img src="'+p.image+'" alt="'+p.title+'">':'📦')+'</div><div class="product-detail-info"><h1>'+p.title+'</h1><div class="product-detail-price">'+p.price+' ₽</div><div class="product-detail-section"><h3>⭐ Рейтинг</h3><div style="font-size:1.3rem">'+renderStars(rt.avg,rt.count)+'</div></div><div class="product-detail-section"><h3>📝 Описание</h3><p>'+(p.description||'Нет описания')+'</p></div>'+(p.instruction?'<div class="product-detail-section"><h3>📋 Инструкция</h3><p>'+p.instruction+'</p></div>':'')+'<div class="product-detail-section"><h3>📁 Категория</h3><p>'+catName(p.category)+'</p></div>'+(p.createdByUser?'<div class="product-detail-section"><button class="contact-seller-btn" onclick="openSellerChat(\''+p.createdBy+'\')">💬 Связаться с продавцом</button></div>':'')+'<button class="btn" onclick="openOrderModal()" style="margin-top:1.5rem">🛒 Купить</button></div>';
+        function renderStars(avg, cnt) {
+            var h = '';
+            var f = Math.floor(avg);
+            for (var i = 1; i <= 5; i++) h += i <= f ? '⭐' : '☆';
+            h += ' <small style="color:var(--gray)">(' + cnt + ')</small>';
+            return h;
+        }
+
+        function showUserBadge() {
+            showToast('⚠️ Товар от пользователя. Проверяйте перед покупкой!', 'warning');
+        }
+
+        function openProduct(id) {
+            db.collection('products').doc(id).get().then(function(doc) {
+                var p = doc.data();
+                if (!p) return;
+                
+                currentProduct = { id: id, p: p };
+                var rt = calcRating(p.reviews || {});
+                
+                var c = document.getElementById('productDetail');
+                c.innerHTML = '<div class="product-detail-img">' + (p.image ? '<img src="' + p.image + '" alt="' + p.title + '">' : '📦') + '</div>';
+                c.innerHTML += '<div class="product-detail-info">';
+                c.innerHTML += '<h1>' + p.title + '</h1>';
+                c.innerHTML += '<div class="product-detail-price">' + p.price + ' ₽</div>';
+                c.innerHTML += '<div class="product-detail-section"><h3>⭐ Рейтинг</h3><div style="font-size:1.3rem">' + renderStars(rt.avg, rt.count) + '</div></div>';
+                c.innerHTML += '<div class="product-detail-section"><h3>📝 Описание</h3><p>' + (p.description || 'Нет описания') + '</p></div>';
+                if (p.instruction) {
+                    c.innerHTML += '<div class="product-detail-section"><h3>📋 Инструкция</h3><p>' + p.instruction + '</p></div>';
+                }
+                c.innerHTML += '<div class="product-detail-section"><h3>📁 Категория</h3><p>' + catName(p.category) + '</p></div>';
+                if (p.createdByUser) {
+                    c.innerHTML += '<div class="product-detail-section"><button class="contact-seller-btn" onclick="openSellerChat(\'' + p.createdBy + '\')">💬 Связаться с продавцом</button></div>';
+                }
+                c.innerHTML += '<button class="btn" onclick="openOrderModal()" style="margin-top:1.5rem">🛒 Купить</button></div>';
+                
                 showPage('product');
             });
         }
 
-        function catName(c){return{electronics:'🔌 Электроника',clothing:'👕 Одежда',home:'🏠 Для дома',games:'🎮 Игры',other:'📦 Другое'}[c]||c;}
-
-        function loadCategories(){
-            var g=document.getElementById('categoriesGrid'),cats=[{id:'all',n:'🔥 Все товары'},{id:'electronics',n:'🔌 Электроника'},{id:'clothing',n:'👕 Одежда'},{id:'home',n:'🏠 Для дома'},{id:'games',n:'🎮 Игры'},{id:'other',n:'📦 Другое'}];
-            var h='';for(var i=0;i<cats.length;i++)h+='<button class="category-btn" onclick="filterCat(\''+cats[i].id+'\')">'+cats[i].n+'</button>';
-            g.innerHTML=h;
+        function catName(c) {
+            return {
+                'electronics': '🔌 Электроника',
+                'clothing': '👕 Одежда',
+                'home': '🏠 Для дома',
+                'games': '🎮 Игры',
+                'other': '📦 Другое'
+            }[c] || c;
         }
 
-        function filterCat(id){toggleCatalog();loadProducts(id==='all'?null:id);showPage('home');}
+        function loadCategories() {
+            var g = document.getElementById('categoriesGrid');
+            var cats = [
+                { id: 'all', n: '🔥 Все товары' },
+                { id: 'electronics', n: '🔌 Электроника' },
+                { id: 'clothing', n: '👕 Одежда' },
+                { id: 'home', n: '🏠 Для дома' },
+                { id: 'games', n: '🎮 Игры' },
+                { id: 'other', n: '📦 Другое' }
+            ];
+            
+            var h = '';
+            for (var i = 0; i < cats.length; i++) {
+                h += '<button class="category-btn" onclick="filterCat(\'' + cats[i].id + '\')">' + cats[i].n + '</button>';
+            }
+            g.innerHTML = h;
+        }
+
+        function filterCat(id) {
+            toggleCatalog();
+            loadProducts(id === 'all' ? null : id);
+            showPage('home');
+        }
 
         // 🛒 ORDERS
-        function openOrderModal(){if(!currentUser){openAuthModal();return;}if(!currentProduct)return;var p=currentProduct.data;document.getElementById('orderMinQty').textContent=p.minQuantity||1;document.getElementById('orderUnitPrice').textContent=p.price+' ₽';document.getElementById('orderProductInfo').innerHTML='<strong>'+p.title+'</strong><br>Цена: '+p.price+' ₽';document.getElementById('orderModal').classList.add('active');calcOrderTotal();}
-        function closeOrderModal(){document.getElementById('orderModal').classList.remove('active');}
-        function calcOrderTotal(){var q=parseInt(document.getElementById('orderQty').value)||1,min=currentProduct.data.minQuantity||1;if(q<min){document.getElementById('orderQty').value=min;showToast('Минимум: '+min,'warning');return;}document.getElementById('orderQtyDisplay').textContent=q;document.getElementById('orderTotal').textContent=(q*currentProduct.data.price)+' ₽';}
+        function openOrderModal() {
+            if (!currentUser) { openAuthModal(); return; }
+            if (!currentProduct) return;
+            
+            var p = currentProduct.p;
+            document.getElementById('orderMinQty').textContent = p.minQuantity || 1;
+            document.getElementById('orderUnitPrice').textContent = p.price + ' ₽';
+            document.getElementById('orderProductInfo').innerHTML = '<strong>' + p.title + '</strong><br>Цена: ' + p.price + ' ₽';
+            document.getElementById('orderModal').classList.add('active');
+            calculateOrderTotal();
+        }
 
-        function confirmOrder(){
-            if(!currentUser||!currentProduct)return;
-            var q=parseInt(document.getElementById('orderQty').value),tot=q*currentProduct.data.price,tok='ORD-'+Math.random().toString(36).substr(2,6).toUpperCase();
-            db.collection('orders').add({token:tok,userId:currentUser.uid,productId:currentProduct.id,quantity:q,total:tot,status:'created',createdAt:firebase.firestore.FieldValue.serverTimestamp(),reviewed:false}).then(function(ref){
-                db.collection('users').doc(currentUser.uid).update({orders:firebase.firestore.FieldValue.arrayUnion(ref.id)}).then(function(){
-                    closeOrderModal();document.getElementById('orderToken').textContent=tok;document.getElementById('orderConfirmModal').classList.add('active');showToast('Заказ оформлен! 🎉','success');
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.remove('active');
+        }
+
+        function calculateOrderTotal() {
+            var q = parseInt(document.getElementById('orderQty').value) || 1;
+            var min = currentProduct.p.minQuantity || 1;
+            if (q < min) {
+                document.getElementById('orderQty').value = min;
+                showToast('Минимум: ' + min, 'warning');
+                return;
+            }
+            document.getElementById('orderQtyDisplay').textContent = q;
+            document.getElementById('orderTotal').textContent = (q * currentProduct.p.price) + ' ₽';
+        }
+
+        function confirmOrder() {
+            if (!currentUser || !currentProduct) return;
+            
+            var q = parseInt(document.getElementById('orderQty').value);
+            var tot = q * currentProduct.p.price;
+            var tok = 'ORD-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            
+            db.collection('orders').add({
+                token: tok,
+                userId: currentUser.uid,
+                productId: currentProduct.id,
+                quantity: q,
+                total: tot,
+                status: 'created',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                reviewed: false
+            }).then(function(ref) {
+                return db.collection('users').doc(currentUser.uid).update({
+                    orders: firebase.firestore.FieldValue.arrayUnion(ref.id)
                 });
-            }).catch(function(e){console.error(e);showToast('Ошибка заказа','error');});
-        }
-
-        function closeOrderConfirmModal(){document.getElementById('orderConfirmModal').classList.remove('active');showPage('profile');}
-        function viewOrder(oid){showToast('Заказ: '+oid,'success');}
-
-        // 💬 CHAT
-        function openSupportChat(){document.getElementById('supportChatModal').classList.add('active');}
-        function closeSupportChat(){document.getElementById('supportChatModal').classList.remove('active');}
-        function sendSupportMessage(){
-            var i=document.getElementById('supportInput'),t=i.value.trim();
-            if(!t||!currentUser)return;
-            var c=document.getElementById('supportMessages');
-            c.insertAdjacentHTML('beforeend','<div class="message sent">'+escapeHtml(t)+'<span class="message-meta">'+(currentUser.displayName||'Вы')+' • '+new Date().toLocaleTimeString('ru-RU')+'</span></div>');
-            c.scrollTop=c.scrollHeight;i.value='';
-            db.collection('supportMessages').add({userId:currentUser.uid,userNick:currentUser.displayName,text:t,timestamp:firebase.firestore.FieldValue.serverTimestamp(),isSupport:false});
-            setTimeout(function(){c.insertAdjacentHTML('beforeend','<div class="message received">Спасибо! Оператор ответит скоро 🤝<br><small>Токен: <strong>'+'SUP-'+Math.random().toString(36).substr(2,6).toUpperCase()+'</strong></small><span class="message-meta">Поддержка • Сейчас</span></div>');c.scrollTop=c.scrollHeight;},800);
-        }
-        function openSellerChat(sid){if(!currentUser){openAuthModal();return;}showToast('Чат с продавцом...','success');}
-        function openChatsPage(){if(!currentUser){openAuthModal();return;}showPage('chats');}
-
-        // ✨ PREMIUM
-        function checkPremiumAndSuggest(){
-            if(!currentUser){openAuthModal();return;}
-            db.collection('users').doc(currentUser.uid).get().then(function(d){
-                var data=d.data(),isP=data.premium&&(!data.premiumUntil||new Date(data.premiumUntil?.toDate?.()||data.premiumUntil)>new Date());
-                if(isP)openSuggestModal();else document.getElementById('premiumModal').classList.add('active');
+            }).then(function() {
+                closeOrderModal();
+                document.getElementById('orderToken').textContent = tok;
+                document.getElementById('orderConfirmModal').classList.add('active');
+                showToast('Заказ оформлен! 🎉', 'success');
+            }).catch(function(e) {
+                console.error(e);
+                showToast('Ошибка заказа', 'error');
             });
         }
-        function contactForPremium(){
-            document.getElementById('premiumModal').classList.remove('active');openSupportChat();
-            setTimeout(function(){var c=document.getElementById('supportMessages');c.insertAdjacentHTML('beforeend','<div class="message received">💎 <strong>Для покупки Premium:</strong><br><a href="https://t.me/fueum" target="_blank" style="color:var(--primary)">@fueum</a><br><small>После оплаты премиум активируется автоматически ✨</small><span class="message-meta">Поддержка • Сейчас</span></div>');c.scrollTop=c.scrollHeight;},400);
+
+        function closeOrderConfirmModal() {
+            document.getElementById('orderConfirmModal').classList.remove('active');
+            showPage('profile');
+        }
+
+        function viewOrder(oid) {
+            showToast('Заказ: ' + oid, 'success');
+        }
+
+        // 💬 CHAT
+        function openSupportChat() {
+            document.getElementById('supportChatModal').classList.add('active');
+        }
+
+        function closeSupportChat() {
+            document.getElementById('supportChatModal').classList.remove('active');
+        }
+
+        function sendSupportMessage() {
+            var i = document.getElementById('supportInput');
+            var t = i.value.trim();
+            if (!t || !currentUser) return;
+            
+            var c = document.getElementById('supportMessages');
+            c.insertAdjacentHTML('beforeend', '<div class="message sent">' + escapeHtml(t) + '<span class="message-meta">' + (currentUser.displayName || 'Вы') + ' • ' + new Date().toLocaleTimeString('ru-RU') + '</span></div>');
+            c.scrollTop = c.scrollHeight;
+            i.value = '';
+            
+            db.collection('supportMessages').add({
+                userId: currentUser.uid,
+                userNick: currentUser.displayName,
+                text: t,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                isSupport: false
+            });
+            
+            setTimeout(function() {
+                c.insertAdjacentHTML('beforeend', '<div class="message received">Спасибо! Оператор ответит скоро 🤝<br><small>Токен: <strong>' + 'SUP-' + Math.random().toString(36).substr(2, 6).toUpperCase() + '</strong></small><span class="message-meta">Поддержка • Сейчас</span></div>');
+                c.scrollTop = c.scrollHeight;
+            }, 800);
+        }
+
+        function openSellerChat(sid) {
+            if (!currentUser) { openAuthModal(); return; }
+            showToast('Чат с продавцом...', 'success');
+        }
+
+        function openChatsPage() {
+            if (!currentUser) { openAuthModal(); return; }
+            showPage('chats');
+        }
+
+        // ✨ PREMIUM
+        function checkPremiumAndSuggest() {
+            if (!currentUser) { openAuthModal(); return; }
+            db.collection('users').doc(currentUser.uid).get().then(function(d) {
+                var data = d.data();
+                var isP = data.premium && (!data.premiumUntil || new Date(data.premiumUntil?.toDate?.() || data.premiumUntil) > new Date());
+                if (isP) openSuggestModal();
+                else document.getElementById('premiumModal').classList.add('active');
+            });
+        }
+
+        function contactForPremium() {
+            document.getElementById('premiumModal').classList.remove('active');
+            openSupportChat();
+            setTimeout(function() {
+                var c = document.getElementById('supportMessages');
+                c.insertAdjacentHTML('beforeend', '<div class="message received">💎 <strong>Для покупки Premium:</strong><br><a href="https://t.me/fueum" target="_blank" style="color:var(--primary)">@fueum</a><br><small>После оплаты премиум активируется автоматически ✨</small><span class="message-meta">Поддержка • Сейчас</span></div>');
+                c.scrollTop = c.scrollHeight;
+            }, 400);
         }
 
         // 📦 SUGGEST
-        function openSuggestModal(){suggestStep=1;document.getElementById('suggestStep1').classList.remove('hidden');[2,3].forEach(function(n){document.getElementById('suggestStep'+n).classList.add('hidden');});document.getElementById('suggestModal').classList.add('active');}
-        function closeSuggestModal(){document.getElementById('suggestModal').classList.remove('active');}
-        function nextSuggestStep(s){[1,2,3].forEach(function(n){document.getElementById('suggestStep'+n).classList.add('hidden');});document.getElementById('suggestStep'+s).classList.remove('hidden');suggestStep=s;}
-
-        function submitProductSuggestion(){
-            if(!currentUser)return;
-            var nm=document.getElementById('suggestName').value.trim(),cat=document.getElementById('suggestCategory').value,pr=parseFloat(document.getElementById('suggestPrice').value),desc=document.getElementById('suggestDescription').value.trim();
-            if(!nm||!cat||!pr||!desc){showToast('Заполните все поля *','warning');return;}
-            showToast('Отправка...','success');
-            var img=null,fi=document.getElementById('suggestImages');
-            if(fi.files&&fi.files[0]){var fd=new FormData();fd.append('image',fi.files[0]);fd.append('key',IMGBB_API_KEY);fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){if(res.success)img=res.data.url;saveSuggestion(nm,cat,pr,desc,img);});}
-            else saveSuggestion(nm,cat,pr,desc,img);
+        function openSuggestModal() {
+            suggestStep = 1;
+            document.getElementById('suggestStep1').classList.remove('hidden');
+            [2, 3].forEach(function(n) { document.getElementById('suggestStep' + n).classList.add('hidden'); });
+            document.getElementById('suggestModal').classList.add('active');
         }
 
-        function saveSuggestion(nm,cat,pr,desc,img){
-            db.collection('productSuggestions').add({title:nm,category:cat,price:pr,description:desc,instruction:document.getElementById('suggestInstruction').value.trim(),image:img,createdBy:currentUser.uid,creatorNick:currentUser.displayName,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
-                db.collection('users').doc(currentUser.uid).update({suggestedProducts:firebase.firestore.FieldValue.arrayUnion('pending')});
-                closeSuggestModal();showToast('Отправлено на модерацию! ✅','success');
-            }).catch(function(e){console.error(e);showToast('Ошибка','error');});
+        function closeSuggestModal() {
+            document.getElementById('suggestModal').classList.remove('active');
         }
 
-        // ⭐ REVIEWS
-        function setupReviewStars(){var stars=document.querySelectorAll('#reviewStars .star');for(var i=0;i<stars.length;i++){stars[i].addEventListener('click',function(){reviewRating=parseInt(this.dataset.value);var all=document.querySelectorAll('#reviewStars .star');for(var j=0;j<all.length;j++){all[j].textContent=j<reviewRating?'★':'☆';all[j].classList.toggle('filled',j<reviewRating);}});}}
-        function openReviewModal(oid,pid){if(!currentUser)return;document.getElementById('reviewProductName').textContent='Загрузка...';document.getElementById('reviewModal').classList.add('active');db.collection('products').doc(pid).get().then(function(d){if(d.exists)document.getElementById('reviewProductName').textContent=d.data().title;});}
-        function closeReviewModal(){document.getElementById('reviewModal').classList.remove('active');reviewRating=0;document.getElementById('reviewText').value='';var s=document.querySelectorAll('#reviewStars .star');for(var i=0;i<s.length;i++){s[i].textContent='☆';s[i].classList.remove('filled');}}
-        function submitReview(){if(!currentUser||reviewRating===0){showToast('Выберите оценку','warning');return;}var t=document.getElementById('reviewText').value.trim();if(!t){showToast('Напишите отзыв','warning');return;}showToast('Отправка...','success');db.collection('reviews').add({userId:currentUser.uid,userName:currentUser.displayName,rating:reviewRating,text:t,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){closeReviewModal();showToast('Отзыв отправлен! ⭐','success');}).catch(function(e){console.error(e);showToast('Ошибка','error');});}
+        function nextSuggestStep(s) {
+            [1, 2, 3].forEach(function(n) { document.getElementById('suggestStep' + n).classList.add('hidden'); });
+            document.getElementById('suggestStep' + s).classList.remove('hidden');
+            suggestStep = s;
+        }
 
-        // ⚙️ ADMIN
-        function showModeration(){if(!currentUser||currentUser.email!=='sobakastalina123@gmail.com'){showToast('Только админ','error');return;}showPage('moderation');loadModerationData();}
-        function switchModTab(t){document.querySelectorAll('.mod-tab').forEach(function(x){x.classList.remove('active');});document.querySelectorAll('.moderation-section').forEach(function(x){x.classList.add('hidden');});event.target.classList.add('active');document.getElementById('mod'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');}
+        function submitProductSuggestion() {
+            if (!currentUser) return;
+            
+            var nm = document.getElementById('suggestName').value.trim();
+            var cat = document.getElementById('suggestCategory').value;
+            var pr = parseFloat(document.getElementById('suggestPrice').value);
+            var desc = document.getElementById('suggestDescription').value.trim();
+            
+            if (!nm || !cat || !pr || !desc) {
+                showToast('Заполните все поля *', 'warning');
+                return;
+            }
+            
+            showToast('Отправка...', 'success');
+            
+            var img = null;
+            var fi = document.getElementById('suggestImages');
+            
+            if (fi.files && fi.files[0]) {
+                var fd = new FormData();
+                fd.append('image', fi.files[0]);
+                fd.append('key', IMGBB_API_KEY);
+                fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd })
+                    .then(function(r) { return r.json(); })
+                    .then(function(res) {
+                        if (res.success) img = res.data.url;
+                        saveSuggestion(nm, cat, pr, desc, img);
+                    });
+            } else {
+                saveSuggestion(nm, cat, pr, desc, img);
+            }
+        }
 
-        function loadModerationData(){
-            db.collection('productSuggestions').where('status','==','pending').get().then(function(snap){
-                var l=document.getElementById('modProductsList');
-                if(snap.empty){l.innerHTML='<div class="empty-state">Нет заявок</div>';return;}
-                var h='';snap.forEach(function(doc){var s=doc.data();h+='<div class="moderation-item"><strong>📦 '+s.title+'</strong><br><small>Категория: '+catName(s.category)+' | '+s.price+' ₽</small><br><small>От: '+s.creatorNick+'</small><p style="margin:0.5rem 0">'+s.description+'</p>'+(s.image?'<img src="'+s.image+'" style="max-width:200px;border-radius:8px">':'')+'<div class="moderation-actions"><button class="btn btn-approve" onclick="approveProduct(\''+doc.id+'\')">✅ Одобрить</button><button class="btn btn-reject" onclick="rejectProduct(\''+doc.id+'\')">❌ Отклонить</button></div></div>';});
-                l.innerHTML=h;
+        function saveSuggestion(nm, cat, pr, desc, img) {
+            db.collection('productSuggestions').add({
+                title: nm,
+                category: cat,
+                price: pr,
+                description: desc,
+                instruction: document.getElementById('suggestInstruction').value.trim(),
+                image: img,
+                createdBy: currentUser.uid,
+                creatorNick: currentUser.displayName,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(function() {
+                return db.collection('users').doc(currentUser.uid).update({
+                    suggestedProducts: firebase.firestore.FieldValue.arrayUnion('pending')
+                });
+            }).then(function() {
+                closeSuggestModal();
+                showToast('Отправлено на модерацию! ✅', 'success');
+            }).catch(function(e) {
+                console.error(e);
+                showToast('Ошибка', 'error');
             });
         }
 
-        function approveProduct(sid){
-            db.collection('productSuggestions').doc(sid).get().then(function(doc){
-                var s=doc.data();
-                db.collection('products').add({title:s.title,category:s.category,price:s.price,description:s.description,instruction:s.instruction,image:s.image,createdBy:s.createdBy,creatorNick:s.creatorNick,createdByUser:true,status:'approved',minQuantity:1,reviews:{},createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
-                    db.collection('productSuggestions').doc(sid).update({status:'approved'});
-                    showToast('Одобрено! 🎉','success');loadModerationData();
+        // ⭐ REVIEWS
+        function setupReviewStars() {
+            var stars = document.querySelectorAll('#reviewStars .star');
+            for (var i = 0; i < stars.length; i++) {
+                stars[i].addEventListener('click', function() {
+                    reviewRating = parseInt(this.dataset.value);
+                    var all = document.querySelectorAll('#reviewStars .star');
+                    for (var j = 0; j < all.length; j++) {
+                        all[j].textContent = j < reviewRating ? '★' : '☆';
+                        all[j].classList.toggle('filled', j < reviewRating);
+                    }
+                });
+            }
+        }
+
+        function openReviewModal(oid, pid) {
+            if (!currentUser) return;
+            document.getElementById('reviewProductName').textContent = 'Загрузка...';
+            document.getElementById('reviewModal').classList.add('active');
+            db.collection('products').doc(pid).get().then(function(d) {
+                if (d.exists) document.getElementById('reviewProductName').textContent = d.data().title;
+            });
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.remove('active');
+            reviewRating = 0;
+            document.getElementById('reviewText').value = '';
+            var s = document.querySelectorAll('#reviewStars .star');
+            for (var i = 0; i < s.length; i++) {
+                s[i].textContent = '☆';
+                s[i].classList.remove('filled');
+            }
+        }
+
+        function submitReview() {
+            if (!currentUser || reviewRating === 0) {
+                showToast('Выберите оценку', 'warning');
+                return;
+            }
+            var t = document.getElementById('reviewText').value.trim();
+            if (!t) {
+                showToast('Напишите отзыв', 'warning');
+                return;
+            }
+            showToast('Отправка...', 'success');
+            db.collection('reviews').add({
+                userId: currentUser.uid,
+                userName: currentUser.displayName,
+                rating: reviewRating,
+                text: t,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(function() {
+                closeReviewModal();
+                showToast('Отзыв отправлен! ⭐', 'success');
+            }).catch(function(e) {
+                console.error(e);
+                showToast('Ошибка', 'error');
+            });
+        }
+
+        // ⚙️ ADMIN
+        function showModeration() {
+            if (!currentUser || currentUser.email !== 'sobakastalina123@gmail.com') {
+                showToast('Только админ', 'error');
+                return;
+            }
+            showPage('moderation');
+            loadModerationData();
+        }
+
+        function switchModTab(t) {
+            document.querySelectorAll('.mod-tab').forEach(function(x) { x.classList.remove('active'); });
+            document.querySelectorAll('.moderation-section').forEach(function(x) { x.classList.add('hidden'); });
+            event.target.classList.add('active');
+            document.getElementById('mod' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('hidden');
+        }
+
+        function loadModerationData() {
+            db.collection('productSuggestions').where('status', '==', 'pending').get().then(function(snap) {
+                var l = document.getElementById('modProductsList');
+                if (snap.empty) {
+                    l.innerHTML = '<div class="empty-state">Нет заявок</div>';
+                    return;
+                }
+                var h = '';
+                snap.forEach(function(doc) {
+                    var s = doc.data();
+                    h += '<div class="moderation-item"><strong>📦 ' + s.title + '</strong><br>';
+                    h += '<small>Категория: ' + catName(s.category) + ' | ' + s.price + ' ₽</small><br>';
+                    h += '<small>От: ' + s.creatorNick + '</small><p style="margin:0.5rem 0">' + s.description + '</p>';
+                    if (s.image) h += '<img src="' + s.image + '" style="max-width:200px;border-radius:8px">';
+                    h += '<div class="moderation-actions">';
+                    h += '<button class="btn btn-approve" onclick="approveProduct(\'' + doc.id + '\')">✅ Одобрить</button>';
+                    h += '<button class="btn btn-reject" onclick="rejectProduct(\'' + doc.id + '\')">❌ Отклонить</button>';
+                    h += '</div></div>';
+                });
+                l.innerHTML = h;
+            });
+        }
+
+        function approveProduct(sid) {
+            db.collection('productSuggestions').doc(sid).get().then(function(doc) {
+                var s = doc.data();
+                db.collection('products').add({
+                    title: s.title,
+                    category: s.category,
+                    price: s.price,
+                    description: s.description,
+                    instruction: s.instruction,
+                    image: s.image,
+                    createdBy: s.createdBy,
+                    creatorNick: s.creatorNick,
+                    createdByUser: true,
+                    status: 'approved',
+                    minQuantity: 1,
+                    reviews: {},
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(function() {
+                    return db.collection('productSuggestions').doc(sid).update({ status: 'approved' });
+                }).then(function() {
+                    showToast('Одобрено! 🎉', 'success');
+                    loadModerationData();
                 });
             });
         }
 
-        function rejectProduct(sid){db.collection('productSuggestions').doc(sid).update({status:'rejected'});showToast('Отклонено','success');loadModerationData();}
-
-        function togglePremium(grant){
-            var uid=document.getElementById('modPremiumUserId').value.trim(),days=parseInt(document.getElementById('modPremiumDays').value)||0;
-            if(!uid){showToast('Введите ID','warning');return;}
-            db.collection('users').doc(uid).update({premium:grant,premiumUntil:grant&&days>0?firebase.firestore.Timestamp.fromDate(new Date(Date.now()+days*864e5)):null}).then(function(){showToast('Premium '+(grant?'выдан':'забран')+' ✅','success');}).catch(function(){showToast('Пользователь не найден','error');});
+        function rejectProduct(sid) {
+            db.collection('productSuggestions').doc(sid).update({ status: 'rejected' });
+            showToast('Отклонено', 'success');
+            loadModerationData();
         }
 
-        function createAdminProduct(){
-            var t=document.getElementById('adminProductName').value.trim(),c=document.getElementById('adminProductCategory').value,p=parseFloat(document.getElementById('adminProductPrice').value),d=document.getElementById('adminProductDescription').value.trim();
-            if(!t||!c||!p||!d){showToast('Заполните * поля','warning');return;}
-            showToast('Публикация...','success');
-            var img=null,fi=document.getElementById('adminProductImage');
-            if(fi.files&&fi.files[0]){var fd=new FormData();fd.append('image',fi.files[0]);fd.append('key',IMGBB_API_KEY);fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){if(res.success)img=res.data.url;saveAdminProduct(t,c,p,d,img);});}
-            else saveAdminProduct(t,c,p,d,img);
+        function togglePremium(grant) {
+            var uid = document.getElementById('modPremiumUserId').value.trim();
+            var days = parseInt(document.getElementById('modPremiumDays').value) || 0;
+            if (!uid) { showToast('Введите ID', 'warning'); return; }
+            
+            db.collection('users').doc(uid).update({
+                premium: grant,
+                premiumUntil: grant && days > 0 ? firebase.firestore.Timestamp.fromDate(new Date(Date.now() + days * 864e5)) : null
+            }).then(function() {
+                showToast('Premium ' + (grant ? 'выдан' : 'забран') + ' ✅', 'success');
+            }).catch(function() {
+                showToast('Пользователь не найден', 'error');
+            });
         }
 
-        function saveAdminProduct(t,c,p,d,img){
-            db.collection('products').add({title:t,category:c,price:p,description:d,instruction:document.getElementById('adminProductInstruction').value.trim(),image:img,createdBy:'admin',creatorNick:'Администратор',createdByUser:false,status:'approved',minQuantity:parseInt(document.getElementById('adminProductMinQty').value)||1,reviews:{},createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){showToast('Опубликовано! 🚀','success');document.getElementById('adminProductName').value='';document.getElementById('adminProductDescription').value='';}).catch(function(e){console.error(e);showToast('Ошибка','error');});
+        function createAdminProduct() {
+            var t = document.getElementById('adminProductName').value.trim();
+            var c = document.getElementById('adminProductCategory').value;
+            var p = parseFloat(document.getElementById('adminProductPrice').value);
+            var d = document.getElementById('adminProductDescription').value.trim();
+            
+            if (!t || !c || !p || !d) { showToast('Заполните * поля', 'warning'); return; }
+            showToast('Публикация...', 'success');
+            
+            var img = null;
+            var fi = document.getElementById('adminProductImage');
+            
+            if (fi.files && fi.files[0]) {
+                var fd = new FormData();
+                fd.append('image', fi.files[0]);
+                fd.append('key', IMGBB_API_KEY);
+                fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd })
+                    .then(function(r) { return r.json(); })
+                    .then(function(res) {
+                        if (res.success) img = res.data.url;
+                        saveAdminProduct(t, c, p, d, img);
+                    });
+            } else {
+                saveAdminProduct(t, c, p, d, img);
+            }
         }
 
-        function updateOrderStatus(){
-            var tok=document.getElementById('modOrderToken').value.trim(),st=document.getElementById('modOrderStatus').value,cm=document.getElementById('modOrderComment').value.trim();
-            if(!tok){showToast('Введите токен','warning');return;}
-            db.collection('orders').where('token','==',tok).limit(1).get().then(function(q){
-                if(q.empty){showToast('Не найден','error');return;}
-                q.docs[0].ref.update({status:st,statusComment:cm,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){showToast('Обновлено! ✅','success');});
+        function saveAdminProduct(t, c, p, d, img) {
+            db.collection('products').add({
+                title: t,
+                category: c,
+                price: p,
+                description: d,
+                instruction: document.getElementById('adminProductInstruction').value.trim(),
+                image: img,
+                createdBy: 'admin',
+                creatorNick: 'Администратор',
+                createdByUser: false,
+                status: 'approved',
+                minQuantity: parseInt(document.getElementById('adminProductMinQty').value) || 1,
+                reviews: {},
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(function() {
+                showToast('Опубликовано! 🚀', 'success');
+                document.getElementById('adminProductName').value = '';
+                document.getElementById('adminProductDescription').value = '';
+            }).catch(function(e) {
+                console.error(e);
+                showToast('Ошибка', 'error');
+            });
+        }
+
+        function updateOrderStatus() {
+            var tok = document.getElementById('modOrderToken').value.trim();
+            var st = document.getElementById('modOrderStatus').value;
+            var cm = document.getElementById('modOrderComment').value.trim();
+            
+            if (!tok) { showToast('Введите токен', 'warning'); return; }
+            
+            db.collection('orders').where('token', '==', tok).limit(1).get().then(function(q) {
+                if (q.empty) { showToast('Не найден', 'error'); return; }
+                return q.docs[0].ref.update({
+                    status: st,
+                    statusComment: cm,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }).then(function() {
+                showToast('Обновлено! ✅', 'success');
             });
         }
 
         // 🧰 UTILS
-        function showToast(msg,type){type=type||'info';var c=document.getElementById('toastContainer'),t=document.createElement('div');t.className='toast '+type;t.textContent=msg;c.appendChild(t);setTimeout(function(){t.style.animation='slideIn 0.3s ease reverse';setTimeout(function(){t.remove();},300);},3000);}
-        function escapeHtml(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
-        document.addEventListener('keydown',function(e){if(e.key==='Escape')document.querySelectorAll('.modal.active').forEach(function(m){m.classList.remove('active');});});
-        document.querySelectorAll('.modal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('active');});});
+        function showToast(msg, type) {
+            type = type || 'info';
+            var c = document.getElementById('toastContainer');
+            var t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(function() {
+                t.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(function() { t.remove(); }, 300);
+            }, 3000);
+        }
+
+        function escapeHtml(t) {
+            var d = document.createElement('div');
+            d.textContent = t;
+            return d.innerHTML;
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(function(m) { m.classList.remove('active'); });
+            }
+        });
+
+        document.querySelectorAll('.modal').forEach(function(m) {
+            m.addEventListener('click', function(e) {
+                if (e.target === m) m.classList.remove('active');
+            });
+        });
     </script>
 </body>
 </html>
