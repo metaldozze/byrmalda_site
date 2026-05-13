@@ -336,7 +336,6 @@
     <button class="menu-btn" data-page="chats" data-auth-required>💬 Чаты</button>
     <button class="menu-btn hidden" id="auth-login-btn">🔐 Войти</button>
     <button class="menu-btn hidden" id="logout-btn">🚪 Выйти</button>
-    <!-- ИСПРАВЛЕНО: добавлен data-page="moderation" -->
     <button class="menu-btn hidden" id="moderation-btn" data-page="moderation" style="background: #fff3e0; color: #ef6c00;">🛡️ Модерация</button>
   </nav>
   
@@ -469,7 +468,8 @@
           <select name="category" required><option value="">Категория *</option><option value="electronics">📱 Электроника</option><option value="clothing">👕 Одежда</option><option value="home">🏠 Для дома</option><option value="other">📦 Другое</option></select>
           <textarea name="description" placeholder="Описание *" rows="3" required></textarea>
           <textarea name="instruction" placeholder="Инструкция" rows="3"></textarea>
-          <input type="url" name="image" placeholder="URL изображения (ImgBB) *" required>
+          <input type="file" name="imageFile" accept="image/*" required>
+          <p style="font-size:0.85rem;color:#666">Фото загрузится на ImgBB</p>
           <button type="submit" class="btn btn-success">Опубликовать</button>
         </form>
       </div>
@@ -608,11 +608,11 @@
       </div>
       <div class="modal-body">
         <div class="propose-step active" id="propose-step-1"><div class="form-group"><label>Название *</label><input type="text" id="propose-title" placeholder="Введите название"></div></div>
-        <div class="propose-step hidden" id="propose-step-2"><div class="form-group"><label>Фото *</label><input type="file" id="propose-image" accept="image/*"><p style="font-size:0.85rem;color:#666;margin-top:0.5rem">Загрузка на ImgBB</p><div id="propose-image-preview" style="margin-top:10px;max-width:200px"></div></div></div>
+        <div class="propose-step hidden" id="propose-step-2"><div class="form-group"><label>Фото *</label><input type="file" id="propose-image" accept="image/*" capture="environment"><p style="font-size:0.85rem;color:#666;margin-top:0.5rem">Выберите из галереи или сделайте фото</p><div id="propose-image-preview" style="margin-top:10px;max-width:200px"></div></div></div>
         <div class="propose-step hidden" id="propose-step-3"><div class="form-group"><label>Описание *</label><textarea id="propose-description" rows="4" placeholder="Подробное описание"></textarea></div></div>
         <div class="propose-step hidden" id="propose-step-4"><div class="form-group"><label>Категория *</label><select id="propose-category"><option value="">Выберите</option><option value="electronics">📱 Электроника</option><option value="clothing">👕 Одежда</option><option value="home">🏠 Для дома</option><option value="other">📦 Другое</option></select></div></div>
         <div class="propose-step hidden" id="propose-step-5"><div class="form-group"><label>Стоимость (₽) *</label><input type="number" id="propose-price" placeholder="100"></div><div class="form-group"><label>Мин. количество *</label><input type="number" id="propose-min-qty" value="1" min="1"></div><div class="form-group"><label>Инструкция</label><textarea id="propose-instruction" rows="3" placeholder="Как использовать"></textarea></div></div>
-        <div class="propose-step hidden" id="propose-step-6"><p style="margin-bottom:1rem">Проверьте данные:</p><div style="background:#f8f9fa;padding:1rem;border-radius:8px;font-size:0.95rem"><p><strong>Название:</strong> <span id="propose-confirm-title"></span></p><p><strong>Категория:</strong> <span id="propose-confirm-category"></span></p><p><strong>Цена:</strong> <span id="propose-confirm-price"></span> ₽</p><p><strong>Мин. кол-во:</strong> <span id="propose-confirm-min-qty"></span></p></div><p style="color:#ef6c00;font-size:0.9rem;margin-top:1rem">⚠️ Товар отправится на модерацию.</p></div>
+        <div class="propose-step hidden" id="propose-step-6"><p style="margin-bottom:1rem">Проверьте данные:</p><div style="background:#f8f9fa;padding:1rem;border-radius:8px;font-size:0.95rem"><p><strong>Название:</strong> <span id="propose-confirm-title"></span></p><p><strong>Категория:</strong> <span id="propose-confirm-category"></span></p><p><strong>Цена:</strong> <span id="propose-confirm-price"></span> ₽</p><p><strong>Мин. кол-во:</strong> <span id="propose-confirm-min-qty"></span></p></div><p style="color:#ef6c00;font-size:0.9rem;margin-top:1rem">⚠️ Товар отправится на модерацию</p></div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" id="propose-back" disabled>← Назад</button>
@@ -697,6 +697,7 @@
     let currentProposeStep = 1;
     let reviewRating = 0;
     let unsubscribeChats = {};
+    let adminSupportUnsub = null;
     
     // ===== УТИЛИТЫ =====
     const showToast = (message, type = 'info') => {
@@ -867,7 +868,9 @@
       
       document.getElementById('logout-btn').addEventListener('click', async () => {
         Object.values(unsubscribeChats).forEach(unsub => unsub?.());
+        if(adminSupportUnsub) adminSupportUnsub();
         unsubscribeChats = {};
+        adminSupportUnsub = null;
         await auth.signOut();
         currentUser = null;
         document.getElementById('user-info').classList.add('hidden');
@@ -881,7 +884,7 @@
       auth.onAuthStateChanged(async (user) => {
         if (user) {
           try {
-            const snap = await db.doc(`users/${user.uid}`).get();
+            const snap = await getDoc(`users/${user.uid}`);
             
             if (!snap.exists) {
               const nick = generateNick();
@@ -917,7 +920,6 @@
               document.getElementById('premium-indicator').classList.remove('hidden');
             }
             
-            // Надёжная проверка админа
             if (await checkIsAdmin(user)) {
               document.getElementById('moderation-btn').classList.remove('hidden');
             }
@@ -1380,7 +1382,7 @@
           const url = await uploadToImgBB(file);
           proposeProductData.image = url;
           preview.innerHTML = `<img src="${url}" style="max-width:100%;border-radius:8px">`;
-        } catch(err) { preview.innerHTML='<p style="color:#dc3545">Ошибка</p>'; }
+        } catch(err) { preview.innerHTML='<p style="color:#dc3545">Ошибка загрузки</p>'; }
       });
       
       document.getElementById('propose-submit').addEventListener('click', submitProposeProduct);
@@ -1465,7 +1467,6 @@
     
     // ===== МОДЕРАЦИЯ =====
     const loadModeration = async () => {
-      // Надёжная проверка админа
       const user = auth.currentUser;
       const isAdminUser = user && await checkIsAdmin(user);
       
@@ -1482,6 +1483,10 @@
           tab.classList.add('active');
           document.getElementById(`mod-${tab.dataset.modTab}`).classList.remove('hidden');
           if(tab.dataset.modTab==='products') loadPendingProducts();
+          if(tab.dataset.modTab==='avatars') loadPendingAvatars();
+          if(tab.dataset.modTab==='reviews') loadPendingReviews();
+          if(tab.dataset.modTab==='reports') loadReports();
+          if(tab.dataset.modTab==='admin-chat') loadAdminSupportChat();
         });
       });
       
@@ -1509,10 +1514,13 @@
       document.getElementById('admin-product-form')?.addEventListener('submit',async(e)=>{
         e.preventDefault(); const form=e.target, fd=new FormData(form);
         try{
+          const imgFile=form.querySelector('input[name="imageFile"]').files[0];
+          if(!imgFile){showToast('Выберите фото','warning');return;}
+          const imgUrl=await uploadToImgBB(imgFile);
           const id=generateId();
           await setDoc(`products/${id}`,{
             id,title:fd.get('title'),price:parseFloat(fd.get('price')),minQty:parseInt(fd.get('minQty')),category:fd.get('category'),
-            description:fd.get('description'),instruction:fd.get('instruction'),image:fd.get('image'),
+            description:fd.get('description'),instruction:fd.get('instruction'),image:imgUrl,
             sellerId:'admin',sellerNick:'Cloudlu Shop',approved:true,createdAt:firebase.firestore.FieldValue.serverTimestamp(),ratings:{}
           });
           form.reset(); showToast('✅ Товар опубликован','success'); loadProducts();
@@ -1541,68 +1549,216 @@
       } catch(e) { container.innerHTML='<p style="color:#dc3545">Ошибка</p>'; }
     };
     
+    const loadPendingAvatars = async () => {
+      const container = document.getElementById('mod-avatars-list');
+      container.innerHTML = '<div class="loading">Загрузка...</div>';
+      try {
+        const snap = await db.collection('moderation/avatars').where('status','==','pending').get();
+        const items = []; snap.forEach(doc=>items.push({id:doc.id,...doc.data()}));
+        if(items.length===0){container.innerHTML='<p style="color:#666">Нет заявок</p>';return;}
+        container.innerHTML = items.map(it=>`<div class="moderation-item"><p><strong>Пользователь:</strong> ${it.currentNick} (${it.userId})</p>${it.newAvatar?`<img src="${it.newAvatar}" style="max-width:150px;border-radius:8px;margin:10px 0">`:''}<div class="moderation-actions"><button class="btn btn-success" data-approve-av="${it.id}">✅ Одобрить</button><button class="btn btn-danger" data-reject-av="${it.id}">❌ Отклонить</button></div></div>`).join('');
+        container.querySelectorAll('[data-approve-av]').forEach(btn=>btn.addEventListener('click',async()=>{
+          const id=btn.dataset.approveAv, it=items.find(x=>x.id===id); if(!it)return;
+          await updateDoc(`users/${it.userId}`,{avatar:it.newAvatar});
+          await deleteDoc(`moderation/avatars/${id}`);
+          showToast('✅ Аватар одобрен','success'); loadPendingAvatars();
+        }));
+        container.querySelectorAll('[data-reject-av]').forEach(btn=>btn.addEventListener('click',async()=>{
+          await deleteDoc(`moderation/avatars/${btn.dataset.rejectAv}`);
+          showToast('❌ Отклонено','info'); loadPendingAvatars();
+        }));
+      } catch(e) { container.innerHTML='<p style="color:#dc3545">Ошибка</p>'; }
+    };
+    
+    const loadPendingReviews = async () => {
+      const container = document.getElementById('mod-reviews-list');
+      container.innerHTML = '<div class="loading">Загрузка...</div>';
+      try {
+        const snap = await db.collection('reviews/pending').get();
+        const items = []; snap.forEach(doc=>items.push({id:doc.id,...doc.data()}));
+        if(items.length===0){container.innerHTML='<p style="color:#666">Нет отзывов</p>';return;}
+        container.innerHTML = items.map(it=>`<div class="moderation-item"><p><strong>Пользователь:</strong> ${it.userNick}</p><p><strong>Оценка:</strong> ${'⭐'.repeat(it.rating)}</p><p>${it.text}</p><div class="moderation-actions"><button class="btn btn-success" data-approve-rev="${it.id}">✅ Одобрить</button><button class="btn btn-danger" data-reject-rev="${it.id}">❌ Отклонить</button></div></div>`).join('');
+        container.querySelectorAll('[data-approve-rev]').forEach(btn=>btn.addEventListener('click',async()=>{
+          const id=btn.dataset.approveRev, it=items.find(x=>x.id===id); if(!it)return;
+          await addDoc('reviews/approved',{...it,status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp()});
+          const prodSnap=await getDoc(`products/${it.productId}`), prod=prodSnap.data();
+          const ratings=prod.ratings||{}; ratings[it.rating]=(ratings[it.rating]||0)+1;
+          await updateDoc(`products/${it.productId}`,{ratings});
+          await deleteDoc(`reviews/pending/${id}`);
+          showToast('✅ Отзыв одобрен','success'); loadPendingReviews();
+        }));
+        container.querySelectorAll('[data-reject-rev]').forEach(btn=>btn.addEventListener('click',async()=>{
+          await deleteDoc(`reviews/pending/${btn.dataset.rejectRev}`);
+          showToast('❌ Отклонено','info'); loadPendingReviews();
+        }));
+      } catch(e) { container.innerHTML='<p style="color:#dc3545">Ошибка</p>'; }
+    };
+    
+    const loadReports = async () => {
+      const container = document.getElementById('mod-reports-list');
+      container.innerHTML = '<div class="loading">Загрузка...</div>';
+      try {
+        const snap = await db.collection('reports').get();
+        const items = []; snap.forEach(doc=>items.push({id:doc.id,...doc.data()}));
+        if(items.length===0){container.innerHTML='<p style="color:#666">Нет жалоб</p>';return;}
+        container.innerHTML = items.map(it=>`<div class="moderation-item"><p><strong>Тип:</strong> ${it.type}</p><p><strong>От:</strong> ${it.reporterNick||'—'} (${it.reporterId})</p><p><strong>Описание:</strong> ${it.description}</p><div class="moderation-actions"><button class="btn btn-success" data-resolve="${it.id}">✅ Решено</button><button class="btn btn-danger" data-ignore="${it.id}">❌ Игнор</button></div></div>`).join('');
+        container.querySelectorAll('[data-resolve]').forEach(btn=>btn.addEventListener('click',async()=>{
+          await updateDoc(`reports/${btn.dataset.resolve}`,{status:'resolved'});
+          showToast('✅ Жалоба решена','success'); loadReports();
+        }));
+        container.querySelectorAll('[data-ignore]').forEach(btn=>btn.addEventListener('click',async()=>{
+          await updateDoc(`reports/${btn.dataset.ignore}`,{status:'ignored'});
+          showToast('❌ Игнорировано','info'); loadReports();
+        }));
+      } catch(e) { container.innerHTML='<p style="color:#dc3545">Ошибка</p>'; }
+    };
+    
+    // ===== АДМИН: ЧАТ ПОДДЕРЖКИ (все пользователи) =====
+    const loadAdminSupportChat = () => {
+      const container = document.getElementById('admin-support-messages');
+      container.innerHTML = '<div class="loading">Загрузка чатов...</div>';
+      if(adminSupportUnsub) adminSupportUnsub();
+      
+      adminSupportUnsub = db.collection('chats/support').onSnapshot(outerSnap => {
+        container.innerHTML = '';
+        outerSnap.forEach(userDoc => {
+          const userId = userDoc.id;
+          userDoc.ref.orderBy('timestamp','asc').onSnapshot(innerSnap => {
+            innerSnap.forEach(msgDoc => {
+              const msg = msgDoc.data();
+              addMessageToChat(container, {...msg, userId}, 'admin');
+            });
+          });
+        });
+      });
+    };
+    
+    document.getElementById('admin-support-send').addEventListener('click', async () => {
+      const input = document.getElementById('admin-support-input');
+      const txt = input.value.trim();
+      if(!txt) return;
+      
+      const match = txt.match(/^\(([^)]+)\)\s*(.+)$/);
+      if(match) {
+        const targetUid = match[1].trim();
+        const message = match[2];
+        try {
+          await addDoc(`chats/support/${targetUid}`, {
+            from: 'admin',
+            fromNick: 'Поддержка',
+            text: message,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          input.value = '';
+          showToast('✅ Ответ отправлен', 'success');
+        } catch(e) {
+          showToast('Ошибка: ' + e.message, 'error');
+        }
+      } else {
+        showToast('Формат: (user_id) ваш текст', 'warning');
+      }
+    });
+    
+    // ===== НИК: ИСПРАВЛЕНА ОТПРАВКА НА МОДЕРАЦИЮ =====
+    document.getElementById('edit-nick-btn').addEventListener('click', () => {
+      const newNick = prompt('Новый никнейм:', currentUser?.nick);
+      if(newNick && newNick !== currentUser?.nick && newNick.length >= 3) {
+        // ✅ ОТПРАВЛЯЕМ НА МОДЕРАЦИЮ!
+        addDoc('moderation/nicks', {
+          userId: currentUser.uid,
+          currentNick: currentUser.nick,
+          newNick: newNick,
+          status: 'pending',
+          requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('✅ Ник отправлен на модерацию', 'success');
+      } else if(newNick) {
+        showToast('Минимум 3 символа', 'warning');
+      }
+    });
+    
     // ===== ЖАЛОБЫ =====
     const setupReport = () => {
-      document.getElementById('report-submit').addEventListener('click', async ()=>{
-        const type=document.getElementById('report-type').value, desc=document.getElementById('report-description').value.trim(), prodId=document.getElementById('report-product-id').value;
-        if(!desc){showToast('Опишите проблему','warning');return;}
-        try{
-          await addDoc('reports',{productId:prodId,reporterId:currentUser?.uid,reporterNick:currentUser?.nick,type,description:desc,status:'new',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-          hideModal('report-modal'); showToast('✅ Жалоба отправлена','success');
-        }catch(e){showToast('Ошибка','error');}
+      document.getElementById('report-submit').addEventListener('click', async () => {
+        const type = document.getElementById('report-type').value;
+        const desc = document.getElementById('report-description').value.trim();
+        const prodId = document.getElementById('report-product-id').value;
+        if(!desc){ showToast('Опишите проблему','warning'); return; }
+        try {
+          await addDoc('reports', {
+            productId: prodId,
+            reporterId: currentUser?.uid,
+            reporterNick: currentUser?.nick,
+            type,
+            description: desc,
+            status: 'new',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          hideModal('report-modal');
+          showToast('✅ Жалоба отправлена', 'success');
+        } catch(e) { showToast('Ошибка', 'error'); }
       });
     };
     
     // ===== ОБРАБОТЧИКИ =====
     const setupEventListeners = () => {
-      document.querySelectorAll('.menu-btn[data-page]').forEach(btn=>btn.addEventListener('click',()=>showPage(btn.dataset.page)));
-      document.getElementById('logo-home').addEventListener('click',()=>showPage('home'));
+      document.querySelectorAll('.menu-btn[data-page]').forEach(btn => btn.addEventListener('click', () => showPage(btn.dataset.page)));
+      document.getElementById('logo-home').addEventListener('click', () => showPage('home'));
+      document.getElementById('toggleSidebar').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
       
-      document.getElementById('toggleSidebar').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+      document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', (e) => hideModal(e.target.closest('.modal').id)));
+      document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', (e) => { if(e.target === m) hideModal(m.id); }));
+      document.getElementById('auth-close').addEventListener('click', () => hideModal('auth-modal'));
       
-      document.querySelectorAll('.modal-close').forEach(btn=>btn.addEventListener('click',(e)=>hideModal(e.target.closest('.modal').id)));
-      document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',(e)=>{if(e.target===m)hideModal(m.id)}));
-      document.getElementById('auth-close').addEventListener('click',()=>hideModal('auth-modal'));
-      
-      document.getElementById('avatar-upload').addEventListener('change', async (e)=>{
-        const file=e.target.files[0]; if(!file||!currentUser) return;
+      // АВАТАР: загрузка и отправка на модерацию
+      document.getElementById('avatar-upload').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if(!file || !currentUser) return;
         showToast('🔄 Загрузка...','info');
-        try{
-          const url=await uploadToImgBB(file);
-          await addDoc('moderation/avatars',{userId:currentUser.uid,currentNick:currentUser.nick,newAvatar:url,status:'pending',requestedAt:firebase.firestore.FieldValue.serverTimestamp()});
-          showToast('✅ Аватар отправлен на модерацию','success');
-        }catch(err){showToast('Ошибка: '+err.message,'error');}
+        try {
+          const url = await uploadToImgBB(file);
+          // ✅ ОТПРАВЛЯЕМ НА МОДЕРАЦИЮ!
+          await addDoc('moderation/avatars', {
+            userId: currentUser.uid,
+            currentNick: currentUser.nick,
+            newAvatar: url,
+            status: 'pending',
+            requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          showToast('✅ Аватар отправлен на модерацию', 'success');
+        } catch(err) { showToast('Ошибка: ' + err.message, 'error'); }
       });
       
-      document.getElementById('edit-nick-btn').addEventListener('click',()=>{
-        const newNick=prompt('Новый никнейм:',currentUser?.nick);
-        if(newNick && newNick!==currentUser?.nick && newNick.length>=3){
-          addDoc('moderation/nicks',{userId:currentUser.uid,currentNick:currentUser.nick,newNick,status:'pending',requestedAt:firebase.firestore.FieldValue.serverTimestamp()});
-          showToast('✅ Ник отправлен на модерацию','success');
-        } else if(newNick) showToast('Минимум 3 символа','warning');
+      document.getElementById('support-send').addEventListener('click', sendSupportMessage);
+      document.getElementById('support-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendSupportMessage(); });
+      
+      document.getElementById('chat-send').addEventListener('click', sendChatMessage);
+      document.getElementById('chat-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendChatMessage(); });
+      document.getElementById('close-chat').addEventListener('click', () => {
+        document.getElementById('active-chat-container').classList.add('hidden');
+        document.getElementById('chats-list').classList.remove('hidden');
+        currentChat = null;
       });
       
-      document.getElementById('support-send').addEventListener('click',sendSupportMessage);
-      document.getElementById('support-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')sendSupportMessage()});
+      document.getElementById('payment-notice-ok').addEventListener('click', () => { hideModal('payment-notice-modal'); showPage('profile'); });
+      document.getElementById('payment-notice-support').addEventListener('click', () => { hideModal('payment-notice-modal'); showPage('support'); });
+      document.getElementById('premium-cancel').addEventListener('click', () => hideModal('premium-offer-modal'));
+      document.getElementById('propose-product-close').addEventListener('click', () => hideModal('propose-product-modal'));
+      document.getElementById('report-cancel').addEventListener('click', () => hideModal('report-modal'));
+      document.getElementById('report-modal-close').addEventListener('click', () => hideModal('report-modal'));
       
-      document.getElementById('chat-send').addEventListener('click',sendChatMessage);
-      document.getElementById('chat-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')sendChatMessage()});
-      document.getElementById('close-chat').addEventListener('click',()=>{document.getElementById('active-chat-container').classList.add('hidden');document.getElementById('chats-list').classList.remove('hidden');currentChat=null;});
+      document.querySelectorAll('#review-stars span').forEach(star => star.addEventListener('click', () => {
+        reviewRating = parseInt(star.dataset.rating);
+        updateReviewStars();
+      }));
+      document.getElementById('review-cancel').addEventListener('click', () => hideModal('review-modal'));
+      document.getElementById('review-modal-close').addEventListener('click', () => hideModal('review-modal'));
+      document.getElementById('review-submit').addEventListener('click', submitReview);
       
-      document.getElementById('payment-notice-ok').addEventListener('click',()=>{hideModal('payment-notice-modal');showPage('profile')});
-      document.getElementById('payment-notice-support').addEventListener('click',()=>{hideModal('payment-notice-modal');showPage('support')});
-      document.getElementById('premium-cancel').addEventListener('click',()=>hideModal('premium-offer-modal'));
-      document.getElementById('propose-product-close').addEventListener('click',()=>hideModal('propose-product-modal'));
-      document.getElementById('report-cancel').addEventListener('click',()=>hideModal('report-modal'));
-      document.getElementById('report-modal-close').addEventListener('click',()=>hideModal('report-modal'));
-      document.querySelectorAll('#review-stars span').forEach(star=>star.addEventListener('click',()=>{reviewRating=parseInt(star.dataset.rating);updateReviewStars()}));
-      document.getElementById('review-cancel').addEventListener('click',()=>hideModal('review-modal'));
-      document.getElementById('review-modal-close').addEventListener('click',()=>hideModal('review-modal'));
-      document.getElementById('review-submit').addEventListener('click',submitReview);
-      document.getElementById('product-modal-close').addEventListener('click',()=>hideModal('product-modal'));
-      document.getElementById('order-cancel').addEventListener('click',()=>hideModal('order-modal'));
-      document.getElementById('order-modal-close').addEventListener('click',()=>hideModal('order-modal'));
-      document.getElementById('order-confirm').addEventListener('click',confirmOrder);
+      document.getElementById('product-modal-close').addEventListener('click', () => hideModal('product-modal'));
+      document.getElementById('order-cancel').addEventListener('click', () => hideModal('order-modal'));
+      document.getElementById('order-modal-close').addEventListener('click', () => hideModal('order-modal'));
+      document.getElementById('order-confirm').addEventListener('click', confirmOrder);
     };
     
     // ===== ИНИЦИАЛИЗАЦИЯ =====
@@ -1612,7 +1768,7 @@
       setupProposeProduct();
       setupReport();
       loadProducts();
-      showToast('👋 Добро пожаловать в Cloudlu Shop!','success');
+      showToast('👋 Добро пожаловать в Cloudlu Shop!', 'success');
     };
     
     document.addEventListener('DOMContentLoaded', init);
