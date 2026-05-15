@@ -906,7 +906,7 @@
 <script type="module">
 // 🔐 Firebase imports с App Check
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut, updateProfile, applyActionCode, checkActionCode } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, limit, updateDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 // 🔐 App Check import
@@ -951,7 +951,44 @@ const hide = el => el.classList.add('hidden');
 const fmtDate = ts => ts?.toDate?.()?.toLocaleDateString('ru-RU') || '...';
 const genId = () => Math.random().toString(36).substring(2, 10).toUpperCase();
 
+// 🔁 Обработка возврата после верификации почты (ДО onAuthStateChanged)
 window.addEventListener('DOMContentLoaded', async () => {
+    // Проверяем, не вернулся ли пользователь после клика по ссылке верификации
+    const urlParams = new URLSearchParams(window.location.search);
+    const oobCode = urlParams.get('oobCode');
+    const mode = urlParams.get('mode');
+    
+    if (oobCode && mode === 'verifyEmail') {
+        try {
+            // Применяем код действия (подтверждаем почту)
+            await applyActionCode(auth, oobCode);
+            
+            // Очищаем URL чтобы не показывать ошибку при обновлении
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Показываем успешное сообщение
+            alert('✅ Email подтверждён! Теперь вы можете войти в аккаунт.');
+            
+            // Если пользователь уже авторизован - обновляем данные
+            if (auth.currentUser) {
+                await auth.currentUser.reload();
+                if (auth.currentUser.emailVerified) {
+                    await loadUser();
+                    updateAuthUI();
+                }
+            }
+        } catch(e) {
+            console.error('applyActionCode error:', e);
+            if (e.code === 'auth/expired-action-code') {
+                alert('❌ Ссылка истекла. Попробуйте войти и запросить новую.');
+            } else if (e.code === 'auth/invalid-action-code') {
+                alert('❌ Ссылка уже использована или недействительна.');
+            } else {
+                alert('❌ Ошибка подтверждения: ' + e.message);
+            }
+        }
+    }
+    
     applyTheme();
     onAuthStateChanged(auth, async u => {
         if (u) {
@@ -1032,54 +1069,125 @@ function resetAuthUI() {
 window.openLogin = () => openModal('login-modal');
 window.switchReg = () => { closeModal('login-modal'); openModal('reg-modal'); showStep(1); };
 
+// 🔁 ИСПРАВЛЕННЫЙ doLogin с авто-отправкой новой ссылки
 window.doLogin = async () => {
     const email = $('log-email').value.trim(), pass = $('log-pass').value;
     $('log-err').textContent = '';
     if (!email || !pass) { $('log-err').textContent = 'Заполните поля'; return; }
+    
     try {
         const cred = await signInWithEmailAndPassword(auth, email, pass);
         const u = cred.user;
-        if (!u.emailVerified) { await signOut(auth); $('log-err').textContent = 'Подтвердите email. Проверьте почту.'; return; }
+        
+        // 🔁 ПРОВЕРКА: если почта не подтверждена — отправляем НОВУЮ ссылку
+        if (!u.emailVerified) {
+            try {
+                await sendEmailVerification(u, {
+                    url: window.location.href,
+                    handleCodeInApp: true
+                });
+            } catch(e) {
+                console.log('sendEmailVerification error:', e);
+            }
+            await signOut(auth); // Выходим чтобы пользователь перешёл по новой ссылке
+            $('log-err').innerHTML = `✉️ Подтвердите почту.<br>Новая ссылка отправлена на <b>${email}</b><br><small>Проверьте папку "Спам"</small>`;
+            return;
+        }
+        
         const ud = await getDoc(doc(db, 'artifacts/byrmalda-prod/users', u.uid));
-        if (ud.exists() && ud.data().isBlocked) { await signOut(auth); showBlock(); return; }
+        if (ud.exists() && ud.data().isBlocked) { 
+            await signOut(auth); 
+            showBlock(); 
+            return; 
+        }
         closeModal('login-modal');
     } catch(e) {
         console.error(e.code);
-        $('log-err').textContent = e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' ? 'Аккаунт не найден или неверный пароль' : 'Ошибка: '+e.message;
+        $('log-err').textContent = e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' 
+            ? 'Аккаунт не найден или неверный пароль' 
+            : 'Ошибка: '+e.message;
     }
 };
 
+// 🔁 regStep1 — проверка email
 window.regStep1 = async () => {
     const email = $('reg-email').value.trim();
     if (!email) { alert('Введите email'); return; }
+    
     try {
         const methods = await auth.fetchSignInMethodsForEmail(email);
-        if (methods.length > 0) { $('reg-err').textContent = 'Email уже зарегистрирован'; return; }
-    } catch(e) {}
+        if (methods.length > 0) { 
+            $('reg-err').textContent = 'Email уже зарегистрирован'; 
+            return; 
+        }
+    } catch(e) {
+        console.log('fetchSignInMethods error:', e);
+    }
+    
     sessionStorage.setItem('pending_email', email);
     showStep(2);
 };
 
-window.regStep2 = () => showStep(3);
+// 🔁 regStep2 — кнопка "Я подтвердил почту"
+window.regStep2 = async () => {
+    const email = sessionStorage.getItem('pending_email');
+    if (!email) { alert('Ошибка: сессия истекла'); return; }
+    
+    // Проверяем, авторизован ли пользователь и подтверждена ли почта
+    const currentUser = auth.currentUser;
+    if (currentUser && currentUser.email === email) {
+        await currentUser.reload(); // Обновляем данные с сервера
+        if (currentUser.emailVerified) {
+            showStep(3);
+            return;
+        }
+    }
+    
+    // Если не подтверждена — отправляем НОВУЮ ссылку
+    try {
+        if (currentUser && currentUser.email === email) {
+            await sendEmailVerification(currentUser, {
+                url: window.location.href,
+                handleCodeInApp: true
+            });
+        }
+        alert('✉️ Новая ссылка отправлена на ' + email + '\nПроверьте почту и папку "Спам"!');
+    } catch(e) {
+        console.error('sendEmailVerification error:', e);
+    }
+    
+    showStep(3);
+};
 
+// 🔁 regStep3 — завершение регистрации
 window.regStep3 = async () => {
     const email = sessionStorage.getItem('pending_email'), name = $('reg-name').value.trim(), p1 = $('reg-pass').value, p2 = $('reg-pass2').value;
     $('reg-err').textContent = '';
     if (!name || !p1 || !p2) { $('reg-err').textContent = 'Заполните все поля'; return; }
     if (p1 !== p2) { $('reg-err').textContent = 'Пароли не совпадают'; return; }
     if (p1.length < 6) { $('reg-err').textContent = 'Пароль минимум 6 символов'; return; }
+    
     try {
         const cred = await createUserWithEmailAndPassword(auth, email, p1);
-        await sendEmailVerification(cred.user);
+        
+        // 🔁 Отправляем верификацию с правильными настройками
+        await sendEmailVerification(cred.user, {
+            url: window.location.href, // куда вернуться после верификации
+            handleCodeInApp: true // обрабатывать в приложении
+        });
+        
         await setDoc(doc(db, 'artifacts/byrmalda-prod/users', cred.user.uid), {
             uid: cred.user.uid, email, name, avatar: null, avatarPending: null,
             registrationDate: serverTimestamp(), isBlocked: false, hasVerifiedProduct: false,
             language: 'ru', theme: 'light', hasSubmittedReview: false
         });
         await updateProfile(cred.user, { displayName: name });
+        
         $('reg-step-3').classList.add('hidden');
         $('reg-ok').classList.remove('hidden');
-        await signOut(auth);
+        
+        // 🔁 НЕ делаем signOut — пусть пользователь останется авторизованным
+        // Он сможет пользоваться сайтом, но функционал будет ограничен пока не подтвердит почту
     } catch(e) {
         console.error(e.code);
         if (e.code === 'auth/email-already-in-use') $('reg-err').textContent = 'Email уже занят';
@@ -1931,7 +2039,7 @@ Object.assign(window, {
     admMarkReportViewed, openSuggest, submitSuggestion, toggleCollabInput
 });
 
-console.log('🚀 BYRMALDA loaded | 🔐 App Check + reCAPTCHA v3 enabled');
+console.log('🚀 BYRMALDA loaded | 🔐 App Check + ✅ Email verification FIXED');
 </script>
 </body>
 </html>
