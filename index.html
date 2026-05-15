@@ -5,277 +5,287 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Byrmalda Brand Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-auth-compat.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        .dark-theme { background-color: #0a0a0a; color: #f5f5f5; }
+        body { font-family: 'Inter', sans-serif; transition: background 0.3s, color 0.3s; }
+        .dark-theme { background-color: #050505; color: #ffffff; }
+        .dark-theme .bg-gray-100, .dark-theme .bg-gray-50 { background-color: #111 !important; color: #eee; }
+        .dark-theme .border-gray-200 { border-color: #222; }
         .light-theme { background-color: #ffffff; color: #1a1a1a; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .modal-overlay { background: rgba(0,0,0,0.8); z-index: 100; }
-        .btn-byrmalda { border-radius: 40px; transition: transform 0.2s; }
-        .btn-byrmalda:active { transform: scale(0.95); }
+        .modal-overlay { background: rgba(0,0,0,0.85); z-index: 1000; backdrop-filter: blur(8px); }
+        .btn-action { transition: all 0.2s; border-radius: 20px; }
+        .btn-action:hover { transform: translateY(-2px); opacity: 0.9; }
         .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
-        .avatar-circle { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
-        .order-card { border-radius: 20px; border: 1px solid #eee; }
-        .lang-hidden { display: none; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         #blocking-layer { display: none; }
+        .product-card-img { aspect-ratio: 1/1; object-fit: cover; border-radius: 32px; }
+        .nav-btn { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; width: 100%; transition: 0.2s; }
+        .nav-btn:hover { background: rgba(0,0,0,0.05); }
+        .dark-theme .nav-btn:hover { background: rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="light-theme overflow-x-hidden">
 
-    <!-- Блокировщик экрана для забаненных -->
-    <div id="blocking-layer" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center text-center p-6">
-        <h1 class="text-3xl font-bold text-white mb-4">Аккаунт заблокирован</h1>
-        <p class="text-gray-400">Аккаунт заблокирован из за нарушений сайта, пожалуйста, напишите нам в тг @fueum</p>
+    <div id="blocking-layer" class="fixed inset-0 bg-black z-[10000] flex flex-col items-center justify-center text-center p-6">
+        <h1 class="text-4xl font-black text-white mb-4 italic">ACCESS DENIED</h1>
+        <p class="text-gray-400 mb-8">Ваш аккаунт заблокирован за нарушение правил сайта.<br>Свяжитесь с нами для разблокировки: @fueum</p>
     </div>
 
     <div id="app" class="flex min-h-screen">
         
-        <!-- Sidebar Navigation -->
         <nav id="sidebar" class="w-20 md:w-64 border-r border-gray-200 flex flex-col p-4 fixed h-full z-50 bg-inherit">
-            <div class="mb-10 text-2xl font-black tracking-tighter">BYRMALDA</div>
+            <div class="mb-10 text-2xl font-black tracking-tighter italic px-2">BYRMALDA</div>
             
-            <div class="space-y-4 flex-1">
-                <button onclick="setView('home')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
-                    <span class="icon">🏠</span> <span class="hidden md:inline" data-lang="menu_home">Главная</span>
-                </button>
-                <button onclick="setView('search')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
-                    <span class="icon">🔍</span> <span class="hidden md:inline" data-lang="menu_search">Поиск</span>
-                </button>
-                <button onclick="setView('catalog')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
-                    <span class="icon">📁</span> <span class="hidden md:inline" data-lang="menu_catalog">Каталог</span>
-                </button>
-                <button onclick="setView('cart')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition relative">
-                    <span class="icon">🛒</span> <span class="hidden md:inline" data-lang="menu_cart">Корзина</span>
+            <div class="space-y-1 flex-1 overflow-y-auto custom-scroll">
+                <button onclick="setView('home')" class="nav-btn"><span>🏠</span> <span class="hidden md:inline">Главная</span></button>
+                <button onclick="setView('search')" class="nav-btn"><span>🔍</span> <span class="hidden md:inline">Поиск</span></button>
+                <button onclick="setView('catalog')" class="nav-btn"><span>📁</span> <span class="hidden md:inline">Каталог</span></button>
+                <button onclick="setView('cart')" class="nav-btn relative">
+                    <span>🛒</span> <span class="hidden md:inline">Корзина</span>
                     <span id="cart-count" class="absolute top-2 left-6 bg-red-500 text-white text-[10px] px-1.5 rounded-full hidden">0</span>
                 </button>
-                <button onclick="setView('profile')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
-                    <span class="icon">👤</span> <span class="hidden md:inline" data-lang="menu_profile">Профиль</span>
+                <button onclick="setView('profile')" class="nav-btn"><span>👤</span> <span class="hidden md:inline">Профиль</span></button>
+                <button onclick="setView('support')" class="nav-btn relative">
+                    <span>💬</span> <span class="hidden md:inline">Поддержка</span>
+                    <span id="support-badge" class="absolute top-2 left-6 bg-red-500 text-white text-[10px] px-1.5 rounded-full hidden">0</span>
                 </button>
-                <button id="btn-support" onclick="setView('support')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition relative">
-                    <span class="icon">💬</span> <span class="hidden md:inline" data-lang="menu_support">Поддержка</span>
-                    <span id="support-count" class="absolute top-2 left-6 bg-red-500 text-white text-[10px] px-1.5 rounded-full hidden">0</span>
-                </button>
-                <button onclick="setView('reviews')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
-                    <span class="icon">⭐</span> <span class="hidden md:inline" data-lang="menu_reviews">Отзывы</span>
-                </button>
-                <button onclick="setView('settings')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
-                    <span class="icon">⚙️</span> <span class="hidden md:inline" data-lang="menu_settings">Настройки</span>
-                </button>
-                <button id="btn-suggest" onclick="openSuggestModal()" class="nav-item w-full flex items-center gap-3 p-3 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-2xl transition hidden">
-                    <span class="icon">💡</span> <span class="hidden md:inline" data-lang="menu_suggest">Предложить</span>
-                </button>
-                <button id="btn-admin" onclick="setView('admin')" class="nav-item w-full flex items-center gap-3 p-3 bg-black text-white hover:bg-gray-800 rounded-2xl transition hidden">
-                    <span class="icon">⚡</span> <span class="hidden md:inline" data-lang="menu_admin">Панель</span>
-                </button>
+                <button onclick="setView('reviews')" class="nav-btn"><span>⭐</span> <span class="hidden md:inline">Отзывы</span></button>
+                <button onclick="setView('settings')" class="nav-btn"><span>⚙️</span> <span class="hidden md:inline">Настройки</span></button>
+                
+                <button id="btn-suggest" onclick="openSuggestModal()" class="nav-btn bg-gray-50 mt-4"><span>💡</span> <span class="hidden md:inline">Предложить товар</span></button>
+                <button id="btn-admin" onclick="setView('admin')" class="nav-btn bg-black text-white mt-2 hidden"><span>⚡</span> <span class="hidden md:inline">Панель</span></button>
             </div>
 
-            <div id="auth-section" class="mt-auto">
-                <button id="btn-login" onclick="toggleModal('login-modal')" class="w-full bg-black text-white p-3 rounded-2xl font-bold" data-lang="btn_login">Войти</button>
-                <div id="user-info-sidebar" class="hidden flex items-center gap-3 p-2">
-                    <img id="sidebar-avatar" src="https://placehold.co/100" class="avatar-circle">
+            <div id="auth-section" class="mt-auto pt-4 border-t border-gray-100">
+                <button id="btn-login-trigger" onclick="toggleModal('login-modal')" class="w-full bg-black text-white p-4 rounded-2xl font-bold">Войти</button>
+                <div id="sidebar-user-card" class="hidden flex items-center gap-3 p-2 bg-gray-50 rounded-2xl">
+                    <img id="sidebar-avatar" src="" onerror="this.src='https://placehold.co/100?text=BYR'" class="w-10 h-10 rounded-full object-cover">
                     <div class="hidden md:block overflow-hidden">
-                        <div id="sidebar-name" class="font-bold truncate">User</div>
-                        <div class="text-[10px] text-gray-400">ID: <span id="sidebar-id">...</span></div>
+                        <div id="sidebar-name" class="font-bold text-sm truncate">...</div>
+                        <div id="sidebar-id" class="text-[10px] text-gray-400 uppercase">...</div>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <!-- Main Content Area -->
-        <main id="content" class="flex-1 ml-20 md:ml-64 p-4 md:p-8">
+        <main id="content" class="flex-1 ml-20 md:ml-64 p-4 md:p-10">
             
-            <!-- Home View -->
-            <section id="view-home" class="view space-y-12">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[60vh]">
-                    <div class="space-y-6">
-                        <h1 class="text-6xl font-black leading-tight italic">"BYRMALDA - это не одежда, это твой новый код реальности."</h1>
-                        <p class="text-xl text-gray-500">"Стиль — это способ сказать, кто вы есть, без слов. Мы создаем эти слова за вас."</p>
-                        <p class="text-lg font-light border-l-4 border-black pl-4">"Каждый шов — манифест. Каждый принт — история."</p>
+            <section id="view-home" class="view space-y-20">
+                <div class="max-w-4xl">
+                    <h1 class="text-7xl font-black italic tracking-tighter mb-8 leading-none uppercase">Byrmalda — Твой новый код реальности.</h1>
+                    <p class="text-2xl text-gray-400 font-light max-w-2xl">"Стиль — это способ сказать, кто вы есть, без слов. Мы создаем эти слова за вас."</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="h-[600px] bg-gray-100 rounded-[40px] overflow-hidden flex items-center justify-center text-gray-300">
+                        <!-- СЮДА ВСТАВЬ ФОТО ПОКАЗА 1 -->
+                        <span class="text-sm font-bold uppercase tracking-widest">Runway Look 01</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400" class="rounded-3xl shadow-xl hover:scale-105 transition duration-500">
-                        <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=400" class="rounded-3xl shadow-xl mt-8 hover:scale-105 transition duration-500">
+                    <div class="h-[600px] bg-gray-100 rounded-[40px] overflow-hidden mt-20 flex items-center justify-center text-gray-300">
+                        <!-- СЮДА ВСТАВЬ ФОТО ПОКАЗА 2 -->
+                        <span class="text-sm font-bold uppercase tracking-widest">Runway Look 02</span>
                     </div>
                 </div>
-                <div class="text-center py-20 border-y border-gray-100">
-                    <h2 class="text-4xl font-bold mb-4">SHOW REELS 2024</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=500" class="rounded-2xl h-64 w-full object-cover">
-                        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=500" class="rounded-2xl h-64 w-full object-cover">
-                        <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=500" class="rounded-2xl h-64 w-full object-cover">
-                    </div>
+                <div class="py-20 border-y border-gray-100">
+                    <blockquote class="text-4xl font-bold italic border-l-8 border-black pl-8 uppercase">"Каждый шов — манифест. Каждый принт — история."</blockquote>
                 </div>
             </section>
 
-            <!-- Search View -->
-            <section id="view-search" class="view hidden space-y-6">
-                <div class="max-w-2xl mx-auto relative">
-                    <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Например: футболка free drun" class="w-full bg-gray-100 p-5 rounded-3xl outline-none focus:ring-2 ring-black transition text-lg">
-                </div>
-                <div id="search-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+            <section id="view-search" class="view hidden space-y-10">
+                <input type="text" id="search-input" oninput="runSearch(this.value)" placeholder="Поиск (напр. футболка free drun)" class="w-full p-8 bg-gray-50 rounded-3xl outline-none text-3xl font-bold focus:ring-4 ring-black/5 transition">
+                <div id="search-results" class="grid grid-cols-2 lg:grid-cols-4 gap-8"></div>
             </section>
 
-            <!-- Catalog View -->
             <section id="view-catalog" class="view hidden space-y-8">
-                <h2 class="text-3xl font-bold" data-lang="catalog_title">Каталог</h2>
-                <div id="catalog-categories" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
-                <div id="catalog-items" class="hidden">
-                    <button onclick="closeCategory()" class="mb-4 text-gray-500">← Назад к категориям</button>
-                    <div id="category-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+                <h2 class="text-4xl font-black uppercase italic">Каталог</h2>
+                <div id="catalog-categories" class="flex flex-wrap gap-4 mb-10"></div>
+                <div id="catalog-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-8"></div>
+            </section>
+
+            <section id="view-profile" class="view hidden max-w-5xl mx-auto space-y-12">
+                <div class="flex flex-col md:flex-row items-center gap-10 bg-gray-50 p-10 rounded-[50px]">
+                    <div class="relative group cursor-pointer" onclick="document.getElementById('avatar-input').click()">
+                        <img id="profile-avatar" src="" onerror="this.src='https://placehold.co/300?text=BYR'" class="w-48 h-48 rounded-full object-cover border-8 border-white shadow-2xl">
+                        <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                            <span class="text-white text-xs font-bold uppercase">Сменить</span>
+                        </div>
+                        <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="handleAvatarChange(this)">
+                    </div>
+                    <div class="flex-1 text-center md:text-left space-y-2">
+                        <div class="flex items-center gap-3 justify-center md:justify-start">
+                            <h2 id="profile-name-val" class="text-5xl font-black uppercase">...</h2>
+                            <span id="profile-verified" class="hidden text-blue-500 text-3xl">✔</span>
+                        </div>
+                        <p class="text-gray-400 text-xl font-bold uppercase">ID: <span id="profile-id-val">...</span></p>
+                        <p class="text-sm font-bold text-gray-500 uppercase">Почта: <span id="profile-email-val">...</span></p>
+                        <p class="text-[10px] text-gray-300 uppercase tracking-widest">Регистрация: <span id="profile-date-val">...</span></p>
+                        <p id="avatar-status-msg" class="text-orange-500 text-xs font-black uppercase hidden mt-2">Фото на проверке у админа...</p>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <h3 class="text-2xl font-black uppercase italic">Мои заказы</h3>
+                    <div id="profile-orders" class="space-y-4"></div>
+                </div>
+
+                <div class="space-y-8">
+                    <h3 class="text-2xl font-black uppercase italic">Мои предложения</h3>
+                    <div id="profile-suggestions" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
             </section>
 
-            <!-- Profile View -->
-            <section id="view-profile" class="view hidden max-w-4xl mx-auto space-y-10">
-                <div class="bg-gray-50 p-8 rounded-[40px] flex flex-col md:flex-row items-center gap-8 relative">
-                    <div class="relative group cursor-pointer" onclick="document.getElementById('avatar-upload').click()">
-                        <img id="profile-img" src="https://placehold.co/200" class="w-40 h-40 rounded-full object-cover border-4 border-white shadow-lg">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                            <span class="text-white text-xs">Сменить</span>
-                        </div>
-                        <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="uploadAvatar(this)">
+            <section id="view-product" class="view hidden">
+                <button onclick="setView('catalog')" class="mb-8 text-gray-400 font-bold hover:text-black uppercase text-sm tracking-widest">← Назад к покупкам</button>
+                <div id="product-detail-layout" class="grid grid-cols-1 lg:grid-cols-2 gap-16"></div>
+            </section>
+
+            <section id="view-cart" class="view hidden space-y-10">
+                <h2 class="text-4xl font-black uppercase italic">Ваша корзина</h2>
+                <div class="bg-white rounded-[40px] overflow-hidden border border-gray-100">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 uppercase text-[10px] font-black text-gray-400">
+                            <tr>
+                                <th class="p-6">Товар</th>
+                                <th class="p-6">Параметры</th>
+                                <th class="p-6">Цена</th>
+                                <th class="p-6"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-items-body"></tbody>
+                    </table>
+                </div>
+                <div class="flex flex-col md:flex-row justify-end gap-10 items-start">
+                    <div id="cart-summary" class="bg-gray-50 p-10 rounded-[40px] min-w-[300px] space-y-4">
+                        <div class="flex justify-between font-bold"><span>Итого товары:</span> <span id="total-items-price">$0</span></div>
+                        <div class="flex justify-between text-sm text-gray-400 italic"><span>Доставка (900₽/кг):</span> <span id="shipping-price">$0</span></div>
+                        <hr class="border-gray-200">
+                        <div class="text-4xl font-black" id="total-final">$0</div>
+                        <div class="text-gray-400 font-bold uppercase text-xs" id="total-converted">0 RUB / 0 UAH</div>
+                        <button onclick="processCheckout()" class="w-full bg-black text-white p-6 rounded-3xl font-black uppercase italic mt-6 btn-action">Оформить заказ</button>
                     </div>
-                    <div class="flex-1 text-center md:text-left">
-                        <div class="flex items-center gap-2 justify-center md:justify-start">
-                            <h2 id="profile-name" class="text-4xl font-black">...</h2>
-                            <span id="profile-badge" class="hidden text-blue-500">✔</span>
-                        </div>
-                        <p class="text-gray-400">ID: <span id="profile-id">...</span></p>
-                        <p class="text-sm mt-2 text-gray-500">Регистрация: <span id="profile-date">...</span></p>
-                        <p class="text-sm font-bold mt-1" id="profile-email">...</p>
+                </div>
+            </section>
+
+            <section id="view-support" class="view hidden max-w-4xl mx-auto h-[80vh] flex flex-col">
+                <div class="bg-black text-white p-6 rounded-t-[40px] flex justify-between items-center">
+                    <h2 class="text-xl font-black italic">SUPPORT CHAT</h2>
+                    <span id="support-status" class="text-[10px] bg-green-500 px-2 py-1 rounded-full">ONLINE</span>
+                </div>
+                <div id="chat-window" class="flex-1 bg-gray-50 p-6 overflow-y-auto custom-scroll space-y-4"></div>
+                <div class="p-4 bg-white rounded-b-[40px] border border-gray-100 flex gap-4">
+                    <input type="text" id="chat-input" placeholder="Введите сообщение..." class="flex-1 bg-gray-100 p-4 rounded-2xl outline-none font-medium">
+                    <button onclick="sendChatMessage()" class="bg-black text-white px-8 rounded-2xl font-black">ОТПРАВИТЬ</button>
+                </div>
+            </section>
+
+            <section id="view-reviews" class="view hidden space-y-10">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-4xl font-black uppercase italic">Отзывы покупателей</h2>
+                    <button onclick="toggleModal('review-modal')" class="bg-black text-white px-8 py-3 rounded-full font-bold uppercase text-xs">Оставить отзыв</button>
+                </div>
+                <div id="reviews-list" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
+            </section>
+
+            <section id="view-settings" class="view hidden max-w-xl mx-auto space-y-6">
+                <h2 class="text-4xl font-black uppercase italic">Настройки</h2>
+                <div class="space-y-4">
+                    <button onclick="changeTheme()" class="w-full p-8 bg-gray-50 rounded-[32px] text-left font-black flex justify-between items-center uppercase italic">
+                        Тема оформления <span id="theme-val" class="bg-white px-4 py-1 rounded-full text-[10px]">LIGHT</span>
+                    </button>
+                    <button onclick="changeLang()" class="w-full p-8 bg-gray-50 rounded-[32px] text-left font-black flex justify-between items-center uppercase italic">
+                        Язык интерфейса <span id="lang-val" class="bg-white px-4 py-1 rounded-full text-[10px]">RU</span>
+                    </button>
+                    <button onclick="toggleModal('complaint-modal')" class="w-full p-8 bg-red-50 text-red-600 rounded-[32px] text-left font-black flex justify-between items-center uppercase italic">
+                        Оставить жалобу <span>🚩</span>
+                    </button>
+                    <hr class="border-gray-100 my-6">
+                    <button onclick="window.open('https://placehold.co/600x800?text=SIZE+CHART', '_blank')" class="w-full p-6 bg-gray-100 rounded-2xl text-xs font-bold uppercase">Таблица размеров одежды</button>
+                    <button onclick="window.open('https://placehold.co/600x800?text=SHOE+CHART', '_blank')" class="w-full p-6 bg-gray-100 rounded-2xl text-xs font-bold uppercase">Таблица размеров обуви</button>
+                    <button onclick="logout()" class="w-full p-6 text-red-500 font-black uppercase tracking-widest mt-10">Выйти из аккаунта</button>
+                </div>
+            </section>
+
+            <section id="view-admin" class="view hidden space-y-12">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-5xl font-black tracking-tighter uppercase italic">Admin Panel</h2>
+                    <div class="flex gap-4">
+                        <button onclick="adminSwitchTab('products')" class="px-6 py-2 bg-black text-white rounded-full text-xs font-bold">Товары</button>
+                        <button onclick="adminSwitchTab('orders')" class="px-6 py-2 bg-gray-100 rounded-full text-xs font-bold">Заказы</button>
+                        <button onclick="adminSwitchTab('moderation')" class="px-6 py-2 bg-gray-100 rounded-full text-xs font-bold">Модерация</button>
                     </div>
                 </div>
                 
-                <div class="space-y-4">
-                    <h3 class="text-2xl font-bold" data-lang="profile_orders">Ваши заказы</h3>
-                    <div id="orders-list" class="space-y-4"></div>
-                </div>
-            </section>
-
-            <!-- Product Details View -->
-            <section id="view-product" class="view hidden">
-                <button onclick="setView('search')" class="mb-6 text-gray-400">← Назад</button>
-                <div id="product-details-container" class="grid grid-cols-1 lg:grid-cols-2 gap-12"></div>
-            </section>
-
-            <!-- Cart View -->
-            <section id="view-cart" class="view hidden space-y-8">
-                <h2 class="text-3xl font-bold">Корзина</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="border-b border-gray-100">
-                            <tr>
-                                <th class="py-4">Товар</th>
-                                <th class="py-4">Размер</th>
-                                <th class="py-4">Цвет</th>
-                                <th class="py-4">Кол-во</th>
-                                <th class="py-4">Цена</th>
-                                <th class="py-4"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="cart-table-body"></tbody>
-                    </table>
-                </div>
-                <div class="flex flex-col items-end gap-2 border-t pt-6">
-                    <div class="text-gray-500">Доставка: <span id="cart-delivery">0</span> руб.</div>
-                    <div class="text-4xl font-black">Итого: <span id="cart-total">0</span> $</div>
-                    <button onclick="checkout()" class="bg-black text-white px-12 py-4 rounded-full font-bold text-xl mt-4">Оформить заказ</button>
-                </div>
-            </section>
-
-            <!-- Support View -->
-            <section id="view-support" class="view hidden max-w-2xl mx-auto h-[80vh] flex flex-col bg-gray-50 rounded-3xl overflow-hidden shadow-sm">
-                <div class="p-4 bg-white border-b flex justify-between items-center">
-                    <span class="font-bold">Поддержка Byrmalda</span>
-                    <span id="support-status" class="text-green-500 text-xs">● Online</span>
-                </div>
-                <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll"></div>
-                <div class="p-4 bg-white border-t flex gap-2">
-                    <input type="text" id="chat-input" placeholder="Напишите нам..." class="flex-1 bg-gray-100 p-3 rounded-2xl outline-none">
-                    <button onclick="sendMessage()" class="bg-black text-white px-6 rounded-2xl font-bold">↑</button>
-                </div>
-            </section>
-
-            <!-- Reviews View -->
-            <section id="view-reviews" class="view hidden space-y-8">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-3xl font-bold">Отзывы покупателей</h2>
-                    <button onclick="openReviewModal()" class="bg-black text-white px-6 py-2 rounded-full text-sm">Оставить отзыв</button>
-                </div>
-                <div id="reviews-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-            </section>
-
-            <!-- Settings View -->
-            <section id="view-settings" class="view hidden max-w-xl mx-auto space-y-4">
-                <h2 class="text-3xl font-bold mb-6">Настройки</h2>
-                <button onclick="openComplaint()" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Жалобы <span>→</span></button>
-                <button onclick="toggleTheme()" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Тема: <span id="theme-text">Светлая</span></button>
-                <button onclick="toggleLang()" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Язык: <span id="lang-text">RU</span></button>
-                <button onclick="window.open('https://sizechart.com', '_blank')" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Таблица размеров одежды <span>↗</span></button>
-                <button onclick="window.open('https://sizechart.com/shoes', '_blank')" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Таблица размеров обуви <span>↗</span></button>
-                <button onclick="logout()" class="w-full p-5 text-red-500 font-bold">Выйти из аккаунта</button>
-            </section>
-
-            <!-- Admin View -->
-            <section id="view-admin" class="view hidden space-y-12">
-                <h2 class="text-4xl font-black">Админ Панель</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Create Product -->
-                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4">
-                        <h3 class="text-xl font-bold">Создание товара</h3>
-                        <div class="space-y-2">
-                            <input type="text" id="adm-prod-name" placeholder="Название" class="w-full p-3 rounded-xl border">
-                            <input type="file" id="adm-prod-imgs" multiple class="w-full p-3 rounded-xl border">
-                            <input type="text" id="adm-prod-sizes" placeholder="Размеры (S,M,L)" class="w-full p-3 rounded-xl border">
-                            <input type="text" id="adm-prod-type" placeholder="Тип (футболка, кроссовки)" class="w-full p-3 rounded-xl border">
-                            <input type="number" id="adm-prod-price" placeholder="Цена ($)" class="w-full p-3 rounded-xl border">
-                            <input type="number" id="adm-prod-weight" placeholder="Масса (грамм)" class="w-full p-3 rounded-xl border">
-                            <input type="number" id="adm-prod-stock" placeholder="В наличии (шт)" class="w-full p-3 rounded-xl border">
-                            <textarea id="adm-prod-desc" placeholder="Описание" class="w-full p-3 rounded-xl border"></textarea>
-                            <button onclick="adminCreateProduct()" class="w-full bg-black text-white p-4 rounded-2xl font-bold">Опубликовать</button>
-                        </div>
-                    </div>
-
-                    <!-- User Ban -->
-                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4">
-                        <h3 class="text-xl font-bold">Блокировка пользователей</h3>
-                        <input type="text" id="adm-ban-uid" placeholder="ID пользователя" class="w-full p-3 rounded-xl border">
-                        <div class="flex gap-2">
-                            <button onclick="adminSetBan(true)" class="flex-1 bg-red-500 text-white p-3 rounded-xl">Бан</button>
-                            <button onclick="adminSetBan(false)" class="flex-1 bg-green-500 text-white p-3 rounded-xl">Анбан</button>
-                        </div>
-                    </div>
-
-                    <!-- Moderate Avatars -->
-                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4">
-                        <h3 class="text-xl font-bold">Аватарки (Заявки)</h3>
-                        <div id="adm-avatar-list" class="space-y-4 max-h-64 overflow-y-auto custom-scroll"></div>
-                    </div>
-
-                    <!-- Order Status -->
-                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4">
-                        <h3 class="text-xl font-bold">Статус заказа</h3>
-                        <input type="text" id="adm-order-id" placeholder="ID заказа" class="w-full p-3 rounded-xl border">
-                        <button onclick="adminCheckOrder()" class="w-full bg-gray-200 p-3 rounded-xl">Проверить</button>
-                        <div id="adm-order-details" class="hidden space-y-2 text-sm">
-                            <div id="adm-order-info"></div>
-                            <div class="flex gap-2">
-                                <button onclick="adminUpdateOrderStatus('paid')" class="flex-1 bg-black text-white p-2 rounded-lg">Оплачено (Да)</button>
-                                <button onclick="adminUpdateOrderStatus('cancel')" class="flex-1 bg-gray-300 p-2 rounded-lg">Нет</button>
+                <div id="admin-tab-products" class="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                    <!-- Create Product Form -->
+                    <div class="bg-gray-100 p-10 rounded-[50px] space-y-6 shadow-sm">
+                        <h3 class="text-2xl font-black uppercase">Создание товара</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="adm-name" placeholder="Название (напр. Футболка Free Drun)" class="p-5 rounded-2xl border-none col-span-2">
+                            <select id="adm-gender" class="p-5 rounded-2xl border-none">
+                                <option value="Унисекс">Унисекс</option>
+                                <option value="Мужской">Мужской</option>
+                                <option value="Женский">Женский</option>
+                            </select>
+                            <select id="adm-type" class="p-5 rounded-2xl border-none">
+                                <option value="Футболка">Футболка</option>
+                                <option value="Кроссовки">Кроссовки</option>
+                                <option value="Толстовка">Толстовка</option>
+                                <option value="Брюки">Брюки</option>
+                                <option value="Аксессуар">Аксессуар</option>
+                            </select>
+                            <input type="text" id="adm-material" placeholder="Материал (Хлопок 100%)" class="p-5 rounded-2xl border-none">
+                            <input type="text" id="adm-color" placeholder="Цвет" class="p-5 rounded-2xl border-none">
+                            <input type="text" id="adm-size" placeholder="Размеры (M, L, XL)" class="p-5 rounded-2xl border-none">
+                            <input type="text" id="adm-collab" placeholder="Коллаб (Да, Brand или Нет)" class="p-5 rounded-2xl border-none">
+                            <input type="number" id="adm-weight" placeholder="Масса (г)" class="p-5 rounded-2xl border-none">
+                            <input type="text" id="adm-release" placeholder="Год/Дата релиза" class="p-5 rounded-2xl border-none">
+                            <input type="number" id="adm-stock" placeholder="В наличии (шт)" class="p-5 rounded-2xl border-none">
+                            <input type="number" id="adm-price" placeholder="Цена ($)" class="p-5 rounded-2xl border-none">
+                            <textarea id="adm-desc" placeholder="Описание товара..." class="p-5 rounded-2xl border-none col-span-2 h-32"></textarea>
+                            <div class="col-span-2">
+                                <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase">Ссылки на фото (через запятую)</p>
+                                <input type="text" id="adm-images-urls" placeholder="URL1, URL2..." class="w-full p-5 rounded-2xl border-none">
                             </div>
                         </div>
+                        <button onclick="adminSaveProduct()" id="adm-save-btn" class="w-full bg-black text-white p-6 rounded-3xl font-black text-xl italic uppercase">Опубликовать</button>
                     </div>
 
-                    <!-- Suggested Products -->
-                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4 col-span-1 md:col-span-2">
-                        <h3 class="text-xl font-bold">Товары от людей</h3>
-                        <div id="adm-suggest-list" class="space-y-4"></div>
+                    <div class="space-y-10">
+                        <div class="bg-gray-100 p-10 rounded-[50px] space-y-4">
+                            <h3 class="text-2xl font-black uppercase">Удалить / Редактировать</h3>
+                            <div id="admin-product-list" class="space-y-2 max-h-[400px] overflow-y-auto custom-scroll"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="admin-tab-orders" class="hidden space-y-10">
+                    <div class="bg-gray-100 p-10 rounded-[50px] space-y-6">
+                        <div class="flex gap-4">
+                            <input type="text" id="adm-order-lookup" placeholder="ID ЗАКАЗА" class="flex-1 p-5 rounded-2xl border-none">
+                            <button onclick="adminLookupOrder()" class="bg-black text-white px-10 rounded-2xl font-black">НАЙТИ</button>
+                        </div>
+                        <div id="adm-order-result" class="hidden p-8 bg-white rounded-[32px] space-y-6"></div>
+                    </div>
+                </div>
+
+                <div id="admin-tab-moderation" class="hidden grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="bg-gray-100 p-10 rounded-[50px] space-y-4">
+                        <h3 class="text-xl font-black uppercase italic">Аватарки</h3>
+                        <div id="adm-avatar-list" class="space-y-4"></div>
+                    </div>
+                    <div class="bg-gray-100 p-10 rounded-[50px] space-y-4">
+                        <h3 class="text-xl font-black uppercase italic">БАН Пользователей</h3>
+                        <input type="text" id="adm-ban-uid" placeholder="ID пользователя" class="w-full p-5 rounded-2xl border-none">
+                        <div class="flex gap-2">
+                            <button onclick="adminSetBan(true)" class="flex-1 bg-red-600 text-white p-4 rounded-2xl font-bold uppercase text-xs">Заблокировать</button>
+                            <button onclick="adminSetBan(false)" class="flex-1 bg-green-600 text-white p-4 rounded-2xl font-bold uppercase text-xs">Разбанить</button>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 p-10 rounded-[50px] space-y-4 col-span-2">
+                        <h3 class="text-xl font-black uppercase italic">Товары от людей</h3>
+                        <div id="adm-suggestions-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                     </div>
                 </div>
             </section>
@@ -283,286 +293,331 @@
         </main>
     </div>
 
-    <!-- Modals -->
+    
+    
+    <!-- Login/Reg Modal -->
     <div id="login-modal" class="modal-overlay fixed inset-0 hidden items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-[40px] w-full max-w-md shadow-2xl relative">
-            <button onclick="toggleModal('login-modal')" class="absolute top-6 right-6 text-2xl">×</button>
-            <div id="login-step-1">
-                <h2 class="text-3xl font-black mb-6">Вход</h2>
-                <input type="email" id="login-email" placeholder="Email" class="w-full p-4 bg-gray-100 rounded-2xl mb-4 border-none focus:ring-2 ring-black">
-                <input type="password" id="login-pass" placeholder="Пароль" class="w-full p-4 bg-gray-100 rounded-2xl mb-2 border-none focus:ring-2 ring-black">
-                <p id="login-error" class="text-red-500 text-xs mb-4 hidden">Аккаунт не найден</p>
-                <button onclick="handleLogin()" class="w-full bg-black text-white p-4 rounded-2xl font-bold mb-4">Войти</button>
-                <p class="text-center text-sm">Нет аккаунта? <span onclick="switchLoginReg(true)" class="text-blue-600 cursor-pointer">Зарегистрируйтесь</span></p>
+        <div class="bg-white p-10 rounded-[50px] w-full max-w-md shadow-2xl relative">
+            <button onclick="toggleModal('login-modal')" class="absolute top-8 right-8 text-3xl font-light">×</button>
+            
+            <div id="login-form">
+                <h2 class="text-4xl font-black mb-8 italic uppercase tracking-tighter leading-none">Вход</h2>
+                <input type="email" id="log-email" placeholder="Email" class="w-full p-5 bg-gray-100 rounded-2xl mb-4 border-none outline-none">
+                <input type="password" id="log-pass" placeholder="Пароль" class="w-full p-5 bg-gray-100 rounded-2xl mb-4 border-none outline-none">
+                <p id="log-err" class="text-red-500 text-[10px] font-black mb-4 uppercase hidden">Аккаунт не найден!</p>
+                <button onclick="handleLogin()" id="log-btn" class="w-full bg-black text-white p-6 rounded-3xl font-black text-xl italic uppercase btn-action">Войти</button>
+                <p class="text-center text-xs font-bold uppercase mt-8 text-gray-400">Нет аккаунта? <span onclick="switchAuth(true)" class="text-blue-600 cursor-pointer underline">Зарегистрируйтесь</span></p>
             </div>
-            <div id="reg-step-1" class="hidden">
-                <h2 class="text-3xl font-black mb-6">Регистрация</h2>
-                <input type="email" id="reg-email" placeholder="Ваш Email" class="w-full p-4 bg-gray-100 rounded-2xl mb-4">
-                <button onclick="handleRegisterStep1()" class="w-full bg-black text-white p-4 rounded-2xl font-bold">Далее</button>
-            </div>
-            <div id="reg-step-2" class="hidden text-center space-y-6">
-                <div class="text-6xl">📧</div>
-                <h2 class="text-2xl font-bold">Проверьте почту</h2>
-                <p class="text-gray-500">Мы отправили письмо с подтверждением. Перейдите по ссылке и нажмите "Далее".</p>
-                <button onclick="handleRegisterStep2()" class="w-full bg-black text-white p-4 rounded-2xl font-bold">Я подтвердил(а)</button>
-            </div>
-            <div id="reg-step-3" class="hidden">
-                <h2 class="text-3xl font-black mb-6">Осталось чуть-чуть</h2>
-                <input type="text" id="reg-name" placeholder="Ваше Имя" class="w-full p-4 bg-gray-100 rounded-2xl mb-4">
-                <input type="password" id="reg-pass1" placeholder="Пароль" class="w-full p-4 bg-gray-100 rounded-2xl mb-4">
-                <input type="password" id="reg-pass2" placeholder="Повторите пароль" class="w-full p-4 bg-gray-100 rounded-2xl mb-4">
-                <button onclick="handleRegisterFinal()" class="w-full bg-black text-white p-4 rounded-2xl font-bold">Завершить</button>
+
+            <div id="reg-form" class="hidden">
+                <h2 class="text-4xl font-black mb-8 italic uppercase tracking-tighter leading-none">Регистрация</h2>
+                <div id="reg-step-1" class="space-y-4">
+                    <input type="email" id="reg-email" placeholder="Ваш Email" class="w-full p-5 bg-gray-100 rounded-2xl border-none outline-none">
+                    <button onclick="handleRegStep1()" id="reg-step1-btn" class="w-full bg-black text-white p-6 rounded-3xl font-black text-xl italic uppercase btn-action">Далее</button>
+                </div>
+                <div id="reg-step-2" class="hidden text-center space-y-6">
+                    <div class="text-6xl animate-pulse">📧</div>
+                    <p class="text-gray-500 font-bold uppercase text-xs leading-relaxed">Мы отправили письмо на вашу почту. Пожалуйста, подтвердите его и нажмите кнопку ниже.</p>
+                    <button onclick="handleRegStep2()" class="w-full bg-black text-white p-6 rounded-3xl font-black uppercase">Я подтвердил(а)</button>
+                </div>
+                <div id="reg-step-3" class="hidden space-y-4">
+                    <div class="text-center text-green-500 text-4xl mb-4">✅</div>
+                    <input type="text" id="reg-name" placeholder="Ваше Имя" class="w-full p-5 bg-gray-100 rounded-2xl border-none outline-none">
+                    <input type="password" id="reg-pass1" placeholder="Пароль" class="w-full p-5 bg-gray-100 rounded-2xl border-none outline-none">
+                    <input type="password" id="reg-pass2" placeholder="Повторите пароль" class="w-full p-5 bg-gray-100 rounded-2xl border-none outline-none">
+                    <button onclick="handleRegFinal()" id="reg-final-btn" class="w-full bg-black text-white p-6 rounded-3xl font-black text-xl italic uppercase btn-action">Завершить</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Product Modal / Zoom -->
-    <div id="zoom-modal" class="modal-overlay fixed inset-0 hidden flex items-center justify-center p-4 bg-black" onclick="this.classList.add('hidden')">
-        <img id="zoom-img" src="" class="max-w-full max-h-full object-contain">
+    <!-- Suggest Modal -->
+    <div id="suggest-modal" class="modal-overlay fixed inset-0 hidden items-center justify-center p-4">
+        <div class="bg-white p-10 rounded-[50px] w-full max-w-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
+            <button onclick="toggleModal('suggest-modal')" class="absolute top-8 right-8 text-3xl font-light">×</button>
+            <h2 class="text-3xl font-black mb-8 italic uppercase">Предложить товар</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="sug-name" placeholder="Название товара" class="p-5 bg-gray-100 rounded-2xl border-none col-span-2">
+                <input type="text" id="sug-type" placeholder="Тип одежды" class="p-5 bg-gray-100 rounded-2xl border-none">
+                <input type="text" id="sug-size" placeholder="Размеры" class="p-5 bg-gray-100 rounded-2xl border-none">
+                <input type="number" id="sug-price" placeholder="Ваша цена ($)" class="p-5 bg-gray-100 rounded-2xl border-none">
+                <input type="text" id="sug-img" placeholder="Ссылка на фото" class="p-5 bg-gray-100 rounded-2xl border-none">
+                <textarea id="sug-desc" placeholder="Описание и материалы..." class="p-5 bg-gray-100 rounded-2xl border-none col-span-2 h-32"></textarea>
+            </div>
+            <button onclick="submitSuggestion()" class="w-full bg-black text-white p-6 rounded-3xl font-black uppercase italic mt-8 btn-action">Отправить на модерацию</button>
+        </div>
     </div>
 
-    <div id="toast" class="fixed bottom-10 right-10 bg-black text-white p-4 rounded-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[999]">
-        Сообщение...
+    <!-- Order Checkout Modal -->
+    <div id="checkout-modal" class="modal-overlay fixed inset-0 hidden items-center justify-center p-4">
+        <div class="bg-white p-12 rounded-[50px] w-full max-w-lg text-center space-y-8">
+            <div class="text-7xl">💸</div>
+            <h2 class="text-3xl font-black uppercase italic">Заказ оформлен!</h2>
+            <div class="p-6 bg-gray-50 rounded-3xl text-left space-y-2 border-l-4 border-blue-500">
+                <p class="font-bold uppercase text-xs">Ваш Трек-номер:</p>
+                <p id="checkout-track" class="text-2xl font-black text-blue-600 tracking-tighter">BYR00000000</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase">Статус: Ожидает оплату</p>
+            </div>
+            <div class="space-y-4">
+                <p class="text-red-600 font-black text-xl uppercase italic animate-pulse">ВНИМАНИЕ!</p>
+                <p class="text-gray-600 font-medium leading-relaxed">Для совершения оплаты обратитесь в поддержку или напишите нашему админу в TG: <span class="text-black font-black">@fueum</span>. Без подтверждения оплаты заказ не будет принят в работу.</p>
+            </div>
+            <button onclick="toggleModal('checkout-modal')" class="w-full bg-black text-white p-6 rounded-3xl font-black uppercase italic btn-action">Хорошо, я напишу</button>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="fixed bottom-10 right-10 bg-black text-white p-6 rounded-3xl translate-y-32 opacity-0 transition-all duration-500 z-[10000] font-black shadow-2xl uppercase italic text-sm">
+        Message...
     </div>
 
     <script>
-        // FIREBASE CONFIG
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyD0YkXZgk8gh01Y7XH3ZRVU5lCjGJ_IRCw",
             authDomain: "frwerwerwr.firebaseapp.com",
             projectId: "frwerwerwr",
             storageBucket: "frwerwerwr.firebasestorage.app",
             messagingSenderId: "969880048160",
-            appId: "1:969880048160:web:9001a95f7ea28e98912245",
-            measurementId: "G-HCQEFD2SJF"
+            appId: "1:969880048160:web:9001a95f7ea28e98912245"
         };
+
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.firestore();
-        const appId = 'byrmalda-prod';
-        const imgbbKey = 'eeef3479094c5cf6bf42607927565065';
+        const auth = firebase.auth();
+        const appId = 'byrmalda-brand-v3';
         const adminEmail = 'sobakastalina123@gmail.com';
+        const RATES = { RUB: 90, UAH: 40 };
 
-        let currentUser = null;
-        let cart = JSON.parse(localStorage.getItem('byrmalda_cart') || '[]');
+        let user = null;
         let products = [];
-        let reviews = [];
-        let currentLang = 'ru';
-        let currentTheme = 'light';
-        let productGalleryIndex = 0;
-        let activeProduct = null;
+        let cart = JSON.parse(localStorage.getItem('byrmalda_cart_v3') || '[]');
+        let currentAdminTab = 'products';
 
-        // Constants for conversion (Approximate)
-        const RATE_RUB = 90;
-        const RATE_UAH = 40;
-
-        auth.onAuthStateChanged(async user => {
-            if (user) {
-                const userDoc = await db.collection('artifacts').doc(appId).collection('users').doc(user.uid).get();
-                if (userDoc.exists) {
-                    currentUser = { ...userDoc.data(), uid: user.uid };
-                    if (currentUser.banned) {
+        // AUTH INITIALIZATION
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        auth.onAuthStateChanged(async (u) => {
+            if (u) {
+                const doc = await db.collection('artifacts').doc(appId).collection('users').doc(u.uid).get();
+                if (doc.exists) {
+                    user = { ...doc.data(), uid: u.uid };
+                    if (user.banned) {
                         document.getElementById('blocking-layer').style.display = 'flex';
                         return;
                     }
-                    updateUIForAuth(true);
-                    loadUserData();
-                    checkAdmin();
-                    loadMessages();
-                    startSupportInterval();
+                    updateUIForUser();
+                    startSupportListener();
                 }
             } else {
-                currentUser = null;
-                updateUIForAuth(false);
+                user = null;
+                updateUIForGuest();
             }
         });
 
-        function updateUIForAuth(isAuth) {
-            document.getElementById('btn-login').classList.toggle('hidden', isAuth);
-            document.getElementById('user-info-sidebar').classList.toggle('hidden', !isAuth);
-            document.getElementById('btn-suggest').classList.toggle('hidden', !isAuth);
-            if (isAuth) {
-                document.getElementById('sidebar-name').innerText = currentUser.name;
-                document.getElementById('sidebar-id').innerText = currentUser.uid.slice(0, 8);
-                document.getElementById('sidebar-avatar').src = currentUser.avatar || 'https://placehold.co/100';
-            }
+        // NAVIGATION
+        function setView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${id}`).classList.remove('hidden');
+            window.scrollTo(0, 0);
+            
+            if (id === 'catalog' || id === 'search') loadProducts();
+            if (id === 'profile') loadUserProfile();
+            if (id === 'admin') loadAdminData();
+            if (id === 'cart') renderCart();
+            if (id === 'reviews') loadReviews();
+            if (id === 'support') markMessagesAsRead();
+        }
+
+        // --- AUTH FUNCTIONS ---
+        function switchAuth(isReg) {
+            document.getElementById('login-form').classList.toggle('hidden', isReg);
+            document.getElementById('reg-form').classList.toggle('hidden', !isReg);
         }
 
         async function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
+            const email = document.getElementById('log-email').value;
+            const pass = document.getElementById('log-pass').value;
+            const btn = document.getElementById('log-btn');
+            const err = document.getElementById('log-err');
+            
+            btn.disabled = true; btn.innerText = "ПРОВЕРКА...";
+            err.classList.add('hidden');
+
             try {
                 await auth.signInWithEmailAndPassword(email, pass);
                 toggleModal('login-modal');
-                showToast("С возвращением!");
-            } catch (err) {
-                document.getElementById('login-error').classList.remove('hidden');
+                showToast("ДОБРО ПОЖАЛОВАТЬ!");
+            } catch (e) {
+                err.classList.remove('hidden');
+            } finally {
+                btn.disabled = false; btn.innerText = "ВОЙТИ";
             }
         }
 
-        function handleRegisterStep1() {
+        function handleRegStep1() {
             const email = document.getElementById('reg-email').value;
-            if (!email.includes('@')) return showToast("Некорректный email");
+            if(!email.includes('@')) return showToast("НЕВЕРНЫЙ EMAIL");
             document.getElementById('reg-step-1').classList.add('hidden');
             document.getElementById('reg-step-2').classList.remove('hidden');
-            showToast("Письмо отправлено (имитация)");
         }
 
-        function handleRegisterStep2() {
+        function handleRegStep2() {
             document.getElementById('reg-step-2').classList.add('hidden');
             document.getElementById('reg-step-3').classList.remove('hidden');
         }
 
-        async function handleRegisterFinal() {
-            const email = document.getElementById('reg-email').value;
+        async function handleRegFinal() {
             const name = document.getElementById('reg-name').value;
             const p1 = document.getElementById('reg-pass1').value;
             const p2 = document.getElementById('reg-pass2').value;
-            if (p1 !== p2) return showToast("Пароли не совпадают");
-            if (!name) return showToast("Введите имя");
+            const email = document.getElementById('reg-email').value;
+            const btn = document.getElementById('reg-final-btn');
+
+            if(p1 !== p2) return showToast("ПАРОЛИ НЕ СОВПАДАЮТ");
+            if(name.length < 2) return showToast("УКАЖИТЕ ИМЯ");
+
+            btn.disabled = true; btn.innerText = "СОЗДАНИЕ...";
 
             try {
                 const cred = await auth.createUserWithEmailAndPassword(email, p1);
-                const newUser = {
+                const userData = {
                     name: name,
                     email: email,
-                    avatar: '',
-                    regDate: new Date().toLocaleDateString(),
-                    uid: cred.user.uid,
+                    avatar: null,
                     banned: false,
-                    verifiedBadge: false
+                    createdAt: Date.now(),
+                    pendingAvatar: null,
+                    verified: false
                 };
-                await db.collection('artifacts').doc(appId).collection('users').doc(cred.user.uid).set(newUser);
-                currentUser = newUser;
+                await db.collection('artifacts').doc(appId).collection('users').doc(cred.user.uid).set(userData);
                 toggleModal('login-modal');
-                showToast("Добро пожаловать!");
-                setView('profile');
-            } catch (err) {
-                showToast(err.message);
+                showToast("ДОБРО ПОЖАЛОВАТЬ В BYRMALDA!");
+            } catch (e) {
+                showToast(e.message);
+            } finally {
+                btn.disabled = false; btn.innerText = "ЗАВЕРШИТЬ";
             }
         }
 
-        function setView(viewId) {
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            window.scrollTo(0, 0);
+        function logout() {
+            auth.signOut().then(() => window.location.reload());
+        }
+
+        // --- UI UPDATES ---
+        function updateUIForUser() {
+            document.getElementById('btn-login-trigger').classList.add('hidden');
+            document.getElementById('sidebar-user-card').classList.remove('hidden');
+            document.getElementById('sidebar-name').innerText = user.name;
+            document.getElementById('sidebar-id').innerText = user.uid.slice(0, 8);
+            document.getElementById('sidebar-avatar').src = user.avatar || 'https://placehold.co/100?text=BYR';
             
-            if (viewId === 'catalog') loadCatalog();
-            if (viewId === 'search') loadAllProducts();
-            if (viewId === 'profile') loadUserData();
-            if (viewId === 'reviews') loadReviews();
-            if (viewId === 'admin') loadAdminData();
+            if (user.email === adminEmail) {
+                document.getElementById('btn-admin').classList.remove('hidden');
+            }
+            updateCartCount();
         }
 
-        function showToast(text) {
-            const t = document.getElementById('toast');
-            t.innerText = text;
-            t.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3000);
+        function updateUIForGuest() {
+            document.getElementById('btn-login-trigger').classList.remove('hidden');
+            document.getElementById('sidebar-user-card').classList.add('hidden');
         }
 
-        function toggleModal(id) {
-            const m = document.getElementById(id);
-            m.classList.toggle('hidden');
-            m.classList.toggle('flex');
-        }
-
-        function switchLoginReg(isReg) {
-            document.getElementById('login-step-1').classList.toggle('hidden', isReg);
-            document.getElementById('reg-step-1').classList.toggle('hidden', !isReg);
-        }
-
-        async function loadAllProducts() {
+        // --- PRODUCT LOGIC ---
+        async function loadProducts() {
             const snap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').get();
-            products = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-            renderProducts(products, 'search-results');
+            products = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+            renderCatalog();
         }
 
-        function renderProducts(list, containerId) {
-            const cont = document.getElementById(containerId);
-            cont.innerHTML = list.map(p => `
-                <div onclick="openProduct('${p.id}')" class="group cursor-pointer space-y-3">
-                    <div class="aspect-square bg-gray-50 rounded-[32px] overflow-hidden relative">
-                        <img src="${p.images?.[0] || 'https://placehold.co/400'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                        ${p.stock <= 0 ? '<div class="absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center font-bold text-red-500">Нет в наличии</div>' : ''}
+        function renderCatalog() {
+            const grid = document.getElementById('catalog-grid');
+            const cats = document.getElementById('catalog-categories');
+            
+            const types = [...new Set(products.map(p => p.type))];
+            cats.innerHTML = types.map(t => `
+                <button onclick="filterByType('${t}')" class="px-6 py-2 bg-gray-50 rounded-full font-black text-[10px] uppercase hover:bg-black hover:text-white transition">${t}</button>
+            `).join('') + `<button onclick="renderCatalog()" class="px-6 py-2 border border-black rounded-full font-black text-[10px] uppercase">Все</button>`;
+
+            grid.innerHTML = products.map(p => renderProductCard(p)).join('');
+        }
+
+        function renderProductCard(p) {
+            return `
+                <div onclick="openProduct('${p.id}')" class="group cursor-pointer space-y-4">
+                    <div class="product-card-img bg-gray-50 overflow-hidden relative">
+                        <img src="${p.images?.[0] || 'https://placehold.co/400?text=NO+IMAGE'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                        ${p.stock <= 0 ? '<div class="absolute inset-0 bg-white/60 flex items-center justify-center font-black text-red-600 italic text-sm">SOLD OUT</div>' : ''}
                     </div>
                     <div>
-                        <h4 class="font-bold truncate">${p.name}</h4>
+                        <h4 class="font-black text-sm uppercase tracking-tight truncate">${p.name}</h4>
                         <div class="flex justify-between items-center mt-1">
-                            <span class="${p.stock <= 0 ? 'text-red-500' : 'text-gray-900'} font-bold">
-                                ${p.stock <= 0 ? 'Sold Out' : p.price + ' $'}
+                            <span class="font-black ${p.stock <= 0 ? 'text-red-500' : 'text-gray-400'} text-xs">
+                                ${p.stock > 0 ? '$' + p.price : 'НЕТ В НАЛИЧИИ'}
                             </span>
-                            ${p.fromUser ? `<span class="text-[10px] bg-yellow-100 px-2 py-1 rounded-full">! User</span>` : ''}
+                            <span class="text-[8px] bg-gray-50 px-2 py-1 rounded-full text-gray-400 font-bold uppercase tracking-widest">${p.type}</span>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
         }
 
-        async function openProduct(id) {
+        function openProduct(id) {
             const p = products.find(x => x.id === id);
             if (!p) return;
-            activeProduct = p;
-            productGalleryIndex = 0;
             setView('product');
-            renderProductDetails(p);
-        }
+            
+            const rub = Math.round(p.price * RATES.RUB);
+            const uah = Math.round(p.price * RATES.UAH);
 
-        function renderProductDetails(p) {
-            const container = document.getElementById('product-details-container');
-            const usd = p.price;
-            const rub = Math.round(usd * RATE_RUB);
-            const uah = Math.round(usd * RATE_UAH);
-
-            container.innerHTML = `
-                <div class="space-y-4">
-                    <div class="relative aspect-square bg-gray-50 rounded-[40px] overflow-hidden">
-                        <img id="main-prod-img" src="${p.images[0]}" class="w-full h-full object-cover cursor-zoom-in" onclick="zoomImg(this.src)">
-                        <button onclick="shiftGallery(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white w-10 h-10 rounded-full shadow-lg">←</button>
-                        <button onclick="shiftGallery(1)" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white w-10 h-10 rounded-full shadow-lg">→</button>
+            document.getElementById('product-detail-layout').innerHTML = `
+                <div class="space-y-6">
+                    <div class="aspect-square bg-gray-50 rounded-[50px] overflow-hidden shadow-2xl">
+                        <img src="${p.images?.[0] || ''}" class="w-full h-full object-cover">
                     </div>
-                    <div class="flex gap-2 overflow-x-auto pb-2 custom-scroll">
-                        ${p.images.map((img, i) => `<img src="${img}" onclick="setGallery(${i})" class="w-20 h-20 rounded-xl object-cover cursor-pointer border-2 ${i === 0 ? 'border-black' : 'border-transparent'}">`).join('')}
+                    <div class="flex gap-4 overflow-x-auto pb-4 custom-scroll">
+                        ${(p.images || []).map(img => `<img src="${img}" class="w-24 h-24 rounded-2xl object-cover border-2 border-transparent hover:border-black cursor-pointer">`).join('')}
                     </div>
                 </div>
-                <div class="space-y-8">
+                <div class="space-y-10">
                     <div>
-                        <h1 class="text-4xl font-black">${p.name}</h1>
-                        <p class="text-gray-400 mt-2">${p.fromUser ? `⚠️ Предложено пользователем ID:${p.userId}` : 'Официальный дроп Byrmalda'}</p>
+                        <h1 class="text-6xl font-black tracking-tighter uppercase leading-none italic">${p.name}</h1>
+                        <p class="text-gray-400 font-black mt-2 text-xs italic tracking-widest uppercase">
+                            ${p.fromUser ? `⚠️ ПРЕДЛОЖЕНО ПОЛЬЗОВАТЕЛЕМ (${p.userId?.slice(0,6)})` : 'BYRMALDA OFFICIAL RELEASE'}
+                        </p>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-y-3 text-sm">
-                        <div class="text-gray-400">Для кого:</div> <div>${p.gender || 'Унисекс'}</div>
-                        <div class="text-gray-400">Тип:</div> <div>${p.type}</div>
-                        <div class="text-gray-400">Материал:</div> <div>${p.material || 'Хлопок'}</div>
-                        <div class="text-gray-400">Цвет:</div> <div>${p.color}</div>
-                        <div class="text-gray-400">Коллаб:</div> <div>${p.collab || 'Нет'}</div>
-                        <div class="text-gray-400">Масса:</div> <div>${p.weight} г</div>
-                        <div class="text-gray-400">Релиз:</div> <div>${p.releaseYear}</div>
-                        <div class="text-gray-400">В наличии:</div> <div class="${p.stock > 0 ? 'text-green-500' : 'text-red-500'} font-bold">${p.stock > 0 ? p.stock + ' шт.' : 'Нет в наличии'}</div>
+
+                    <div class="grid grid-cols-2 gap-y-4 text-[10px] font-black border-y border-gray-100 py-10 uppercase tracking-widest">
+                        <div class="text-gray-300">ДЛЯ КОГО:</div> <div>${p.gender}</div>
+                        <div class="text-gray-300">ТИП:</div> <div>${p.type}</div>
+                        <div class="text-gray-300">МАТЕРИАЛ:</div> <div>${p.material}</div>
+                        <div class="text-gray-300">ЦВЕТ:</div> <div>${p.color}</div>
+                        <div class="text-gray-300">КОЛЛАБОРАЦИЯ:</div> <div>${p.collab}</div>
+                        <div class="text-gray-300">МАССА:</div> <div>${p.weight} Г</div>
+                        <div class="text-gray-300">РЕЛИЗ:</div> <div>${p.release}</div>
+                        <div class="text-gray-300">В НАЛИЧИИ:</div> <div class="${p.stock > 0 ? 'text-green-500' : 'text-red-500'}">${p.stock > 0 ? p.stock + ' ШТ.' : 'ОТСУТСТВУЕТ'}</div>
                     </div>
 
                     <div class="space-y-4">
-                        <h3 class="font-bold">Описание</h3>
-                        <p class="text-gray-600 leading-relaxed">${p.description}</p>
+                        <h3 class="font-black text-xs italic uppercase tracking-widest text-gray-400">Описание</h3>
+                        <p class="text-gray-600 leading-relaxed text-lg font-medium">${p.description}</p>
                     </div>
 
-                    <div class="bg-gray-50 p-6 rounded-[32px] space-y-6">
+                    <div class="p-10 bg-gray-50 rounded-[40px] space-y-8">
                         ${p.stock > 0 ? `
-                            <div class="space-y-1">
-                                <div class="text-4xl font-black">${usd} $</div>
-                                <div class="text-gray-400 text-sm">${rub} RUB / ${uah} UAH</div>
+                            <div>
+                                <div class="text-6xl font-black italic tracking-tighter">$${p.price}</div>
+                                <div class="text-gray-400 font-bold mt-1 uppercase text-[10px] tracking-widest">${rub} RUB / ${uah} UAH</div>
                             </div>
-                        ` : '<div class="text-2xl font-bold text-red-500">НЕТ В НАЛИЧИИ</div>'}
-                        
+                        ` : '<div class="text-3xl font-black text-red-500 italic uppercase">Нет в наличии</div>'}
+
                         <div class="grid grid-cols-2 gap-4">
-                            <select id="buy-size" class="p-4 rounded-2xl bg-white outline-none border-none">
-                                ${p.sizes.split(',').map(s => `<option value="${s}">${s}</option>`).join('')}
+                            <select id="buy-size" class="p-5 rounded-2xl bg-white border-none outline-none font-black text-xs uppercase">
+                                ${(p.size || "").split(',').map(s => `<option value="${s.trim()}">РАЗМЕР: ${s.trim()}</option>`).join('')}
                             </select>
-                            <input type="number" id="buy-qty" value="1" min="1" max="${p.stock}" class="p-4 rounded-2xl bg-white outline-none border-none">
+                            <input type="number" id="buy-qty" value="1" min="1" max="${p.stock || 10}" class="p-5 rounded-2xl bg-white border-none outline-none font-black text-xs">
                         </div>
 
-                        <button onclick="addToCart()" class="w-full ${p.stock > 0 ? 'bg-black text-white' : 'bg-orange-500 text-white'} p-5 rounded-2xl font-bold text-lg">
+                        <button onclick="addToCart('${p.id}')" class="w-full ${p.stock > 0 ? 'bg-black' : 'bg-red-600'} text-white p-6 rounded-3xl font-black text-xl italic uppercase btn-action">
                             ${p.stock > 0 ? 'Добавить в корзину' : 'Предзаказ'}
                         </button>
                     </div>
@@ -570,273 +625,472 @@
             `;
         }
 
-        function shiftGallery(dir) {
-            productGalleryIndex += dir;
-            if (productGalleryIndex < 0) productGalleryIndex = activeProduct.images.length - 1;
-            if (productGalleryIndex >= activeProduct.images.length) productGalleryIndex = 0;
-            document.getElementById('main-prod-img').src = activeProduct.images[productGalleryIndex];
-        }
-
-        function zoomImg(src) {
-            document.getElementById('zoom-img').src = src;
-            toggleModal('zoom-modal');
-        }
-
-        function addToCart() {
-            if (!currentUser) return showToast("Войдите в аккаунт");
+        // --- CART LOGIC ---
+        function addToCart(pid) {
+            if (!user) return showToast("ПОЖАЛУЙСТА, ВОЙДИТЕ");
+            const p = products.find(x => x.id === pid);
             const size = document.getElementById('buy-size').value;
             const qty = parseInt(document.getElementById('buy-qty').value);
-            
-            const item = {
-                id: activeProduct.id,
-                name: activeProduct.name,
-                image: activeProduct.images[0],
-                price: activeProduct.price,
-                weight: activeProduct.weight,
-                size: size,
-                color: activeProduct.color,
-                qty: qty,
-                preorder: activeProduct.stock <= 0
-            };
 
-            cart.push(item);
-            localStorage.setItem('byrmalda_cart', JSON.stringify(cart));
-            updateCartUI();
-            showToast("Добавлено в корзину");
+            cart.push({
+                ...p,
+                idInCart: Date.now() + Math.random(),
+                selectedSize: size,
+                selectedQty: qty,
+                isPreorder: p.stock <= 0
+            });
+            
+            saveCart();
+            showToast("ДОБАВЛЕНО В КОРЗИНУ");
         }
 
-        function updateCartUI() {
-            const body = document.getElementById('cart-table-body');
-            document.getElementById('cart-count').innerText = cart.length;
-            document.getElementById('cart-count').classList.toggle('hidden', cart.length === 0);
+        function saveCart() {
+            localStorage.setItem('byrmalda_cart_v3', JSON.stringify(cart));
+            updateCartCount();
+        }
 
+        function updateCartCount() {
+            const el = document.getElementById('cart-count');
+            el.innerText = cart.length;
+            el.classList.toggle('hidden', cart.length === 0);
+        }
+
+        function renderCart() {
+            const body = document.getElementById('cart-items-body');
             if (cart.length === 0) {
-                body.innerHTML = '<tr><td colspan="6" class="py-10 text-center text-gray-400">Корзина пуста</td></tr>';
+                body.innerHTML = '<tr><td colspan="4" class="p-20 text-center text-gray-300 font-black uppercase italic">Ваша корзина пуста</td></tr>';
+                updateCartTotals(0, 0);
                 return;
             }
 
-            let totalUsd = 0;
-            let totalWeight = 0;
+            body.innerHTML = cart.map(item => `
+                <tr class="border-b border-gray-50">
+                    <td class="p-6">
+                        <div class="flex items-center gap-4">
+                            <img src="${item.images?.[0] || ''}" class="w-16 h-16 rounded-2xl object-cover">
+                            <div>
+                                <div class="font-black uppercase text-sm">${item.name}</div>
+                                <div class="text-[10px] text-red-500 font-bold uppercase tracking-widest">${item.isPreorder ? 'Предзаказ' : 'В наличии'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-6">
+                        <div class="text-[10px] font-black uppercase tracking-widest text-gray-400">РАЗМЕР: ${item.selectedSize}</div>
+                        <div class="text-[10px] font-black uppercase tracking-widest text-gray-400">КОЛ-ВО: ${item.selectedQty}</div>
+                        <div class="text-[10px] font-black uppercase tracking-widest text-gray-400">ВЕС: ${item.weight * item.selectedQty}г</div>
+                    </td>
+                    <td class="p-6 font-black italic">$${item.price * item.selectedQty}</td>
+                    <td class="p-6 text-right">
+                        <button onclick="removeFromCart(${item.idInCart})" class="text-red-500 font-black text-xl hover:scale-125 transition">×</button>
+                    </td>
+                </tr>
+            `).join('');
 
-            body.innerHTML = cart.map((item, idx) => {
-                totalUsd += item.price * item.qty;
-                totalWeight += item.weight * item.qty;
-                return `
-                    <tr class="border-b border-gray-50">
-                        <td class="py-4 flex items-center gap-4">
-                            <img src="${item.image}" class="w-16 h-16 rounded-xl object-cover">
-                            <span class="font-bold">${item.name} ${item.preorder ? '<span class="text-orange-500 text-[10px] block">ПРЕДЗАКАЗ</span>' : ''}</span>
-                        </td>
-                        <td class="py-4">${item.size}</td>
-                        <td class="py-4">${item.color}</td>
-                        <td class="py-4">${item.qty}</td>
-                        <td class="py-4">${item.price * item.qty} $</td>
-                        <td class="py-4 text-right">
-                            <button onclick="removeFromCart(${idx})" class="text-red-500">Удалить</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            const itemsTotal = cart.reduce((acc, i) => acc + (i.price * i.selectedQty), 0);
+            const totalWeightGram = cart.reduce((acc, i) => acc + (i.weight * i.selectedQty), 0);
+            const shippingRub = (totalWeightGram / 1000) * 900;
+            const shippingUsd = Math.ceil(shippingRub / RATES.RUB);
 
-            const deliveryRub = Math.ceil(totalWeight / 1000) * 900;
-            document.getElementById('cart-delivery').innerText = deliveryRub;
-            document.getElementById('cart-total').innerText = totalUsd;
+            updateCartTotals(itemsTotal, shippingUsd);
         }
 
-        function removeFromCart(idx) {
-            cart.splice(idx, 1);
-            localStorage.setItem('byrmalda_cart', JSON.stringify(cart));
-            updateCartUI();
+        function updateCartTotals(items, ship) {
+            const final = items + ship;
+            document.getElementById('total-items-price').innerText = `$${items}`;
+            document.getElementById('shipping-price').innerText = `$${ship}`;
+            document.getElementById('total-final').innerText = `$${final}`;
+            document.getElementById('total-converted').innerText = `${final * RATES.RUB} RUB / ${final * RATES.UAH} UAH`;
         }
 
-        async function checkout() {
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.idInCart !== id);
+            saveCart();
+            renderCart();
+        }
+
+        async function processCheckout() {
             if (cart.length === 0) return;
-            const orderId = 'ORD-' + Math.floor(Math.random()*1000000);
-            const total = document.getElementById('cart-total').innerText;
-            const delivery = document.getElementById('cart-delivery').innerText;
+            const oid = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+            const track = 'BYR' + Math.floor(10000000 + Math.random() * 90000000);
+            
+            const total = parseInt(document.getElementById('total-final').innerText.replace('$', ''));
 
-            const newOrder = {
-                orderId: orderId,
-                userId: currentUser.uid,
-                items: cart,
+            const orderData = {
+                items: cart.map(i => ({ id: i.id, name: i.name, size: i.selectedSize, qty: i.selectedQty, img: i.images[0], price: i.price })),
                 total: total,
-                delivery: delivery,
                 status: 'ожидает оплату',
+                track: track,
+                userId: user.uid,
                 createdAt: Date.now(),
-                autoUpdated: false,
-                trackNumber: 'T' + Math.floor(Math.random()*1000000000)
+                manualUpdate: false
             };
 
-            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).set(newOrder);
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(oid).set(orderData);
             
-            showToast("Для совершения оплаты обратитесь в поддержку или напишите нашему админу в тг @fueum");
+            document.getElementById('checkout-track').innerText = track;
+            toggleModal('checkout-modal');
+            
             cart = [];
-            localStorage.setItem('byrmalda_cart', '[]');
-            updateCartUI();
+            saveCart();
             setView('profile');
         }
 
-        let supportInterval = null;
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const msg = input.value.trim();
-            if (!msg || !currentUser) return;
+        // --- PROFILE LOGIC ---
+        async function loadUserProfile() {
+            document.getElementById('profile-name-val').innerText = user.name;
+            document.getElementById('profile-id-val').innerText = user.uid.slice(0, 8);
+            document.getElementById('profile-email-val').innerText = user.email;
+            document.getElementById('profile-date-val').innerText = new Date(user.createdAt).toLocaleDateString();
+            document.getElementById('profile-avatar').src = user.avatar || 'https://placehold.co/300?text=BYR';
+            document.getElementById('avatar-status-msg').classList.toggle('hidden', !user.pendingAvatar);
+            document.getElementById('profile-verified').classList.toggle('hidden', !user.verified);
 
-            const isResponse = currentUser.email === adminEmail && msg.startsWith('(');
-            let targetUserId = currentUser.uid;
-
-            if (isResponse) {
-                const match = msg.match(/\((\d+)\)/);
-                // logic for admin response simplified
-            }
-
-            const message = {
-                userId: currentUser.uid,
-                userName: currentUser.name,
-                text: msg,
-                time: new Date().toLocaleTimeString(),
-                date: new Date().toLocaleDateString(),
-                isAdmin: currentUser.email === adminEmail
-            };
-
-            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('support').add(message);
-            input.value = '';
-            loadMessages();
-        }
-
-        function startSupportInterval() {
-            if (supportInterval) clearInterval(supportInterval);
-            supportInterval = setInterval(loadMessages, 5000);
-        }
-
-        async function loadMessages() {
-            const snap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('support').orderBy('time', 'asc').limitToLast(50).get();
-            const win = document.getElementById('chat-window');
-            const isAdmin = currentUser?.email === adminEmail;
-
-            win.innerHTML = snap.docs.map(doc => {
-                const m = doc.data();
-                // Admin logic: show everyone's messages. User logic: show only theirs and admin replies to them
-                if (!isAdmin && m.userId !== currentUser.uid && !m.isAdmin) return '';
-                // Admin messages with (ID) are filtered by user
-                if (!isAdmin && m.isAdmin && !m.text.includes(`(${currentUser.uid.slice(0,7)})`)) return '';
-
+            // Orders
+            const oSnap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').where('userId', '==', user.uid).get();
+            const orders = oSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+            
+            document.getElementById('profile-orders').innerHTML = orders.map(o => {
+                const status = calculateStatus(o);
                 return `
-                    <div class="flex ${m.isAdmin ? 'justify-start' : 'justify-end'}">
-                        <div class="${m.isAdmin ? 'bg-gray-200 text-black' : 'bg-black text-white'} p-3 rounded-2xl max-w-[80%]">
-                            <div class="text-[10px] opacity-50">${m.userName} | ${m.time}</div>
-                            <div>${m.text}</div>
+                    <div class="bg-white p-6 rounded-[32px] flex items-center gap-6 shadow-sm border border-gray-50 relative">
+                        <img src="${o.items[0]?.img || ''}" class="w-24 h-24 rounded-2xl object-cover" onclick="openProduct('${o.items[0]?.id}')">
+                        <div class="flex-1">
+                            <div class="font-black uppercase italic">${o.items[0]?.name} ${o.items.length > 1 ? `+${o.items.length - 1}` : ''}</div>
+                            <div class="text-[10px] font-bold text-blue-600 uppercase mt-1">СТАТУС: ${status}</div>
+                            <div class="text-[8px] text-gray-400 mt-2 uppercase tracking-widest">ТРЕК: ${o.track} | ИТОГО: $${o.total}</div>
                         </div>
+                        ${status === 'создан' ? `<button onclick="cancelOrder('${o.id}')" class="text-red-500 font-black text-xl">×</button>` : ''}
                     </div>
                 `;
+            }).join('') || '<p class="text-gray-400 text-[10px] font-bold uppercase italic">Заказов пока нет</p>';
+
+            // Suggestions
+            const sSnap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').where('userId', '==', user.uid).get();
+            const sugs = sSnap.docs.map(d => ({...d.data(), id: d.id}));
+            document.getElementById('profile-suggestions').innerHTML = sugs.map(s => `
+                <div class="bg-gray-100 p-4 rounded-3xl flex items-center gap-4">
+                    <img src="${s.images[0]}" class="w-12 h-12 rounded-xl object-cover">
+                    <div class="flex-1">
+                        <div class="text-xs font-black uppercase truncate">${s.name}</div>
+                        <div class="text-[8px] text-gray-400 uppercase tracking-widest">$${s.price} | В наличии: ${s.stock}</div>
+                    </div>
+                    <button onclick="deleteProduct('${s.id}')" class="text-red-500 text-xs font-black uppercase">Удалить</button>
+                </div>
+            `).join('') || '<p class="text-gray-300 text-[10px] uppercase">Пусто</p>';
+        }
+
+        function calculateStatus(order) {
+            if (order.manualUpdate) return order.status;
+            if (order.status === 'ожидает оплату') return 'ожидает оплату';
+            
+            const elapsed = Date.now() - order.createdAt;
+            const day = 24 * 60 * 60 * 1000;
+            const hour = 60 * 60 * 1000;
+
+            if (elapsed > (4 * day + 15 * hour)) return 'в пути';
+            if (elapsed > (4 * day)) return 'передача товара в доставку';
+            return 'создан';
+        }
+
+        async function handleAvatarChange(input) {
+            if (!input.files[0]) return;
+            showToast("ЗАГРУЗКА...");
+            // Имитация загрузки
+            const url = URL.createObjectURL(input.files[0]);
+            await db.collection('artifacts').doc(appId).collection('users').doc(user.uid).update({ pendingAvatar: url });
+            showToast("ОТПРАВЛЕНО НА МОДЕРАЦИЮ");
+            loadUserProfile();
+        }
+
+        // --- SUPPORT LOGIC ---
+        let supportMessages = [];
+        function startSupportListener() {
+            db.collection('artifacts').doc(appId).collection('public').doc('data').collection('support')
+              .orderBy('time', 'asc').onSnapshot(snap => {
+                supportMessages = snap.docs.map(d => d.data());
+                renderChat();
+                updateSupportBadge();
+            });
+        }
+
+        function renderChat() {
+            const win = document.getElementById('chat-window');
+            win.innerHTML = supportMessages.map(m => {
+                const isMe = m.uid === user.uid;
+                const isAdminResp = m.isResponse && m.targetUid === user.uid;
+                
+                if (isMe || isAdminResp || user.email === adminEmail) {
+                    return `
+                        <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                            <div class="text-[8px] text-gray-400 mb-1 uppercase font-bold">${new Date(m.time).toLocaleTimeString()} | ID: ${m.uid.slice(0,6)}</div>
+                            <div class="${isMe ? 'bg-black text-white' : 'bg-white text-black'} p-4 rounded-3xl text-sm font-medium shadow-sm max-w-[80%]">
+                                ${m.text}
+                            </div>
+                        </div>
+                    `;
+                }
+                return '';
             }).join('');
             win.scrollTop = win.scrollHeight;
         }
 
-        function checkAdmin() {
-            if (currentUser.email === adminEmail) {
-                document.getElementById('btn-admin').classList.remove('hidden');
-            }
-        }
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
 
-        async function adminCreateProduct() {
-            const name = document.getElementById('adm-prod-name').value;
-            const files = document.getElementById('adm-prod-imgs').files;
-            const price = document.getElementById('adm-prod-price').value;
-            const stock = document.getElementById('adm-prod-stock').value;
-
-            if (files.length === 0) return showToast("Загрузите фото");
-            
-            // Simplified upload logic
-            const uploadedUrls = [];
-            for(let f of files) {
-                const url = await mockUpload(f);
-                uploadedUrls.push(url);
-            }
-
-            const product = {
-                name,
-                images: uploadedUrls,
-                price: parseFloat(price),
-                stock: parseInt(stock),
-                type: document.getElementById('adm-prod-type').value,
-                sizes: document.getElementById('adm-prod-sizes').value,
-                weight: parseInt(document.getElementById('adm-prod-weight').value),
-                description: document.getElementById('adm-prod-desc').value,
-                releaseYear: 2024,
-                color: 'Black/White',
-                fromUser: false
+            let msgData = {
+                text: text,
+                uid: user.uid,
+                time: Date.now(),
+                isResponse: false,
+                targetUid: null
             };
 
-            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').add(product);
-            showToast("Товар опубликован!");
-            loadAllProducts();
+            // Admin reply logic: (ID) message
+            if (user.email === adminEmail && text.startsWith('(')) {
+                const match = text.match(/\((.*?)\)/);
+                if (match) {
+                    msgData.isResponse = true;
+                    const shortId = match[1];
+                    // Find actual UID by short ID
+                    const uSnap = await db.collection('artifacts').doc(appId).collection('users').get();
+                    const target = uSnap.docs.find(d => d.id.startsWith(shortId));
+                    if (target) {
+                        msgData.targetUid = target.id;
+                        msgData.text = text.replace(match[0], '').trim();
+                    }
+                }
+            }
+
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('support').add(msgData);
+            input.value = '';
         }
 
-        async function mockUpload(file) {
-            // Usually we'd use ImgBB API here. Using placeholder for simulation
-            return URL.createObjectURL(file);
+        function updateSupportBadge() {
+            const count = supportMessages.filter(m => m.time > (localStorage.getItem('support_read') || 0)).length;
+            document.getElementById('support-badge').innerText = count;
+            document.getElementById('support-badge').classList.toggle('hidden', count === 0);
         }
 
-        async function loadUserData() {
-            if (!currentUser) return;
-            document.getElementById('profile-name').innerText = currentUser.name;
-            document.getElementById('profile-id').innerText = currentUser.uid.slice(0, 8);
-            document.getElementById('profile-date').innerText = currentUser.regDate;
-            document.getElementById('profile-email').innerText = currentUser.email;
-            document.getElementById('profile-img').src = currentUser.avatar || 'https://placehold.co/200';
-            document.getElementById('profile-badge').classList.toggle('hidden', !currentUser.verifiedBadge);
+        function markMessagesAsRead() {
+            localStorage.setItem('support_read', Date.now());
+            updateSupportBadge();
+        }
 
-            // Load Orders
-            const snap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders')
-                .where('userId', '==', currentUser.uid).get();
-            
-            const list = document.getElementById('orders-list');
-            list.innerHTML = snap.docs.map(doc => {
-                const o = doc.data();
-                const status = calculateStatus(o);
-                return `
-                    <div class="order-card p-4 bg-white flex items-center gap-4">
-                        <img src="${o.items[0].image}" class="w-20 h-20 rounded-xl object-cover">
-                        <div class="flex-1">
-                            <h4 class="font-bold">${o.items.length} товаров - ${o.total}$</h4>
-                            <p class="text-xs text-gray-400">Трек: ${o.trackNumber}</p>
-                            <div class="text-sm mt-1">Статус: <span class="font-bold text-blue-600">${status}</span></div>
+        // --- ADMIN FUNCTIONS ---
+        function adminSwitchTab(tab) {
+            currentAdminTab = tab;
+            document.querySelectorAll('[id^="admin-tab-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`admin-tab-${tab}`).classList.remove('hidden');
+            loadAdminData();
+        }
+
+        async function loadAdminData() {
+            if (currentAdminTab === 'products') {
+                const pList = document.getElementById('admin-product-list');
+                pList.innerHTML = products.map(p => `
+                    <div class="bg-white p-4 rounded-2xl flex justify-between items-center text-xs">
+                        <span class="font-black uppercase truncate flex-1">${p.name}</span>
+                        <div class="flex gap-2">
+                            <button onclick="editProduct('${p.id}')" class="text-blue-500 font-bold">РЕД.</button>
+                            <button onclick="deleteProduct('${p.id}')" class="text-red-500 font-bold">УДАЛИТЬ</button>
                         </div>
-                        ${o.status === 'ожидает оплату' || o.status === 'создан' ? `
-                            <button onclick="cancelOrder('${o.orderId}')" class="text-red-500 font-bold">×</button>
-                        ` : ''}
+                    </div>
+                `).join('');
+            }
+            if (currentAdminTab === 'moderation') {
+                // Avatars
+                const uSnap = await db.collection('artifacts').doc(appId).collection('users').get();
+                const pendingUsers = uSnap.docs.filter(d => d.data().pendingAvatar);
+                document.getElementById('adm-avatar-list').innerHTML = pendingUsers.map(d => `
+                    <div class="bg-white p-4 rounded-2xl flex items-center gap-4">
+                        <img src="${d.data().pendingAvatar}" class="w-12 h-12 rounded-full object-cover">
+                        <div class="flex-1 font-black text-[10px] uppercase">${d.data().name}</div>
+                        <button onclick="adminApproveAvatar('${d.id}', true)" class="bg-green-500 text-white p-2 rounded-lg">✔</button>
+                        <button onclick="adminApproveAvatar('${d.id}', false)" class="bg-red-500 text-white p-2 rounded-lg">✖</button>
+                    </div>
+                `).join('') || 'Запросов нет';
+
+                // Suggestions
+                const sSnap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').where('fromUser', '==', true).get();
+                document.getElementById('adm-suggestions-list').innerHTML = sSnap.docs.map(d => {
+                    const s = d.data();
+                    return `
+                        <div class="bg-white p-6 rounded-3xl space-y-4">
+                            <img src="${s.images[0]}" class="w-full h-32 object-cover rounded-xl">
+                            <div class="font-black text-xs uppercase">${s.name}</div>
+                            <div class="flex gap-2">
+                                <button onclick="adminApproveSuggestion('${d.id}', true)" class="flex-1 bg-green-500 text-white py-2 rounded-xl text-[10px] font-black uppercase">Одобрить</button>
+                                <button onclick="adminApproveSuggestion('${d.id}', false)" class="flex-1 bg-red-500 text-white py-2 rounded-xl text-[10px] font-black uppercase">Отказать</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('') || 'Предложений нет';
+            }
+        }
+
+        async function adminSaveProduct() {
+            const btn = document.getElementById('adm-save-btn');
+            btn.disabled = true; btn.innerText = "ПУБЛИКАЦИЯ...";
+
+            const data = {
+                name: document.getElementById('adm-name').value,
+                gender: document.getElementById('adm-gender').value,
+                type: document.getElementById('adm-type').value,
+                material: document.getElementById('adm-material').value,
+                color: document.getElementById('adm-color').value,
+                size: document.getElementById('adm-size').value,
+                collab: document.getElementById('adm-collab').value,
+                weight: parseInt(document.getElementById('adm-weight').value || 0),
+                release: document.getElementById('adm-release').value,
+                stock: parseInt(document.getElementById('adm-stock').value || 0),
+                price: parseFloat(document.getElementById('adm-price').value || 0),
+                description: document.getElementById('adm-desc').value,
+                images: document.getElementById('adm-images-urls').value.split(',').map(s => s.trim()),
+                fromUser: false,
+                createdAt: Date.now(),
+                userId: user.uid
+            };
+
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').add(data);
+            showToast("ТОВАР СОЗДАН!");
+            loadProducts();
+            btn.disabled = false; btn.innerText = "ОПУБЛИКОВАТЬ";
+        }
+
+        async function deleteProduct(id) {
+            if(!confirm("УДАЛИТЬ ТОВАР?")) return;
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').doc(id).delete();
+            showToast("УДАЛЕНО");
+            loadProducts();
+            if(currentAdminTab === 'products') loadAdminData();
+        }
+
+        async function adminLookupOrder() {
+            const id = document.getElementById('adm-order-lookup').value.trim();
+            const res = document.getElementById('adm-order-result');
+            res.classList.remove('hidden'); res.innerHTML = "Поиск...";
+
+            const doc = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(id).get();
+            if(!doc.exists) return res.innerHTML = "НЕ НАЙДЕНО";
+            const o = doc.data();
+            res.innerHTML = `
+                <div class="text-xs font-black uppercase italic">Заказ: ${id}</div>
+                <div class="flex gap-4">
+                    <img src="${o.items[0].img}" class="w-20 h-20 rounded-xl object-cover">
+                    <div class="text-[10px] space-y-1 uppercase font-bold text-gray-500">
+                        <div>Покупатель: ${o.userId.slice(0,8)}</div>
+                        <div>Сумма: $${o.total}</div>
+                        <div class="text-blue-600">СТАТУС: ${o.status}</div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="adminConfirmPayment('${id}')" class="flex-1 bg-green-500 text-white p-3 rounded-xl font-black text-[10px] uppercase">Оплачено (ДА)</button>
+                    <button onclick="adminUpdateStatus('${id}', 'в пути')" class="flex-1 bg-black text-white p-3 rounded-xl font-black text-[10px] uppercase">В пути</button>
+                    <button onclick="adminUpdateStatus('${id}', 'отменен')" class="flex-1 bg-red-500 text-white p-3 rounded-xl font-black text-[10px] uppercase">Отмена</button>
+                </div>
+            `;
+        }
+
+        async function adminConfirmPayment(id) {
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(id).update({ 
+                status: 'создан',
+                manualUpdate: true 
+            });
+            showToast("СТАТУС: СОЗДАН");
+            adminLookupOrder();
+        }
+
+        async function adminSetBan(state) {
+            const uid = document.getElementById('adm-ban-uid').value.trim();
+            if(!uid) return;
+            await db.collection('artifacts').doc(appId).collection('users').doc(uid).update({ banned: state });
+            showToast(state ? "ЗАБАНЕН" : "РАЗБАНЕН");
+        }
+
+        async function adminApproveAvatar(uid, approve) {
+            const uRef = db.collection('artifacts').doc(appId).collection('users').doc(uid);
+            const doc = await uRef.get();
+            if (approve) {
+                await uRef.update({ avatar: doc.data().pendingAvatar, pendingAvatar: null, verified: true });
+            } else {
+                await uRef.update({ pendingAvatar: null });
+            }
+            loadAdminData();
+        }
+
+        // --- REVIEWS & COMPLAINTS ---
+        async function loadReviews() {
+            const snap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('reviews').get();
+            const list = document.getElementById('reviews-list');
+            list.innerHTML = snap.docs.map(d => {
+                const r = d.data();
+                return `
+                    <div class="bg-gray-50 p-8 rounded-[40px] space-y-4 shadow-sm">
+                        <div class="flex justify-between items-center">
+                            <div class="font-black uppercase text-sm">${r.userName}</div>
+                            <div class="text-yellow-500">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+                        </div>
+                        <p class="text-gray-600 font-medium italic">"${r.text}"</p>
+                        <div class="text-[8px] text-gray-300 uppercase font-black">${new Date(r.time).toLocaleDateString()}</div>
                     </div>
                 `;
-            }).join('');
+            }).join('') || '<p class="text-gray-300 font-black uppercase">Отзывов пока нет</p>';
         }
 
-        function calculateStatus(o) {
-            if (o.status === 'ожидает оплату' || o.status === 'отменен') return o.status;
-            if (o.autoUpdated === false && o.status === 'создан') {
-                const now = Date.now();
-                const diff = (now - o.createdAt) / 1000 / 60 / 60; // hours
-                if (diff > 96) return 'передача товара в доставку'; // 4 days approx
-                if (diff > 120) return 'в пути';
-            }
-            return o.status;
+        // --- SYSTEM HELPERS ---
+        function toggleModal(id) {
+            const m = document.getElementById(id);
+            m.classList.toggle('hidden');
+            m.classList.toggle('flex');
         }
 
-        async function cancelOrder(id) {
-            const doc = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(id).get();
-            const o = doc.data();
-            if (o.status !== 'ожидает оплату' && o.status !== 'создан') {
-                return showToast("Заказ уже нельзя отменить на этом этапе");
-            }
-            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(id).update({ status: 'отменен' });
-            showToast("Заказ отменен");
-            loadUserData();
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('translate-y-32', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
         }
 
-        // Init App
+        function changeTheme() {
+            const isDark = document.body.classList.toggle('dark-theme');
+            document.body.classList.toggle('light-theme', !isDark);
+            document.getElementById('theme-val').innerText = isDark ? 'DARK' : 'LIGHT';
+            localStorage.setItem('byr_theme', isDark ? 'dark' : 'light');
+        }
+
+        function changeLang() {
+            const el = document.getElementById('lang-val');
+            el.innerText = el.innerText === 'RU' ? 'EN' : 'RU';
+            showToast("LANGUAGE CHANGED");
+        }
+
+        // SUGGESTIONS
+        async function submitSuggestion() {
+            if(!user) return;
+            const data = {
+                name: document.getElementById('sug-name').value,
+                type: document.getElementById('sug-type').value,
+                size: document.getElementById('sug-size').value,
+                price: parseFloat(document.getElementById('sug-price').value),
+                images: [document.getElementById('sug-img').value],
+                description: document.getElementById('sug-desc').value,
+                userId: user.uid,
+                fromUser: true,
+                stock: 1,
+                createdAt: Date.now()
+            };
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').add(data);
+            toggleModal('suggest-modal');
+            showToast("ОТПРАВЛЕНО НА МОДЕРАЦИЮ");
+        }
+
+        // ON LOAD
         window.onload = () => {
-            updateCartUI();
-            setView('home');
+            const savedTheme = localStorage.getItem('byr_theme');
+            if(savedTheme === 'dark') changeTheme();
+            loadProducts();
         };
 
     </script>
