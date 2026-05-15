@@ -3,2007 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BYRMALDA | Бренд одежды и обуви</title>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <title>Byrmalda Brand Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-auth-compat.js"></script>
     <style>
-        :root {
-            --primary: #1a1a1a;
-            --secondary: #f8f8f8;
-            --accent: #e63946;
-            --text: #333;
-            --text-light: #666;
-            --border: #e0e0e0;
-            --success: #2a9d8f;
-            --warning: #e9c46a;
-            --shadow: 0 2px 10px rgba(0,0,0,0.08);
-            --radius: 12px;
-            --transition: all 0.3s ease;
-        }
-        
-        .dark-theme {
-            --primary: #f8f8f8;
-            --secondary: #1a1a1a;
-            --accent: #ff6b6b;
-            --text: #f0f0f0;
-            --text-light: #aaa;
-            --border: #333;
-            --shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--secondary);
-            color: var(--text);
-            line-height: 1.6;
-            transition: var(--transition);
-        }
-        
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* Sidebar Navigation */
-        .sidebar {
-            width: 240px;
-            background: var(--primary);
-            color: var(--secondary);
-            padding: 2rem 1rem;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow);
-            z-index: 100;
-            transition: var(--transition);
-        }
-        
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 2.5rem;
-            text-align: center;
-            letter-spacing: 2px;
-            color: var(--secondary);
-        }
-        
-        .nav-btn {
-            display: block;
-            width: 100%;
-            padding: 12px 16px;
-            margin: 8px 0;
-            background: none;
-            border: none;
-            color: var(--secondary);
-            text-align: left;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 1rem;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .nav-btn:hover, .nav-btn.active {
-            background: rgba(255,255,255,0.15);
-            transform: translateX(4px);
-        }
-        
-        .nav-btn i {
-            width: 20px;
-            text-align: center;
-        }
-        
-        .notification-badge {
-            background: var(--accent);
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 10px;
-            margin-left: auto;
-            display: none;
-        }
-        
-        .nav-btn.has-notification .notification-badge {
-            display: inline;
-        }
-        
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 240px;
-            padding: 2rem;
-            transition: var(--transition);
-        }
-        
-        .page {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-        
-        .page.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Home Page */
-        .hero {
-            text-align: center;
-            padding: 3rem 1rem;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        .quote {
-            font-size: 2.2rem;
-            font-weight: 300;
-            margin: 2rem 0;
-            line-height: 1.4;
-            font-style: italic;
-            color: var(--text);
-        }
-        
-        .quote-author {
-            display: block;
-            margin-top: 1rem;
-            font-weight: 500;
-            color: var(--text-light);
-        }
-        
-        .showcase {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-        
-        .showcase-item {
-            border-radius: var(--radius);
-            overflow: hidden;
-            height: 300px;
-            background: linear-gradient(45deg, #f5f5f5, #e0e0e0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            font-weight: 500;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-        
-        .showcase-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
-        
-        /* Auth Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: var(--secondary);
-            border-radius: var(--radius);
-            padding: 2.5rem;
-            width: 90%;
-            max-width: 450px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            position: relative;
-            animation: modalSlide 0.3s ease;
-        }
-        
-        @keyframes modalSlide {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-light);
-            transition: var(--transition);
-        }
-        
-        .close-modal:hover {
-            color: var(--accent);
-        }
-        
-        .modal-title {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            color: var(--text);
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--secondary);
-            color: var(--text);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.2);
-        }
-        
-        .btn {
-            display: inline-block;
-            background: var(--primary);
-            color: var(--secondary);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            width: 100%;
-        }
-        
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        .btn-accent {
-            background: var(--accent);
-        }
-        
-        .btn-accent:hover {
-            background: #c12939;
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-        }
-        
-        .btn-outline:hover {
-            background: var(--primary);
-            color: var(--secondary);
-        }
-        
-        .auth-switch {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: var(--text-light);
-        }
-        
-        .auth-switch a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        
-        .auth-switch a:hover {
-            text-decoration: underline;
-        }
-        
-        .error-message {
-            color: var(--accent);
-            text-align: center;
-            margin: 10px 0;
-            font-size: 0.9rem;
-            min-height: 20px;
-        }
-        
-        .success-message {
-            color: var(--success);
-            text-align: center;
-            margin: 10px 0;
-            font-size: 0.9rem;
-            min-height: 20px;
-        }
-        
-        /* Profile Page */
-        .profile-header {
-            display: flex;
-            align-items: center;
-            padding: 1.5rem;
-            background: var(--primary);
-            border-radius: var(--radius);
-            margin-bottom: 2rem;
-            color: var(--secondary);
-            box-shadow: var(--shadow);
-        }
-        
-        .avatar-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--secondary);
-            margin-right: 1.5rem;
-            overflow: hidden;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: var(--text-light);
-            border: 3px solid var(--accent);
-        }
-        
-        .avatar-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .avatar-upload {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background: var(--accent);
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-        
-        .user-info h2 {
-            font-size: 1.8rem;
-            margin-bottom: 4px;
-        }
-        
-        .user-id {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 8px;
-        }
-        
-        .user-meta {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-        .orders-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .order-card {
-            background: var(--primary);
-            border-radius: var(--radius);
-            padding: 1.2rem;
-            display: flex;
-            gap: 1rem;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-        }
-        
-        .order-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .order-card.cancelable .cancel-btn {
-            display: block;
-        }
-        
-        .cancel-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        
-        .cancel-btn:hover {
-            background: #c12939;
-            transform: scale(1.1);
-        }
-        
-        .order-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            background: var(--secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            font-weight: 500;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-        
-        .order-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .order-details {
-            flex: 1;
-        }
-        
-        .order-name {
-            font-weight: 600;
-            margin-bottom: 4px;
-            font-size: 1.1rem;
-        }
-        
-        .order-status {
-            font-size: 0.9rem;
-            padding: 3px 10px;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 4px 0;
-        }
-        
-        .status-awaiting {
-            background: rgba(233, 196, 106, 0.2);
-            color: #e9c46a;
-        }
-        
-        .status-created {
-            background: rgba(42, 157, 143, 0.2);
-            color: #2a9d8f;
-        }
-        
-        .status-shipping {
-            background: rgba(102, 126, 234, 0.2);
-            color: #667eea;
-        }
-        
-        .status-delivered {
-            background: rgba(42, 157, 143, 0.2);
-            color: #2a9d8f;
-        }
-        
-        .order-meta {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
-        
-        /* Product Page */
-        .product-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .product-gallery {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .main-image {
-            width: 100%;
-            height: 400px;
-            border-radius: var(--radius);
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-            cursor: zoom-in;
-        }
-        
-        .main-image img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-        }
-        
-        .main-image.zoomed img {
-            transform: scale(1.5);
-            cursor: zoom-out;
-        }
-        
-        .gallery-nav {
-            display: flex;
-            justify-content: space-between;
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            padding: 0 10px;
-            transform: translateY(-50%);
-        }
-        
-        .gallery-btn {
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        
-        .gallery-btn:hover {
-            background: rgba(0,0,0,0.8);
-        }
-        
-        .thumbnails {
-            display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
-            padding: 5px 0;
-        }
-        
-        .thumbnail {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            background: var(--primary);
-            cursor: pointer;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            font-size: 0.8rem;
-            border: 2px solid transparent;
-            transition: var(--transition);
-        }
-        
-        .thumbnail.active {
-            border-color: var(--accent);
-        }
-        
-        .thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-        
-        .product-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        .product-title {
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1.3;
-        }
-        
-        .product-specs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px 20px;
-            background: var(--primary);
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            color: var(--secondary);
-        }
-        
-        .spec-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .spec-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 4px;
-        }
-        
-        .spec-value {
-            font-weight: 500;
-        }
-        
-        .spec-value.unavailable {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        
-        .product-description {
-            line-height: 1.7;
-            padding: 1rem 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .price-section {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 1.5rem;
-            background: var(--primary);
-            border-radius: var(--radius);
-            color: var(--secondary);
-        }
-        
-        .price-usd {
-            font-size: 2.2rem;
-            font-weight: 700;
-        }
-        
-        .price-converted {
-            display: flex;
-            gap: 15px;
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .action-btn {
-            padding: 14px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-        
-        .btn-preorder {
-            background: var(--warning);
-            color: #333;
-        }
-        
-        .btn-preorder:hover {
-            background: #d9b34a;
-        }
-        
-        /* Catalog & Search */
-        .catalog-grid, .search-results {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        
-        .category-card, .product-card {
-            background: var(--primary);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .category-card:hover, .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .card-image {
-            height: 180px;
-            background: var(--secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            font-weight: 500;
-            overflow: hidden;
-        }
-        
-        .card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .card-content {
-            padding: 1rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .card-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-        }
-        
-        .card-price {
-            font-weight: 700;
-            color: var(--accent);
-            margin-top: auto;
-        }
-        
-        .card-price.unavailable {
-            color: var(--accent);
-        }
-        
-        .search-container {
-            margin-bottom: 2rem;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 14px 20px;
-            border: 2px solid var(--border);
-            border-radius: 50px;
-            font-size: 1.1rem;
-            background: var(--secondary);
-            color: var(--text);
-            transition: var(--transition);
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.2);
-        }
-        
-        /* Cart Page */
-        .cart-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--primary);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            margin-bottom: 2rem;
-        }
-        
-        .cart-table th {
-            background: rgba(0,0,0,0.1);
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--secondary);
-        }
-        
-        .cart-table td {
-            padding: 15px;
-            border-bottom: 1px solid var(--border);
-            color: var(--secondary);
-        }
-        
-        .cart-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .cart-item-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            background: var(--secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-            font-weight: 500;
-            flex-shrink: 0;
-        }
-        
-        .cart-item-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-        
-        .cart-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .quantity-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--secondary);
-            border: none;
-            color: var(--primary);
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .remove-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        
-        .remove-btn:hover {
-            background: #c12939;
-            transform: scale(1.1);
-        }
-        
-        .cart-summary {
-            background: var(--primary);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            max-width: 400px;
-            margin-left: auto;
-            color: var(--secondary);
-            box-shadow: var(--shadow);
-        }
-        
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .summary-row:last-child {
-            border-bottom: none;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-top: 10px;
-            padding-top: 15px;
-        }
-        
-        .checkout-btn {
-            margin-top: 1.5rem;
-            padding: 14px;
-            font-size: 1.1rem;
-        }
-        
-        /* Chat Support */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 150px);
-            background: var(--primary);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-        
-        .chat-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: var(--secondary);
-        }
-        
-        .chat-messages {
-            flex: 1;
-            padding: 1.5rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .message {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            position: relative;
-            line-height: 1.5;
-        }
-        
-        .message.user {
-            align-self: flex-end;
-            background: var(--accent);
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
-        
-        .message.support {
-            align-self: flex-start;
-            background: var(--secondary);
-            color: var(--text);
-            border-bottom-left-radius: 5px;
-        }
-        
-        .message-meta {
-            font-size: 0.75rem;
-            opacity: 0.8;
-            margin-top: 4px;
-            text-align: right;
-        }
-        
-        .message.user .message-meta {
-            color: rgba(255,255,255,0.9);
-        }
-        
-        .chat-input-container {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 10px;
-        }
-        
-        .chat-input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            background: var(--secondary);
-            color: var(--text);
-            font-size: 1rem;
-        }
-        
-        .chat-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        
-        .send-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: var(--transition);
-        }
-        
-        .send-btn:hover {
-            background: #c12939;
-            transform: scale(1.05);
-        }
-        
-        /* Admin Panel */
-        .admin-section {
-            background: var(--primary);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--secondary);
-            box-shadow: var(--shadow);
-        }
-        
-        .admin-section h3 {
-            margin-bottom: 1.2rem;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            font-size: 1.4rem;
-        }
-        
-        .admin-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-        
-        .admin-form .form-group {
-            margin-bottom: 0;
-        }
-        
-        .admin-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        
-        .status-pending {
-            background: rgba(233, 196, 106, 0.2);
-            color: #e9c46a;
-        }
-        
-        .status-approved {
-            background: rgba(42, 157, 143, 0.2);
-            color: #2a9d8f;
-        }
-        
-        .status-rejected {
-            background: rgba(230, 57, 70, 0.2);
-            color: var(--accent);
-        }
-        
-        /* Settings Page */
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        .setting-card {
-            background: var(--primary);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            color: var(--secondary);
-            box-shadow: var(--shadow);
-        }
-        
-        .setting-card h3 {
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-        
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .toggle-container:last-child {
-            border-bottom: none;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: var(--accent);
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(24px);
-        }
-        
-        /* Reviews Page */
-        .review-card {
-            background: var(--primary);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--secondary);
-            box-shadow: var(--shadow);
-        }
-        
-        .review-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .review-author {
-            font-weight: 600;
-            margin-right: 10px;
-        }
-        
-        .review-rating {
-            color: #ffc107;
-            margin-right: 10px;
-        }
-        
-        .review-date {
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
-        
-        .review-content {
-            line-height: 1.6;
-        }
-        
-        /* Responsive */
-        @media (max-width: 900px) {
-            .sidebar {
-                width: 70px;
-                padding: 1.5rem 0.5rem;
-            }
-            
-            .logo span, .nav-btn span, .notification-badge {
-                display: none;
-            }
-            
-            .nav-btn {
-                justify-content: center;
-                padding: 12px;
-            }
-            
-            .nav-btn i {
-                margin: 0;
-                font-size: 1.2rem;
-            }
-            
-            .main-content {
-                margin-left: 70px;
-            }
-            
-            .product-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .product-gallery {
-                order: 2;
-            }
-            
-            .product-info {
-                order: 1;
-            }
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding: 1rem;
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-            
-            .product-specs {
-                grid-template-columns: 1fr;
-            }
-            
-            .cart-table {
-                font-size: 0.9rem;
-            }
-            
-            .cart-table th, .cart-table td {
-                padding: 10px 8px;
-            }
-            
-            .cart-item-img {
-                width: 50px;
-                height: 50px;
-            }
-        }
-        
-        /* Utility Classes */
-        .hidden {
-            display: none !important;
-        }
-        
-        .text-center {
-            text-align: center;
-        }
-        
-        .mt-2 {
-            margin-top: 1rem;
-        }
-        
-        .mb-2 {
-            margin-bottom: 1rem;
-        }
-        
-        .text-accent {
-            color: var(--accent);
-        }
-        
-        .text-success {
-            color: var(--success);
-        }
-        
-        .verified-badge {
-            color: var(--success);
-            margin-right: 5px;
-            font-weight: bold;
-        }
-        
-        /* Loading & Empty States */
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-light);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-light);
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-            opacity: 0.5;
-        }
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .dark-theme { background-color: #0a0a0a; color: #f5f5f5; }
+        .light-theme { background-color: #ffffff; color: #1a1a1a; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .modal-overlay { background: rgba(0,0,0,0.8); z-index: 100; }
+        .btn-byrmalda { border-radius: 40px; transition: transform 0.2s; }
+        .btn-byrmalda:active { transform: scale(0.95); }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        .avatar-circle { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+        .order-card { border-radius: 20px; border: 1px solid #eee; }
+        .lang-hidden { display: none; }
+        #blocking-layer { display: none; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="logo">BYRMALDA</div>
-            
-            <button class="nav-btn active" data-page="home">
-                <i>🏠</i> <span>Главная</span>
-            </button>
-            <button class="nav-btn" data-page="search">
-                <i>🔍</i> <span>Поиск</span>
-            </button>
-            <button class="nav-btn" data-page="catalog">
-                <i>📦</i> <span>Каталог</span>
-            </button>
-            <button class="nav-btn" data-page="cart">
-                <i>🛒</i> <span>Корзина</span>
-                <span class="notification-badge">0</span>
-            </button>
-            <button class="nav-btn" data-page="support">
-                <i>💬</i> <span>Поддержка</span>
-                <span class="notification-badge">0</span>
-            </button>
-            <button class="nav-btn" data-page="settings">
-                <i>⚙️</i> <span>Настройки</span>
-            </button>
-            <button class="nav-btn" data-page="reviews">
-                <i>⭐</i> <span>Отзывы</span>
-            </button>
-            
-            <!-- User specific buttons (shown after login) -->
-            <div id="user-nav" class="hidden">
-                <button class="nav-btn" data-page="profile">
-                    <i>👤</i> <span>Профиль</span>
-                </button>
-                <button class="nav-btn" id="suggest-product-btn">
-                    <i>✨</i> <span>Предложить товар</span>
-                </button>
-            </div>
-            
-            <!-- Admin specific button -->
-            <div id="admin-nav" class="hidden">
-                <button class="nav-btn" data-page="admin">
-                    <i>🛡️</i> <span>Панель админа</span>
-                </button>
-            </div>
-            
-            <!-- Auth buttons -->
-            <div id="auth-nav">
-                <button class="nav-btn" id="login-btn">
-                    <i>🔑</i> <span>Войти</span>
-                </button>
-            </div>
-        </aside>
+<body class="light-theme overflow-x-hidden">
+
+    <!-- Блокировщик экрана для забаненных -->
+    <div id="blocking-layer" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center text-center p-6">
+        <h1 class="text-3xl font-bold text-white mb-4">Аккаунт заблокирован</h1>
+        <p class="text-gray-400">Аккаунт заблокирован из за нарушений сайта, пожалуйста, напишите нам в тг @fueum</p>
+    </div>
+
+    <div id="app" class="flex min-h-screen">
         
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="w-20 md:w-64 border-r border-gray-200 flex flex-col p-4 fixed h-full z-50 bg-inherit">
+            <div class="mb-10 text-2xl font-black tracking-tighter">BYRMALDA</div>
+            
+            <div class="space-y-4 flex-1">
+                <button onclick="setView('home')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
+                    <span class="icon">🏠</span> <span class="hidden md:inline" data-lang="menu_home">Главная</span>
+                </button>
+                <button onclick="setView('search')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
+                    <span class="icon">🔍</span> <span class="hidden md:inline" data-lang="menu_search">Поиск</span>
+                </button>
+                <button onclick="setView('catalog')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
+                    <span class="icon">📁</span> <span class="hidden md:inline" data-lang="menu_catalog">Каталог</span>
+                </button>
+                <button onclick="setView('cart')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition relative">
+                    <span class="icon">🛒</span> <span class="hidden md:inline" data-lang="menu_cart">Корзина</span>
+                    <span id="cart-count" class="absolute top-2 left-6 bg-red-500 text-white text-[10px] px-1.5 rounded-full hidden">0</span>
+                </button>
+                <button onclick="setView('profile')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
+                    <span class="icon">👤</span> <span class="hidden md:inline" data-lang="menu_profile">Профиль</span>
+                </button>
+                <button id="btn-support" onclick="setView('support')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition relative">
+                    <span class="icon">💬</span> <span class="hidden md:inline" data-lang="menu_support">Поддержка</span>
+                    <span id="support-count" class="absolute top-2 left-6 bg-red-500 text-white text-[10px] px-1.5 rounded-full hidden">0</span>
+                </button>
+                <button onclick="setView('reviews')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
+                    <span class="icon">⭐</span> <span class="hidden md:inline" data-lang="menu_reviews">Отзывы</span>
+                </button>
+                <button onclick="setView('settings')" class="nav-item w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-2xl transition">
+                    <span class="icon">⚙️</span> <span class="hidden md:inline" data-lang="menu_settings">Настройки</span>
+                </button>
+                <button id="btn-suggest" onclick="openSuggestModal()" class="nav-item w-full flex items-center gap-3 p-3 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-2xl transition hidden">
+                    <span class="icon">💡</span> <span class="hidden md:inline" data-lang="menu_suggest">Предложить</span>
+                </button>
+                <button id="btn-admin" onclick="setView('admin')" class="nav-item w-full flex items-center gap-3 p-3 bg-black text-white hover:bg-gray-800 rounded-2xl transition hidden">
+                    <span class="icon">⚡</span> <span class="hidden md:inline" data-lang="menu_admin">Панель</span>
+                </button>
+            </div>
+
+            <div id="auth-section" class="mt-auto">
+                <button id="btn-login" onclick="toggleModal('login-modal')" class="w-full bg-black text-white p-3 rounded-2xl font-bold" data-lang="btn_login">Войти</button>
+                <div id="user-info-sidebar" class="hidden flex items-center gap-3 p-2">
+                    <img id="sidebar-avatar" src="https://placehold.co/100" class="avatar-circle">
+                    <div class="hidden md:block overflow-hidden">
+                        <div id="sidebar-name" class="font-bold truncate">User</div>
+                        <div class="text-[10px] text-gray-400">ID: <span id="sidebar-id">...</span></div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
         <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Home Page -->
-            <section id="home" class="page active">
-                <div class="hero">
-                    <h1>BYRMALDA</h1>
-                    <p class="quote">"Стиль — это способ сказать, кто ты есть, не произнося ни слова"<span class="quote-author">— BYRMALDA</span></p>
-                    <p class="quote">"Каждая деталь имеет значение. Каждая строчка — история."<span class="quote-author">— BYRMALDA</span></p>
-                    <p class="quote">"Не просто одежда. Выражение себя."<span class="quote-author">— BYRMALDA</span></p>
+        <main id="content" class="flex-1 ml-20 md:ml-64 p-4 md:p-8">
+            
+            <!-- Home View -->
+            <section id="view-home" class="view space-y-12">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[60vh]">
+                    <div class="space-y-6">
+                        <h1 class="text-6xl font-black leading-tight italic">"BYRMALDA - это не одежда, это твой новый код реальности."</h1>
+                        <p class="text-xl text-gray-500">"Стиль — это способ сказать, кто вы есть, без слов. Мы создаем эти слова за вас."</p>
+                        <p class="text-lg font-light border-l-4 border-black pl-4">"Каждый шов — манифест. Каждый принт — история."</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400" class="rounded-3xl shadow-xl hover:scale-105 transition duration-500">
+                        <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=400" class="rounded-3xl shadow-xl mt-8 hover:scale-105 transition duration-500">
+                    </div>
+                </div>
+                <div class="text-center py-20 border-y border-gray-100">
+                    <h2 class="text-4xl font-bold mb-4">SHOW REELS 2024</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=500" class="rounded-2xl h-64 w-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=500" class="rounded-2xl h-64 w-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=500" class="rounded-2xl h-64 w-full object-cover">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search View -->
+            <section id="view-search" class="view hidden space-y-6">
+                <div class="max-w-2xl mx-auto relative">
+                    <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Например: футболка free drun" class="w-full bg-gray-100 p-5 rounded-3xl outline-none focus:ring-2 ring-black transition text-lg">
+                </div>
+                <div id="search-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+            </section>
+
+            <!-- Catalog View -->
+            <section id="view-catalog" class="view hidden space-y-8">
+                <h2 class="text-3xl font-bold" data-lang="catalog_title">Каталог</h2>
+                <div id="catalog-categories" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+                <div id="catalog-items" class="hidden">
+                    <button onclick="closeCategory()" class="mb-4 text-gray-500">← Назад к категориям</button>
+                    <div id="category-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+                </div>
+            </section>
+
+            <!-- Profile View -->
+            <section id="view-profile" class="view hidden max-w-4xl mx-auto space-y-10">
+                <div class="bg-gray-50 p-8 rounded-[40px] flex flex-col md:flex-row items-center gap-8 relative">
+                    <div class="relative group cursor-pointer" onclick="document.getElementById('avatar-upload').click()">
+                        <img id="profile-img" src="https://placehold.co/200" class="w-40 h-40 rounded-full object-cover border-4 border-white shadow-lg">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                            <span class="text-white text-xs">Сменить</span>
+                        </div>
+                        <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="uploadAvatar(this)">
+                    </div>
+                    <div class="flex-1 text-center md:text-left">
+                        <div class="flex items-center gap-2 justify-center md:justify-start">
+                            <h2 id="profile-name" class="text-4xl font-black">...</h2>
+                            <span id="profile-badge" class="hidden text-blue-500">✔</span>
+                        </div>
+                        <p class="text-gray-400">ID: <span id="profile-id">...</span></p>
+                        <p class="text-sm mt-2 text-gray-500">Регистрация: <span id="profile-date">...</span></p>
+                        <p class="text-sm font-bold mt-1" id="profile-email">...</p>
+                    </div>
                 </div>
                 
-                <div class="showcase">
-                    <div class="showcase-item">Показ 2024 • Париж</div>
-                    <div class="showcase-item">Коллекция "Urban Soul"</div>
-                    <div class="showcase-item">Limited Edition</div>
-                    <div class="showcase-item">Эко-материалы</div>
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold" data-lang="profile_orders">Ваши заказы</h3>
+                    <div id="orders-list" class="space-y-4"></div>
                 </div>
             </section>
-            
-            <!-- Search Page -->
-            <section id="search" class="page">
-                <h2>Поиск товаров</h2>
-                <div class="search-container">
-                    <input type="text" class="search-input" id="search-input" placeholder="Например: футболка free drun...">
-                </div>
-                <div id="search-results" class="search-results">
-                    <!-- Results will be populated by JS -->
-                    <div class="empty-state">
-                        <i>🔍</i>
-                        <p>Введите название товара для поиска</p>
-                    </div>
-                </div>
+
+            <!-- Product Details View -->
+            <section id="view-product" class="view hidden">
+                <button onclick="setView('search')" class="mb-6 text-gray-400">← Назад</button>
+                <div id="product-details-container" class="grid grid-cols-1 lg:grid-cols-2 gap-12"></div>
             </section>
-            
-            <!-- Catalog Page -->
-            <section id="catalog" class="page">
-                <h2>Каталог</h2>
-                <div class="catalog-grid" id="catalog-grid">
-                    <!-- Categories will be populated by JS -->
-                    <div class="category-card" data-category="tshirts">
-                        <div class="card-image">Футболки</div>
-                        <div class="card-content">
-                            <div class="card-title">Футболки</div>
-                        </div>
-                    </div>
-                    <div class="category-card" data-category="sneakers">
-                        <div class="card-image">Кроссовки</div>
-                        <div class="card-content">
-                            <div class="card-title">Кроссовки</div>
-                        </div>
-                    </div>
-                    <div class="category-card" data-category="hoodies">
-                        <div class="card-image">Толстовки</div>
-                        <div class="card-content">
-                            <div class="card-title">Толстовки</div>
-                        </div>
-                    </div>
-                    <div class="category-card" data-category="shoes">
-                        <div class="card-image">Обувь</div>
-                        <div class="card-content">
-                            <div class="card-title">Массивная обувь</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Product Page (hidden by default, shown when product selected) -->
-            <section id="product" class="page">
-                <button class="btn-outline" id="back-to-catalog" style="margin-bottom: 1.5rem;">← Назад к каталогу</button>
-                <div class="product-container">
-                    <div class="product-gallery">
-                        <div class="main-image" id="main-image">
-                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='16' fill='%23999' text-anchor='middle' dominant-baseline='middle'%3EФото товара%3C/text%3E%3C/svg%3E" alt="Товар">
-                            <div class="gallery-nav">
-                                <button class="gallery-btn" id="prev-image">❮</button>
-                                <button class="gallery-btn" id="next-image">❯</button>
-                            </div>
-                        </div>
-                        <div class="thumbnails" id="thumbnails">
-                            <!-- Thumbnails will be added by JS -->
-                        </div>
-                    </div>
-                    <div class="product-info">
-                        <h1 class="product-title" id="product-title">Футболка Free Drun белая</h1>
-                        
-                        <div class="product-specs">
-                            <div class="spec-item">
-                                <span class="spec-label">Для кого</span>
-                                <span class="spec-value" id="product-gender">Унисекс</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Размер</span>
-                                <span class="spec-value" id="product-sizes">S, M, L, XL</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Тип</span>
-                                <span class="spec-value" id="product-type">Футболка</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Материал</span>
-                                <span class="spec-value" id="product-material">Хлопок 95%, Эластан 5%</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Цвет</span>
-                                <span class="spec-value" id="product-colors">Белый, Черный, Серый</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Коллаборация</span>
-                                <span class="spec-value" id="product-collab">Нет</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Масса</span>
-                                <span class="spec-value" id="product-weight">180 г</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Год релиза</span>
-                                <span class="spec-value" id="product-year">2024</span>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">В наличии</span>
-                                <span class="spec-value" id="product-stock">12 шт</span>
-                            </div>
-                        </div>
-                        
-                        <div class="product-description" id="product-description">
-                            Уникальная футболка из премиального хлопка с принтом от дизайнеров BYRMALDA. Идеально подходит для повседневной носки и создания стильных образов.
-                        </div>
-                        
-                        <div class="price-section">
-                            <div class="price-usd" id="price-usd">$45.00</div>
-                            <div class="price-converted">
-                                <span id="price-rub">≈ 4,100 ₽</span>
-                                <span id="price-uah">≈ 1,650 ₴</span>
-                            </div>
-                            <button class="btn btn-accent action-btn" id="add-to-cart-btn">Купить</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Cart Page -->
-            <section id="cart" class="page">
-                <h2>Корзина</h2>
-                <div id="cart-empty" class="empty-state hidden">
-                    <i>🛒</i>
-                    <p>Ваша корзина пуста</p>
-                    <button class="btn btn-outline mt-2" id="continue-shopping">Продолжить покупки</button>
-                </div>
-                
-                <div id="cart-content" class="hidden">
-                    <table class="cart-table">
-                        <thead>
+
+            <!-- Cart View -->
+            <section id="view-cart" class="view hidden space-y-8">
+                <h2 class="text-3xl font-bold">Корзина</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="border-b border-gray-100">
                             <tr>
-                                <th>Товар</th>
-                                <th>Размер</th>
-                                <th>Цвет</th>
-                                <th>Кол-во</th>
-                                <th>Цена</th>
-                                <th></th>
+                                <th class="py-4">Товар</th>
+                                <th class="py-4">Размер</th>
+                                <th class="py-4">Цвет</th>
+                                <th class="py-4">Кол-во</th>
+                                <th class="py-4">Цена</th>
+                                <th class="py-4"></th>
                             </tr>
                         </thead>
-                        <tbody id="cart-items">
-                            <!-- Cart items will be populated by JS -->
-                        </tbody>
+                        <tbody id="cart-table-body"></tbody>
                     </table>
-                    
-                    <div class="cart-summary">
-                        <div class="summary-row">
-                            <span>Товары:</span>
-                            <span id="cart-subtotal">$0.00</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Доставка (1 кг = 900 ₽):</span>
-                            <span id="cart-shipping">0 ₽</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Итого:</span>
-                            <span id="cart-total">$0.00</span>
-                        </div>
-                        <button class="btn btn-accent checkout-btn" id="checkout-btn">Оформить заказ</button>
-                    </div>
+                </div>
+                <div class="flex flex-col items-end gap-2 border-t pt-6">
+                    <div class="text-gray-500">Доставка: <span id="cart-delivery">0</span> руб.</div>
+                    <div class="text-4xl font-black">Итого: <span id="cart-total">0</span> $</div>
+                    <button onclick="checkout()" class="bg-black text-white px-12 py-4 rounded-full font-bold text-xl mt-4">Оформить заказ</button>
                 </div>
             </section>
-            
-            <!-- Support Chat Page -->
-            <section id="support" class="page">
-                <h2>Поддержка</h2>
-                <div class="chat-container">
-                    <div class="chat-header">Чат с поддержкой</div>
-                    <div class="chat-messages" id="chat-messages">
-                        <div class="message support">
-                            Здравствуйте! Чем могу помочь?
-                            <div class="message-meta">Сегодня, 12:30</div>
-                        </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <input type="text" class="chat-input" id="chat-input" placeholder="Напишите сообщение...">
-                        <button class="send-btn" id="send-message">➤</button>
-                    </div>
+
+            <!-- Support View -->
+            <section id="view-support" class="view hidden max-w-2xl mx-auto h-[80vh] flex flex-col bg-gray-50 rounded-3xl overflow-hidden shadow-sm">
+                <div class="p-4 bg-white border-b flex justify-between items-center">
+                    <span class="font-bold">Поддержка Byrmalda</span>
+                    <span id="support-status" class="text-green-500 text-xs">● Online</span>
+                </div>
+                <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll"></div>
+                <div class="p-4 bg-white border-t flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Напишите нам..." class="flex-1 bg-gray-100 p-3 rounded-2xl outline-none">
+                    <button onclick="sendMessage()" class="bg-black text-white px-6 rounded-2xl font-bold">↑</button>
                 </div>
             </section>
-            
-            <!-- Settings Page -->
-            <section id="settings" class="page">
-                <h2>Настройки</h2>
-                <div class="settings-grid">
-                    <div class="setting-card">
-                        <h3>Учетная запись</h3>
-                        <div class="toggle-container">
-                            <span>Сменить тему</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="theme-toggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="toggle-container">
-                            <span>Язык интерфейса</span>
-                            <select class="form-control" id="language-select" style="width: auto; padding: 8px 15px;">
-                                <option value="ru">Русский</option>
-                                <option value="en">English</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-outline mt-2" id="complaint-btn">Подать жалобу</button>
-                    </div>
-                    
-                    <div class="setting-card">
-                        <h3>Размерные сетки</h3>
-                        <button class="btn btn-outline" style="margin-bottom: 10px;">📏 Размерная сетка одежды</button>
-                        <button class="btn btn-outline">👟 Размерная сетка обуви</button>
-                    </div>
-                    
-                    <div class="setting-card">
-                        <h3>Оставить отзыв</h3>
-                        <p style="margin-bottom: 15px; opacity: 0.9;">Поделитесь своим опытом использования товаров BYRMALDA</p>
-                        <button class="btn btn-accent" id="write-review-btn">Написать отзыв</button>
-                    </div>
+
+            <!-- Reviews View -->
+            <section id="view-reviews" class="view hidden space-y-8">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-3xl font-bold">Отзывы покупателей</h2>
+                    <button onclick="openReviewModal()" class="bg-black text-white px-6 py-2 rounded-full text-sm">Оставить отзыв</button>
                 </div>
+                <div id="reviews-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
             </section>
-            
-            <!-- Reviews Page -->
-            <section id="reviews" class="page">
-                <h2>Отзывы покупателей</h2>
-                <div id="reviews-list">
-                    <div class="review-card">
-                        <div class="review-header">
-                            <span class="review-author">Анна К.</span>
-                            <span class="review-rating">★★★★★</span>
-                            <span class="review-date">15 мая 2024</span>
-                        </div>
-                        <div class="review-content">
-                            Потрясающее качество! Футболка сидит идеально, материал приятный к телу. Доставка была быстрой, упаковка стильная. Обязательно закажу еще!
-                        </div>
-                    </div>
-                    <div class="review-card">
-                        <div class="review-header">
-                            <span class="review-author">Михаил Р.</span>
-                            <span class="review-rating">★★★★☆</span>
-                            <span class="review-date">2 мая 2024</span>
-                        </div>
-                        <div class="review-content">
-                            Кроссовки выглядят даже круче, чем на фото. Единственное — размер чуть большеват, советую брать на полразмера меньше. В остальном — восторг!
-                        </div>
-                    </div>
-                </div>
+
+            <!-- Settings View -->
+            <section id="view-settings" class="view hidden max-w-xl mx-auto space-y-4">
+                <h2 class="text-3xl font-bold mb-6">Настройки</h2>
+                <button onclick="openComplaint()" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Жалобы <span>→</span></button>
+                <button onclick="toggleTheme()" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Тема: <span id="theme-text">Светлая</span></button>
+                <button onclick="toggleLang()" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Язык: <span id="lang-text">RU</span></button>
+                <button onclick="window.open('https://sizechart.com', '_blank')" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Таблица размеров одежды <span>↗</span></button>
+                <button onclick="window.open('https://sizechart.com/shoes', '_blank')" class="w-full p-5 bg-gray-100 rounded-3xl text-left font-bold flex justify-between">Таблица размеров обуви <span>↗</span></button>
+                <button onclick="logout()" class="w-full p-5 text-red-500 font-bold">Выйти из аккаунта</button>
             </section>
-            
-            <!-- Profile Page -->
-            <section id="profile" class="page">
-                <div class="profile-header">
-                    <div class="avatar-container" id="profile-avatar">
-                        <span>👤</span>
-                        <div class="avatar-upload">✏️</div>
-                        <input type="file" id="avatar-upload-input" class="hidden" accept="image/*">
-                    </div>
-                    <div class="user-info">
-                        <h2><span class="verified-badge hidden" id="verified-badge">✓</span><span id="profile-name">Имя пользователя</span></h2>
-                        <div class="user-id">ID: <span id="profile-id">user_12345</span></div>
-                        <div class="user-meta">
-                            <div>Зарегистрирован: <span id="profile-registered">15 мая 2024</span></div>
-                            <div>Почта: <span id="profile-email">user@example.com</span></div>
+
+            <!-- Admin View -->
+            <section id="view-admin" class="view hidden space-y-12">
+                <h2 class="text-4xl font-black">Админ Панель</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Create Product -->
+                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4">
+                        <h3 class="text-xl font-bold">Создание товара</h3>
+                        <div class="space-y-2">
+                            <input type="text" id="adm-prod-name" placeholder="Название" class="w-full p-3 rounded-xl border">
+                            <input type="file" id="adm-prod-imgs" multiple class="w-full p-3 rounded-xl border">
+                            <input type="text" id="adm-prod-sizes" placeholder="Размеры (S,M,L)" class="w-full p-3 rounded-xl border">
+                            <input type="text" id="adm-prod-type" placeholder="Тип (футболка, кроссовки)" class="w-full p-3 rounded-xl border">
+                            <input type="number" id="adm-prod-price" placeholder="Цена ($)" class="w-full p-3 rounded-xl border">
+                            <input type="number" id="adm-prod-weight" placeholder="Масса (грамм)" class="w-full p-3 rounded-xl border">
+                            <input type="number" id="adm-prod-stock" placeholder="В наличии (шт)" class="w-full p-3 rounded-xl border">
+                            <textarea id="adm-prod-desc" placeholder="Описание" class="w-full p-3 rounded-xl border"></textarea>
+                            <button onclick="adminCreateProduct()" class="w-full bg-black text-white p-4 rounded-2xl font-bold">Опубликовать</button>
                         </div>
                     </div>
-                </div>
-                
-                <h3>Мои заказы</h3>
-                <div class="orders-list" id="orders-list">
-                    <!-- Orders will be populated by JS -->
-                    <div class="order-card">
-                        <div class="order-image">👕</div>
-                        <div class="order-details">
-                            <div class="order-name">Футболка Free Drun белая</div>
-                            <div class="order-status status-created">Создан</div>
-                            <div class="order-meta">ID заказа: ORD-78945 • Трек: BYR789456123</div>
-                        </div>
-                        <button class="cancel-btn" title="Отменить заказ">×</button>
-                    </div>
-                    <div class="order-card cancelable">
-                        <div class="order-image">👟</div>
-                        <div class="order-details">
-                            <div class="order-name">Кроссовки Urban Soul черные</div>
-                            <div class="order-status status-awaiting">Ожидает оплату</div>
-                            <div class="order-meta">ID заказа: ORD-78946 • Трек: -</div>
-                        </div>
-                        <button class="cancel-btn" title="Отменить заказ">×</button>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Admin Panel -->
-            <section id="admin" class="page">
-                <h2>Панель администратора</h2>
-                
-                <div class="admin-section">
-                    <h3>✨ Создание товара</h3>
-                    <form class="admin-form" id="create-product-form">
-                        <div class="form-group">
-                            <label>Название товара</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Категория</label>
-                            <select class="form-control">
-                                <option>Футболка</option>
-                                <option>Худи</option>
-                                <option>Кроссовки</option>
-                                <option>Обувь</option>
-                                <!-- More options -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Цена ($)</label>
-                            <input type="number" class="form-control" step="0.01" required>
-                        </div>
-                        <div class="form-group">
-                            <label>В наличии (шт)</label>
-                            <input type="number" class="form-control" min="0" value="10">
-                        </div>
-                        <div class="form-group">
-                            <label>Описание</label>
-                            <textarea class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Фотографии</label>
-                            <input type="file" class="form-control" multiple accept="image/*">
-                        </div>
-                        <div class="admin-actions">
-                            <button type="submit" class="btn btn-accent">Опубликовать</button>
-                            <button type="button" class="btn btn-outline">Сохранить черновик</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <div class="admin-section">
-                    <h3>🔒 Управление пользователями</h3>
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <input type="text" class="form-control" placeholder="Введите ID пользователя" style="flex:1;">
-                        <button class="btn btn-outline">Найти</button>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn" style="background:#e63946;">Заблокировать</button>
-                        <button class="btn btn-outline" style="border-color:#2a9d8f;color:#2a9d8f;">Разблокировать</button>
-                    </div>
-                </div>
-                
-                <div class="admin-section">
-                    <h3>✅ Модерация</h3>
-                    <div style="margin-bottom: 15px;">
-                        <strong>Новые заявки на аватарки:</strong>
-                        <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
-                            <div style="background:var(--secondary); border-radius:8px; padding:10px; width:100px; text-align:center;">
-                                <div style="width:60px;height:60px;background:#ddd;border-radius:50%;margin:0 auto 8px;"></div>
-                                <small>User_789</small>
-                                <div style="margin-top:5px; display:flex; gap:5px; justify-content:center;">
-                                    <button class="btn" style="padding:4px 8px;font-size:0.8rem;background:var(--success);">✓</button>
-                                    <button class="btn" style="padding:4px 8px;font-size:0.8rem;background:var(--accent);">✗</button>
-                                </div>
-                            </div>
-                            <!-- More avatars -->
+
+                    <!-- User Ban -->
+                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4">
+                        <h3 class="text-xl font-bold">Блокировка пользователей</h3>
+                        <input type="text" id="adm-ban-uid" placeholder="ID пользователя" class="w-full p-3 rounded-xl border">
+                        <div class="flex gap-2">
+                            <button onclick="adminSetBan(true)" class="flex-1 bg-red-500 text-white p-3 rounded-xl">Бан</button>
+                            <button onclick="adminSetBan(false)" class="flex-1 bg-green-500 text-white p-3 rounded-xl">Анбан</button>
                         </div>
                     </div>
-                    
-                    <div>
-                        <strong>Товары от пользователей:</strong>
-                        <div style="margin-top:10px;">
-                            <div style="background:var(--secondary); border-radius:8px; padding:12px; margin-bottom:10px;">
-                                <strong>Футболка "Summer Vibes"</strong> от User_456
-                                <div style="margin:8px 0; display:flex; gap:10px;">
-                                    <button class="btn" style="padding:6px 12px;font-size:0.9rem;background:var(--success);">Одобрить</button>
-                                    <button class="btn btn-outline" style="padding:6px 12px;font-size:0.9rem;">Редактировать</button>
-                                    <button class="btn" style="padding:6px 12px;font-size:0.9rem;background:var(--accent);">Отклонить</button>
-                                </div>
+
+                    <!-- Moderate Avatars -->
+                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4">
+                        <h3 class="text-xl font-bold">Аватарки (Заявки)</h3>
+                        <div id="adm-avatar-list" class="space-y-4 max-h-64 overflow-y-auto custom-scroll"></div>
+                    </div>
+
+                    <!-- Order Status -->
+                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4">
+                        <h3 class="text-xl font-bold">Статус заказа</h3>
+                        <input type="text" id="adm-order-id" placeholder="ID заказа" class="w-full p-3 rounded-xl border">
+                        <button onclick="adminCheckOrder()" class="w-full bg-gray-200 p-3 rounded-xl">Проверить</button>
+                        <div id="adm-order-details" class="hidden space-y-2 text-sm">
+                            <div id="adm-order-info"></div>
+                            <div class="flex gap-2">
+                                <button onclick="adminUpdateOrderStatus('paid')" class="flex-1 bg-black text-white p-2 rounded-lg">Оплачено (Да)</button>
+                                <button onclick="adminUpdateOrderStatus('cancel')" class="flex-1 bg-gray-300 p-2 rounded-lg">Нет</button>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="admin-section">
-                    <h3>📦 Управление заказами</h3>
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <input type="text" class="form-control" placeholder="Введите ID заказа" style="flex:1;">
-                        <button class="btn btn-outline">Найти</button>
-                    </div>
-                    <div style="background:var(--secondary); border-radius:8px; padding:15px; color:var(--text);">
-                        <div style="display:flex; gap:15px; margin-bottom:15px;">
-                            <div style="width:80px;height:80px;background:#ddd;border-radius:8px;"></div>
-                            <div>
-                                <strong>Футболка Free Drun белая</strong><br>
-                                <small>ID заказа: ORD-78945</small><br>
-                                <small>Статус: <span class="status-badge status-created">Создан</span></small>
-                            </div>
-                        </div>
-                        <div style="margin-bottom:10px;">
-                            <strong>Подтверждение оплаты:</strong>
-                            <div style="margin-top:5px; display:flex; gap:10px;">
-                                <button class="btn" style="padding:6px 15px;background:var(--success);">Да, оплата получена</button>
-                                <button class="btn btn-outline" style="padding:6px 15px;">Нет, жду оплату</button>
-                            </div>
-                        </div>
-                        <div>
-                            <strong>Изменить статус:</strong>
-                            <select class="form-control" style="margin-top:8px; width:auto;">
-                                <option>Создан</option>
-                                <option>Передача в доставку</option>
-                                <option>В пути</option>
-                                <option>Доставлен</option>
-                            </select>
-                            <button class="btn btn-outline" style="margin-top:8px; padding:6px 15px;">Сохранить</button>
-                        </div>
+
+                    <!-- Suggested Products -->
+                    <div class="bg-gray-50 p-6 rounded-3xl space-y-4 col-span-1 md:col-span-2">
+                        <h3 class="text-xl font-bold">Товары от людей</h3>
+                        <div id="adm-suggest-list" class="space-y-4"></div>
                     </div>
                 </div>
             </section>
+
         </main>
     </div>
-    
-    <!-- Login Modal -->
-    <div class="modal" id="login-modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-login">&times;</span>
-            <h3 class="modal-title">Вход в аккаунт</h3>
-            <div class="form-group">
-                <label>Почта</label>
-                <input type="email" class="form-control" id="login-email" placeholder="your@email.com">
+
+    <!-- Modals -->
+    <div id="login-modal" class="modal-overlay fixed inset-0 hidden items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-[40px] w-full max-w-md shadow-2xl relative">
+            <button onclick="toggleModal('login-modal')" class="absolute top-6 right-6 text-2xl">×</button>
+            <div id="login-step-1">
+                <h2 class="text-3xl font-black mb-6">Вход</h2>
+                <input type="email" id="login-email" placeholder="Email" class="w-full p-4 bg-gray-100 rounded-2xl mb-4 border-none focus:ring-2 ring-black">
+                <input type="password" id="login-pass" placeholder="Пароль" class="w-full p-4 bg-gray-100 rounded-2xl mb-2 border-none focus:ring-2 ring-black">
+                <p id="login-error" class="text-red-500 text-xs mb-4 hidden">Аккаунт не найден</p>
+                <button onclick="handleLogin()" class="w-full bg-black text-white p-4 rounded-2xl font-bold mb-4">Войти</button>
+                <p class="text-center text-sm">Нет аккаунта? <span onclick="switchLoginReg(true)" class="text-blue-600 cursor-pointer">Зарегистрируйтесь</span></p>
             </div>
-            <div class="form-group">
-                <label>Пароль</label>
-                <input type="password" class="form-control" id="login-password" placeholder="••••••••">
+            <div id="reg-step-1" class="hidden">
+                <h2 class="text-3xl font-black mb-6">Регистрация</h2>
+                <input type="email" id="reg-email" placeholder="Ваш Email" class="w-full p-4 bg-gray-100 rounded-2xl mb-4">
+                <button onclick="handleRegisterStep1()" class="w-full bg-black text-white p-4 rounded-2xl font-bold">Далее</button>
             </div>
-            <div class="error-message" id="login-error"></div>
-            <button class="btn btn-accent" id="login-submit">Войти</button>
-            <div class="auth-switch">
-                Нет аккаунта? <a id="switch-to-register">Зарегистрируйтесь</a>
+            <div id="reg-step-2" class="hidden text-center space-y-6">
+                <div class="text-6xl">📧</div>
+                <h2 class="text-2xl font-bold">Проверьте почту</h2>
+                <p class="text-gray-500">Мы отправили письмо с подтверждением. Перейдите по ссылке и нажмите "Далее".</p>
+                <button onclick="handleRegisterStep2()" class="w-full bg-black text-white p-4 rounded-2xl font-bold">Я подтвердил(а)</button>
             </div>
-        </div>
-    </div>
-    
-    <!-- Register Modal - Step 1: Email -->
-    <div class="modal" id="register-modal-1">
-        <div class="modal-content">
-            <span class="close-modal" id="close-register-1">&times;</span>
-            <h3 class="modal-title">Регистрация</h3>
-            <p style="text-align:center; margin-bottom:20px; color:var(--text-light);">Введите вашу почту для начала регистрации</p>
-            <div class="form-group">
-                <label>Почта</label>
-                <input type="email" class="form-control" id="register-email" placeholder="your@email.com">
+            <div id="reg-step-3" class="hidden">
+                <h2 class="text-3xl font-black mb-6">Осталось чуть-чуть</h2>
+                <input type="text" id="reg-name" placeholder="Ваше Имя" class="w-full p-4 bg-gray-100 rounded-2xl mb-4">
+                <input type="password" id="reg-pass1" placeholder="Пароль" class="w-full p-4 bg-gray-100 rounded-2xl mb-4">
+                <input type="password" id="reg-pass2" placeholder="Повторите пароль" class="w-full p-4 bg-gray-100 rounded-2xl mb-4">
+                <button onclick="handleRegisterFinal()" class="w-full bg-black text-white p-4 rounded-2xl font-bold">Завершить</button>
             </div>
-            <div class="error-message" id="register-error-1"></div>
-            <button class="btn btn-accent" id="register-next-1">Далее</button>
-        </div>
-    </div>
-    
-    <!-- Register Modal - Step 2: Verification -->
-    <div class="modal" id="register-modal-2">
-        <div class="modal-content">
-            <span class="close-modal" id="close-register-2">&times;</span>
-            <h3 class="modal-title">Проверка почты</h3>
-            <div style="text-align:center; padding:20px 0;">
-                <div style="font-size:3rem; margin-bottom:15px;">✉️</div>
-                <p>Мы отправили письмо с подтверждением на <strong id="register-email-display">your@email.com</strong></p>
-                <p style="color:var(--text-light); margin:15px 0;">Пожалуйста, проверьте ваш почтовый ящик и перейдите по ссылке для подтверждения</p>
-                <div class="success-message" id="verification-success" style="display:none;">
-                    ✓ Письмо подтверждено!
-                </div>
-            </div>
-            <button class="btn btn-outline" id="register-next-2" disabled>Далее</button>
-        </div>
-    </div>
-    
-    <!-- Register Modal - Step 3: Profile Setup -->
-    <div class="modal" id="register-modal-3">
-        <div class="modal-content">
-            <span class="close-modal" id="close-register-3">&times;</span>
-            <h3 class="modal-title">Завершение регистрации</h3>
-            <div class="form-group">
-                <label>Ваше имя (для заказов)</label>
-                <input type="text" class="form-control" id="register-name" placeholder="Иван Иванов">
-            </div>
-            <div class="form-group">
-                <label>Пароль</label>
-                <input type="password" class="form-control" id="register-password" placeholder="••••••••">
-            </div>
-            <div class="form-group">
-                <label>Повторите пароль</label>
-                <input type="password" class="form-control" id="register-password-confirm" placeholder="••••••••">
-            </div>
-            <div class="error-message" id="register-error-3"></div>
-            <button class="btn btn-accent" id="register-submit">Завершить регистрацию</button>
-        </div>
-    </div>
-    
-    <!-- Success Modal after registration -->
-    <div class="modal" id="success-modal">
-        <div class="modal-content" style="text-align:center; padding:2.5rem 2rem;">
-            <div style="font-size:4rem; margin-bottom:15px; color:var(--success);">✓</div>
-            <h3 class="modal-title">Добро пожаловать!</h3>
-            <p style="margin:15px 0; color:var(--text-light);">Ваш аккаунт успешно создан. Теперь вы можете покупать товары и отслеживать заказы.</p>
-            <button class="btn btn-accent" id="success-close">Продолжить</button>
-        </div>
-    </div>
-    
-    <!-- Order Confirmation Modal -->
-    <div class="modal" id="order-modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-order">&times;</span>
-            <h3 class="modal-title">Заказ оформлен!</h3>
-            <div style="text-align:center; padding:20px 0;">
-                <div style="font-size:3rem; margin-bottom:15px;">📦</div>
-                <p>Для совершения оплаты обратитесь в поддержку или напишите нашему админу в тг <strong>@fueum</strong></p>
-                <p style="margin:15px 0; color:var(--text-light);">После подтверждения оплаты статус заказа изменится на "Создан"</p>
-                <div style="background:var(--secondary); border-radius:8px; padding:12px; margin:15px 0; color:var(--text);">
-                    <strong>ID заказа:</strong> <span id="order-id-display">ORD-XXXXX</span>
-                </div>
-            </div>
-            <button class="btn btn-accent" id="order-close">OK</button>
-        </div>
-    </div>
-    
-    <!-- Product Selection Modal (for cart) -->
-    <div class="modal" id="product-select-modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-product-select">&times;</span>
-            <h3 class="modal-title">Выберите параметры</h3>
-            <div class="form-group">
-                <label>Размер</label>
-                <select class="form-control" id="select-size">
-                    <option>S</option>
-                    <option>M</option>
-                    <option>L</option>
-                    <option>XL</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Цвет</label>
-                <select class="form-control" id="select-color">
-                    <option>Белый</option>
-                    <option>Черный</option>
-                    <option>Серый</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Количество</label>
-                <input type="number" class="form-control" id="select-quantity" min="1" value="1">
-            </div>
-            <div class="error-message" id="product-select-error"></div>
-            <button class="btn btn-accent" id="add-to-cart-confirm">Добавить в корзину</button>
-        </div>
-    </div>
-    
-    <!-- Review Modal -->
-    <div class="modal" id="review-modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-review">&times;</span>
-            <h3 class="modal-title">Оставить отзыв</h3>
-            <div class="form-group">
-                <label>Оценка</label>
-                <div style="display:flex; gap:5px; margin-top:5px;">
-                    <span style="font-size:1.5rem; cursor:pointer;" data-rating="1">☆</span>
-                    <span style="font-size:1.5rem; cursor:pointer;" data-rating="2">☆</span>
-                    <span style="font-size:1.5rem; cursor:pointer;" data-rating="3">☆</span>
-                    <span style="font-size:1.5rem; cursor:pointer;" data-rating="4">☆</span>
-                    <span style="font-size:1.5rem; cursor:pointer;" data-rating="5">☆</span>
-                </div>
-                <input type="hidden" id="review-rating">
-            </div>
-            <div class="form-group">
-                <label>Ваш отзыв</label>
-                <textarea class="form-control" id="review-text" rows="4" placeholder="Расскажите о своем опыте..."></textarea>
-            </div>
-            <div class="error-message" id="review-error"></div>
-            <button class="btn btn-accent" id="review-submit">Отправить на проверку</button>
-        </div>
-    </div>
-    
-    <!-- Complaint Modal -->
-    <div class="modal" id="complaint-modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-complaint">&times;</span>
-            <h3 class="modal-title">Подать жалобу</h3>
-            <p style="margin-bottom:15px; color:var(--text-light);">Опишите проблему, с которой вы столкнулись</p>
-            <div class="form-group">
-                <textarea class="form-control" id="complaint-text" rows="4" placeholder="Что случилось?"></textarea>
-            </div>
-            <div class="error-message" id="complaint-error"></div>
-            <button class="btn btn-accent" id="complaint-submit">Отправить жалобу</button>
-        </div>
-    </div>
-    
-    <!-- Avatar Upload Modal -->
-    <div class="modal" id="avatar-modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-avatar">&times;</span>
-            <h3 class="modal-title">Новая аватарка</h3>
-            <p style="margin:15px 0; color:var(--text-light); text-align:center;">Выберите изображение для вашей аватарки. После загрузки она отправится на модерацию.</p>
-            <div class="form-group">
-                <input type="file" class="form-control" id="new-avatar-input" accept="image/*">
-            </div>
-            <div class="success-message" id="avatar-success" style="display:none; text-align:center;">
-                ✓ Аватарка отправлена на модерацию! Она появится в профиле после одобрения админом.
-            </div>
-            <button class="btn btn-accent" id="avatar-upload-btn">Загрузить</button>
         </div>
     </div>
 
+    <!-- Product Modal / Zoom -->
+    <div id="zoom-modal" class="modal-overlay fixed inset-0 hidden flex items-center justify-center p-4 bg-black" onclick="this.classList.add('hidden')">
+        <img id="zoom-img" src="" class="max-w-full max-h-full object-contain">
+    </div>
+
+    <div id="toast" class="fixed bottom-10 right-10 bg-black text-white p-4 rounded-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[999]">
+        Сообщение...
+    </div>
+
     <script>
-        // Initialize Firebase
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyD0YkXZgk8gh01Y7XH3ZRVU5lCjGJ_IRCw",
             authDomain: "frwerwerwr.firebaseapp.com",
@@ -2013,1091 +336,509 @@
             appId: "1:969880048160:web:9001a95f7ea28e98912245",
             measurementId: "G-HCQEFD2SJF"
         };
-        
-        // Initialize Firebase only if not already initialized
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
-        
-        // ImgBB API Key
-        const IMG_BB_API_KEY = "eeef3479094c5cf6bf42607927565065";
-        
-        // Currency conversion rates (approximate)
-        const EXCHANGE_RATES = {
-            USD_TO_RUB: 91.5,
-            USD_TO_UAH: 36.8
-        };
-        
-        // App State
-        const state = {
-            currentUser: null,
-            isAdmin: false,
-            currentProduct: null,
-            cart: [],
-            theme: localStorage.getItem('byrmalda-theme') || 'light',
-            language: localStorage.getItem('byrmalda-language') || 'ru',
-            chatMessages: [],
-            newMessagesCount: 0
-        };
-        
-        // DOM Elements
-        const pages = document.querySelectorAll('.page');
-        const navButtons = document.querySelectorAll('.nav-btn');
-        const loginModal = document.getElementById('login-modal');
-        const registerModals = [
-            document.getElementById('register-modal-1'),
-            document.getElementById('register-modal-2'),
-            document.getElementById('register-modal-3')
-        ];
-        const successModal = document.getElementById('success-modal');
-        const orderModal = document.getElementById('order-modal');
-        const productSelectModal = document.getElementById('product-select-modal');
-        const reviewModal = document.getElementById('review-modal');
-        const complaintModal = document.getElementById('complaint-modal');
-        const avatarModal = document.getElementById('avatar-modal');
-        
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set initial theme
-            if (state.theme === 'dark') {
-                document.body.classList.add('dark-theme');
-                document.getElementById('theme-toggle').checked = true;
-            }
-            
-            // Set initial language
-            document.getElementById('language-select').value = state.language;
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            // Check auth state
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    state.currentUser = user;
-                    state.isAdmin = user.email === 'sobakastalina123@gmail.com';
-                    loadUserProfile();
-                    updateNavForAuth();
-                } else {
-                    state.currentUser = null;
-                    state.isAdmin = false;
-                    updateNavForAuth();
-                }
-            });
-            
-            // Load cart from localStorage
-            loadCart();
-            
-            // Setup currency conversion display
-            updateCurrencyDisplay();
-        });
-        
-        // Setup all event listeners
-        function setupEventListeners() {
-            // Navigation
-            navButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const pageId = btn.dataset.page;
-                    if (pageId) {
-                        showPage(pageId);
-                        // Update active button
-                        navButtons.forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
+        const appId = 'byrmalda-prod';
+        const imgbbKey = 'eeef3479094c5cf6bf42607927565065';
+        const adminEmail = 'sobakastalina123@gmail.com';
+
+        let currentUser = null;
+        let cart = JSON.parse(localStorage.getItem('byrmalda_cart') || '[]');
+        let products = [];
+        let reviews = [];
+        let currentLang = 'ru';
+        let currentTheme = 'light';
+        let productGalleryIndex = 0;
+        let activeProduct = null;
+
+        // Constants for conversion (Approximate)
+        const RATE_RUB = 90;
+        const RATE_UAH = 40;
+
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                const userDoc = await db.collection('artifacts').doc(appId).collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    currentUser = { ...userDoc.data(), uid: user.uid };
+                    if (currentUser.banned) {
+                        document.getElementById('blocking-layer').style.display = 'flex';
+                        return;
                     }
-                });
-            });
-            
-            // Auth modals
-            document.getElementById('login-btn').addEventListener('click', () => {
-                loginModal.classList.add('active');
-            });
-            
-            document.getElementById('close-login').addEventListener('click', () => {
-                loginModal.classList.remove('active');
-                document.getElementById('login-error').textContent = '';
-            });
-            
-            document.getElementById('login-submit').addEventListener('click', handleLogin);
-            
-            document.getElementById('switch-to-register').addEventListener('click', () => {
-                loginModal.classList.remove('active');
-                registerModals[0].classList.add('active');
-            });
-            
-            // Register flow
-            document.getElementById('close-register-1').addEventListener('click', () => {
-                registerModals[0].classList.remove('active');
-                document.getElementById('register-error-1').textContent = '';
-            });
-            
-            document.getElementById('register-next-1').addEventListener('click', handleRegisterStep1);
-            
-            document.getElementById('close-register-2').addEventListener('click', () => {
-                registerModals[1].classList.remove('active');
-            });
-            
-            document.getElementById('register-next-2').addEventListener('click', () => {
-                registerModals[1].classList.remove('active');
-                registerModals[2].classList.add('active');
-            });
-            
-            // Simulate email verification for demo
-            setTimeout(() => {
-                document.getElementById('verification-success').style.display = 'block';
-                document.getElementById('register-next-2').disabled = false;
-            }, 3000);
-            
-            document.getElementById('close-register-3').addEventListener('click', () => {
-                registerModals[2].classList.remove('active');
-                document.getElementById('register-error-3').textContent = '';
-            });
-            
-            document.getElementById('register-submit').addEventListener('click', handleRegisterStep3);
-            
-            document.getElementById('success-close').addEventListener('click', () => {
-                successModal.classList.remove('active');
-                showPage('home');
-            });
-            
-            // Product page
-            document.getElementById('back-to-catalog').addEventListener('click', () => {
-                showPage('catalog');
-            });
-            
-            document.getElementById('add-to-cart-btn').addEventListener('click', () => {
-                if (!state.currentUser) {
-                    loginModal.classList.add('active');
-                    return;
-                }
-                productSelectModal.classList.add('active');
-            });
-            
-            document.getElementById('close-product-select').addEventListener('click', () => {
-                productSelectModal.classList.remove('active');
-                document.getElementById('product-select-error').textContent = '';
-            });
-            
-            document.getElementById('add-to-cart-confirm').addEventListener('click', addToCart);
-            
-            // Cart page
-            document.getElementById('continue-shopping').addEventListener('click', () => {
-                showPage('catalog');
-            });
-            
-            document.getElementById('checkout-btn').addEventListener('click', handleCheckout);
-            
-            document.getElementById('close-order').addEventListener('click', () => {
-                orderModal.classList.remove('active');
-            });
-            
-            document.getElementById('order-close').addEventListener('click', () => {
-                orderModal.classList.remove('active');
-                // Clear cart items that were ordered
-                clearOrderedItems();
-                updateCartDisplay();
-                showPage('profile');
-            });
-            
-            // Support chat
-            document.getElementById('send-message').addEventListener('click', sendChatMessage);
-            document.getElementById('chat-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendChatMessage();
-            });
-            
-            // Settings
-            document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
-            document.getElementById('language-select').addEventListener('change', (e) => {
-                state.language = e.target.value;
-                localStorage.setItem('byrmalda-language', state.language);
-                // In a real app, we would reload translations here
-                alert('Язык изменен. В полной версии интерфейс будет переведен.');
-            });
-            
-            document.getElementById('write-review-btn').addEventListener('click', () => {
-                if (!state.currentUser) {
-                    loginModal.classList.add('active');
-                    return;
-                }
-                reviewModal.classList.add('active');
-            });
-            
-            document.getElementById('close-review').addEventListener('click', () => {
-                reviewModal.classList.remove('active');
-                document.getElementById('review-error').textContent = '';
-            });
-            
-            // Rating stars
-            document.querySelectorAll('#review-modal [data-rating]').forEach(star => {
-                star.addEventListener('click', function() {
-                    const rating = this.dataset.rating;
-                    document.getElementById('review-rating').value = rating;
-                    // Update visual stars
-                    document.querySelectorAll('#review-modal [data-rating]').forEach(s => {
-                        s.textContent = s.dataset.rating <= rating ? '★' : '☆';
-                    });
-                });
-            });
-            
-            document.getElementById('review-submit').addEventListener('click', submitReview);
-            
-            document.getElementById('complaint-btn').addEventListener('click', () => {
-                if (!state.currentUser) {
-                    loginModal.classList.add('active');
-                    return;
-                }
-                complaintModal.classList.add('active');
-            });
-            
-            document.getElementById('close-complaint').addEventListener('click', () => {
-                complaintModal.classList.remove('active');
-                document.getElementById('complaint-error').textContent = '';
-            });
-            
-            document.getElementById('complaint-submit').addEventListener('click', submitComplaint);
-            
-            // Avatar upload
-            document.getElementById('profile-avatar').addEventListener('click', () => {
-                if (!state.currentUser) {
-                    loginModal.classList.add('active');
-                    return;
-                }
-                document.getElementById('avatar-upload-input').click();
-            });
-            
-            document.getElementById('avatar-upload-input').addEventListener('change', (e) => {
-                if (e.target.files[0]) {
-                    avatarModal.classList.add('active');
-                }
-            });
-            
-            document.getElementById('close-avatar').addEventListener('click', () => {
-                avatarModal.classList.remove('active');
-                document.getElementById('avatar-success').style.display = 'none';
-                document.getElementById('new-avatar-input').value = '';
-            });
-            
-            document.getElementById('avatar-upload-btn').addEventListener('click', uploadAvatar);
-            
-            // Search functionality
-            document.getElementById('search-input').addEventListener('input', handleSearch);
-            
-            // Catalog category selection
-            document.querySelectorAll('.category-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const category = card.dataset.category;
-                    // In a real app, this would filter products by category
-                    showPage('search');
-                    document.getElementById('search-input').value = category;
-                    handleSearch();
-                });
-            });
-            
-            // Product gallery navigation
-            document.getElementById('prev-image').addEventListener('click', () => {
-                // In a real app, this would change the main image
-                alert('Предыдущее фото');
-            });
-            
-            document.getElementById('next-image').addEventListener('click', () => {
-                // In a real app, this would change the main image
-                alert('Следующее фото');
-            });
-            
-            // Zoom functionality
-            document.getElementById('main-image').addEventListener('click', function() {
-                this.classList.toggle('zoomed');
-            });
-            
-            // Order cancellation
-            document.querySelectorAll('.cancel-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const orderCard = btn.closest('.order-card');
-                    const status = orderCard.querySelector('.order-status').textContent;
-                    
-                    if (status === 'Ожидает оплату' || status === 'Создан') {
-                        if (confirm('Вы уверены, что хотите отменить этот заказ?')) {
-                            orderCard.style.opacity = '0.6';
-                            orderCard.querySelector('.order-status').textContent = 'Отменен';
-                            orderCard.querySelector('.order-status').className = 'order-status status-rejected';
-                            btn.style.display = 'none';
-                            alert('Заказ отменен');
-                        }
-                    } else {
-                        alert('Нельзя отменить заказ, который уже передан в доставку или находится в пути');
-                    }
-                });
-            });
-            
-            // Order card click to view product
-            document.querySelectorAll('.order-card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    if (!e.target.classList.contains('cancel-btn')) {
-                        showPage('product');
-                        // In a real app, this would load the specific product
-                    }
-                });
-            });
-            
-            // Suggest product button
-            document.getElementById('suggest-product-btn').addEventListener('click', () => {
-                if (!state.currentUser) {
-                    loginModal.classList.add('active');
-                    return;
-                }
-                showPage('admin');
-                // In a real app, this would show a simplified product creation form for users
-                alert('Форма предложения товара будет доступна здесь. В полной версии вы сможете отправить товар на модерацию.');
-            });
-        }
-        
-        // Show a specific page and hide others
-        function showPage(pageId) {
-            pages.forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById(pageId).classList.add('active');
-            
-            // Special handling for some pages
-            if (pageId === 'cart') {
-                updateCartDisplay();
-            }
-        }
-        
-        // Update navigation based on auth state
-        function updateNavForAuth() {
-            const userNav = document.getElementById('user-nav');
-            const adminNav = document.getElementById('admin-nav');
-            const authNav = document.getElementById('auth-nav');
-            
-            if (state.currentUser) {
-                userNav.classList.remove('hidden');
-                authNav.classList.add('hidden');
-                
-                if (state.isAdmin) {
-                    adminNav.classList.remove('hidden');
-                } else {
-                    adminNav.classList.add('hidden');
+                    updateUIForAuth(true);
+                    loadUserData();
+                    checkAdmin();
+                    loadMessages();
+                    startSupportInterval();
                 }
             } else {
-                userNav.classList.add('hidden');
-                adminNav.classList.add('hidden');
-                authNav.classList.remove('hidden');
+                currentUser = null;
+                updateUIForAuth(false);
+            }
+        });
+
+        function updateUIForAuth(isAuth) {
+            document.getElementById('btn-login').classList.toggle('hidden', isAuth);
+            document.getElementById('user-info-sidebar').classList.toggle('hidden', !isAuth);
+            document.getElementById('btn-suggest').classList.toggle('hidden', !isAuth);
+            if (isAuth) {
+                document.getElementById('sidebar-name').innerText = currentUser.name;
+                document.getElementById('sidebar-id').innerText = currentUser.uid.slice(0, 8);
+                document.getElementById('sidebar-avatar').src = currentUser.avatar || 'https://placehold.co/100';
             }
         }
-        
-        // Handle login
+
         async function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            const errorEl = document.getElementById('login-error');
-            
-            if (!email || !password) {
-                errorEl.textContent = 'Заполните все поля';
-                return;
-            }
-            
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
             try {
-                await auth.signInWithEmailAndPassword(email, password);
-                loginModal.classList.remove('active');
-                errorEl.textContent = '';
-            } catch (error) {
-                console.error('Login error:', error);
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    errorEl.textContent = 'Ошибка: аккаунт не найден или неверный пароль';
-                } else {
-                    errorEl.textContent = 'Ошибка входа: ' + error.message;
-                }
+                await auth.signInWithEmailAndPassword(email, pass);
+                toggleModal('login-modal');
+                showToast("С возвращением!");
+            } catch (err) {
+                document.getElementById('login-error').classList.remove('hidden');
             }
         }
-        
-        // Handle registration step 1 (email)
+
         function handleRegisterStep1() {
-            const email = document.getElementById('register-email').value.trim();
-            const errorEl = document.getElementById('register-error-1');
-            
-            if (!email) {
-                errorEl.textContent = 'Введите почту';
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                errorEl.textContent = 'Введите корректный email';
-                return;
-            }
-            
-            // Show next step
-            document.getElementById('register-email-display').textContent = email;
-            registerModals[0].classList.remove('active');
-            registerModals[1].classList.add('active');
-            errorEl.textContent = '';
+            const email = document.getElementById('reg-email').value;
+            if (!email.includes('@')) return showToast("Некорректный email");
+            document.getElementById('reg-step-1').classList.add('hidden');
+            document.getElementById('reg-step-2').classList.remove('hidden');
+            showToast("Письмо отправлено (имитация)");
         }
-        
-        // Handle registration step 3 (profile setup)
-        async function handleRegisterStep3() {
-            const name = document.getElementById('register-name').value.trim();
-            const password = document.getElementById('register-password').value;
-            const passwordConfirm = document.getElementById('register-password-confirm').value;
-            const errorEl = document.getElementById('register-error-3');
-            const email = document.getElementById('register-email').value.trim();
-            
-            if (!name || !password || !passwordConfirm) {
-                errorEl.textContent = 'Заполните все поля';
-                return;
-            }
-            
-            if (password !== passwordConfirm) {
-                errorEl.textContent = 'Пароли не совпадают';
-                return;
-            }
-            
-            if (password.length < 6) {
-                errorEl.textContent = 'Пароль должен содержать минимум 6 символов';
-                return;
-            }
-            
+
+        function handleRegisterStep2() {
+            document.getElementById('reg-step-2').classList.add('hidden');
+            document.getElementById('reg-step-3').classList.remove('hidden');
+        }
+
+        async function handleRegisterFinal() {
+            const email = document.getElementById('reg-email').value;
+            const name = document.getElementById('reg-name').value;
+            const p1 = document.getElementById('reg-pass1').value;
+            const p2 = document.getElementById('reg-pass2').value;
+            if (p1 !== p2) return showToast("Пароли не совпадают");
+            if (!name) return showToast("Введите имя");
+
             try {
-                // Create user in Firebase Auth
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                
-                // Save additional user data to Firestore
-                await db.collection('users').doc(user.uid).set({
-                    email: email,
+                const cred = await auth.createUserWithEmailAndPassword(email, p1);
+                const newUser = {
                     name: name,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    avatar: null,
-                    isVerified: true, // Since we simulated verification
-                    isAdmin: email === 'sobakastalina123@gmail.com'
-                });
-                
-                // Close modals and show success
-                registerModals[2].classList.remove('active');
-                successModal.classList.add('active');
-                errorEl.textContent = '';
-                
-            } catch (error) {
-                console.error('Registration error:', error);
-                if (error.code === 'auth/email-already-in-use') {
-                    errorEl.textContent = 'Аккаунт с такой почтой уже существует';
-                } else {
-                    errorEl.textContent = 'Ошибка регистрации: ' + error.message;
-                }
+                    email: email,
+                    avatar: '',
+                    regDate: new Date().toLocaleDateString(),
+                    uid: cred.user.uid,
+                    banned: false,
+                    verifiedBadge: false
+                };
+                await db.collection('artifacts').doc(appId).collection('users').doc(cred.user.uid).set(newUser);
+                currentUser = newUser;
+                toggleModal('login-modal');
+                showToast("Добро пожаловать!");
+                setView('profile');
+            } catch (err) {
+                showToast(err.message);
             }
         }
-        
-        // Load user profile data
-        async function loadUserProfile() {
-            if (!state.currentUser) return;
+
+        function setView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            window.scrollTo(0, 0);
             
-            try {
-                const userDoc = await db.collection('users').doc(state.currentUser.uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    document.getElementById('profile-name').textContent = userData.name || 'Пользователь';
-                    document.getElementById('profile-email').textContent = userData.email;
-                    document.getElementById('profile-id').textContent = state.currentUser.uid.substring(0, 12);
-                    
-                    // Set registration date
-                    if (userData.createdAt) {
-                        const date = userData.createdAt.toDate();
-                        document.getElementById('profile-registered').textContent = 
-                            date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-                    }
-                    
-                    // Set avatar if exists and approved
-                    if (userData.avatar && userData.avatarApproved) {
-                        document.getElementById('profile-avatar').innerHTML = 
-                            `<img src="${userData.avatar}" alt="Аватар">`;
-                    }
-                    
-                    // Show verified badge if user has approved products
-                    if (userData.hasApprovedProducts) {
-                        document.getElementById('verified-badge').classList.remove('hidden');
-                    }
-                }
-                
-                // Load user orders
-                loadUserOrders();
-                
-            } catch (error) {
-                console.error('Error loading profile:', error);
-            }
+            if (viewId === 'catalog') loadCatalog();
+            if (viewId === 'search') loadAllProducts();
+            if (viewId === 'profile') loadUserData();
+            if (viewId === 'reviews') loadReviews();
+            if (viewId === 'admin') loadAdminData();
         }
-        
-        // Load user orders
-        async function loadUserOrders() {
-            if (!state.currentUser) return;
-            
-            try {
-                const ordersSnapshot = await db.collection('orders')
-                    .where('userId', '==', state.currentUser.uid)
-                    .orderBy('createdAt', 'desc')
-                    .limit(10)
-                    .get();
-                
-                const ordersList = document.getElementById('orders-list');
-                ordersList.innerHTML = '';
-                
-                if (ordersSnapshot.empty) {
-                    ordersList.innerHTML = '<div class="empty-state"><i>📦</i><p>У вас пока нет заказов</p></div>';
-                    return;
-                }
-                
-                ordersSnapshot.forEach(doc => {
-                    const order = doc.data();
-                    const orderEl = document.createElement('div');
-                    orderEl.className = `order-card ${order.status === 'Ожидает оплату' || order.status === 'Создан' ? 'cancelable' : ''}`;
-                    orderEl.innerHTML = `
-                        <div class="order-image">🛍️</div>
-                        <div class="order-details">
-                            <div class="order-name">${order.items[0].name}</div>
-                            <div class="order-status status-${getStatusClass(order.status)}">${order.status}</div>
-                            <div class="order-meta">ID заказа: ${order.id} • Трек: ${order.trackingNumber || '-'}</div>
+
+        function showToast(text) {
+            const t = document.getElementById('toast');
+            t.innerText = text;
+            t.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        function toggleModal(id) {
+            const m = document.getElementById(id);
+            m.classList.toggle('hidden');
+            m.classList.toggle('flex');
+        }
+
+        function switchLoginReg(isReg) {
+            document.getElementById('login-step-1').classList.toggle('hidden', isReg);
+            document.getElementById('reg-step-1').classList.toggle('hidden', !isReg);
+        }
+
+        async function loadAllProducts() {
+            const snap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').get();
+            products = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            renderProducts(products, 'search-results');
+        }
+
+        function renderProducts(list, containerId) {
+            const cont = document.getElementById(containerId);
+            cont.innerHTML = list.map(p => `
+                <div onclick="openProduct('${p.id}')" class="group cursor-pointer space-y-3">
+                    <div class="aspect-square bg-gray-50 rounded-[32px] overflow-hidden relative">
+                        <img src="${p.images?.[0] || 'https://placehold.co/400'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        ${p.stock <= 0 ? '<div class="absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center font-bold text-red-500">Нет в наличии</div>' : ''}
+                    </div>
+                    <div>
+                        <h4 class="font-bold truncate">${p.name}</h4>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="${p.stock <= 0 ? 'text-red-500' : 'text-gray-900'} font-bold">
+                                ${p.stock <= 0 ? 'Sold Out' : p.price + ' $'}
+                            </span>
+                            ${p.fromUser ? `<span class="text-[10px] bg-yellow-100 px-2 py-1 rounded-full">! User</span>` : ''}
                         </div>
-                        <button class="cancel-btn" title="Отменить заказ">×</button>
-                    `;
-                    ordersList.appendChild(orderEl);
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function openProduct(id) {
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+            activeProduct = p;
+            productGalleryIndex = 0;
+            setView('product');
+            renderProductDetails(p);
+        }
+
+        function renderProductDetails(p) {
+            const container = document.getElementById('product-details-container');
+            const usd = p.price;
+            const rub = Math.round(usd * RATE_RUB);
+            const uah = Math.round(usd * RATE_UAH);
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="relative aspect-square bg-gray-50 rounded-[40px] overflow-hidden">
+                        <img id="main-prod-img" src="${p.images[0]}" class="w-full h-full object-cover cursor-zoom-in" onclick="zoomImg(this.src)">
+                        <button onclick="shiftGallery(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white w-10 h-10 rounded-full shadow-lg">←</button>
+                        <button onclick="shiftGallery(1)" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white w-10 h-10 rounded-full shadow-lg">→</button>
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-2 custom-scroll">
+                        ${p.images.map((img, i) => `<img src="${img}" onclick="setGallery(${i})" class="w-20 h-20 rounded-xl object-cover cursor-pointer border-2 ${i === 0 ? 'border-black' : 'border-transparent'}">`).join('')}
+                    </div>
+                </div>
+                <div class="space-y-8">
+                    <div>
+                        <h1 class="text-4xl font-black">${p.name}</h1>
+                        <p class="text-gray-400 mt-2">${p.fromUser ? `⚠️ Предложено пользователем ID:${p.userId}` : 'Официальный дроп Byrmalda'}</p>
+                    </div>
                     
-                    // Add event listeners for new order card
-                    orderEl.querySelector('.cancel-btn').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        cancelOrder(order.id);
-                    });
-                    
-                    orderEl.addEventListener('click', (e) => {
-                        if (!e.target.classList.contains('cancel-btn')) {
-                            showPage('product');
-                            // In a real app, load the specific product from order
-                        }
-                    });
-                });
-                
-            } catch (error) {
-                console.error('Error loading orders:', error);
-            }
-        }
-        
-        // Helper function to get status class for styling
-        function getStatusClass(status) {
-            const map = {
-                'Ожидает оплату': 'awaiting',
-                'Создан': 'created',
-                'Передача товара в доставку': 'shipping',
-                'В пути': 'shipping',
-                'Доставлен': 'delivered',
-                'Отменен': 'rejected'
-            };
-            return map[status] || 'created';
-        }
-        
-        // Cancel order
-        async function cancelOrder(orderId) {
-            if (!confirm('Вы уверены, что хотите отменить этот заказ?')) return;
-            
-            try {
-                await db.collection('orders').doc(orderId).update({
-                    status: 'Отменен',
-                    canceledAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // Reload orders
-                loadUserOrders();
-                alert('Заказ отменен');
-                
-            } catch (error) {
-                console.error('Error canceling order:', error);
-                alert('Ошибка при отмене заказа');
-            }
-        }
-        
-        // Add product to cart
-        function addToCart() {
-            const size = document.getElementById('select-size').value;
-            const color = document.getElementById('select-color').value;
-            const quantity = parseInt(document.getElementById('select-quantity').value) || 1;
-            const errorEl = document.getElementById('product-select-error');
-            
-            if (!state.currentProduct) {
-                errorEl.textContent = 'Ошибка: товар не выбран';
-                return;
-            }
-            
-            // Check if product is in stock
-            if (state.currentProduct.stock < quantity) {
-                errorEl.textContent = 'Недостаточно товара в наличии';
-                return;
-            }
-            
-            // Create cart item
-            const cartItem = {
-                id: state.currentProduct.id || Date.now().toString(),
-                name: state.currentProduct.name,
-                image: state.currentProduct.images?.[0] || null,
-                size,
-                color,
-                quantity,
-                price: state.currentProduct.price,
-                weight: state.currentProduct.weight || 200, // default 200g
-                isPreorder: state.currentProduct.stock === 0
-            };
-            
-            // Add to cart state
-            state.cart.push(cartItem);
-            
-            // Save to localStorage
-            saveCart();
-            
-            // Close modal and show confirmation
-            productSelectModal.classList.remove('active');
-            document.getElementById('product-select-error').textContent = '';
-            
-            // Update cart badge
-            updateCartBadge();
-            
-            alert('Товар добавлен в корзину!');
-        }
-        
-        // Load cart from localStorage
-        function loadCart() {
-            const savedCart = localStorage.getItem('byrmalda-cart');
-            if (savedCart) {
-                state.cart = JSON.parse(savedCart);
-                updateCartBadge();
-            }
-        }
-        
-        // Save cart to localStorage
-        function saveCart() {
-            localStorage.setItem('byrmalda-cart', JSON.stringify(state.cart));
-            updateCartBadge();
-        }
-        
-        // Update cart badge count
-        function updateCartBadge() {
-            const badge = document.querySelector('.nav-btn[data-page="cart"] .notification-badge');
-            const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-            badge.textContent = count;
-            badge.style.display = count > 0 ? 'inline' : 'none';
-        }
-        
-        // Update cart display on cart page
-        function updateCartDisplay() {
-            const cartContent = document.getElementById('cart-content');
-            const cartEmpty = document.getElementById('cart-empty');
-            const cartItemsEl = document.getElementById('cart-items');
-            
-            if (state.cart.length === 0) {
-                cartContent.classList.add('hidden');
-                cartEmpty.classList.remove('hidden');
-                return;
-            }
-            
-            cartContent.classList.remove('hidden');
-            cartEmpty.classList.add('hidden');
-            cartItemsEl.innerHTML = '';
-            
-            let subtotal = 0;
-            let totalWeight = 0;
-            
-            state.cart.forEach((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                subtotal += itemTotal;
-                totalWeight += (item.weight * item.quantity) / 1000; // convert to kg
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>
-                        <div style="display:flex;align-items:center;gap:10px;">
-                            <div class="cart-item-img">${item.image ? `<img src="${item.image}" alt="${item.name}">` : '🛍️'}</div>
-                            <div>
-                                <div style="font-weight:500;">${item.name}</div>
-                                ${item.isPreorder ? '<small style="color:#e9c46a;">Предзаказ</small>' : ''}
+                    <div class="grid grid-cols-2 gap-y-3 text-sm">
+                        <div class="text-gray-400">Для кого:</div> <div>${p.gender || 'Унисекс'}</div>
+                        <div class="text-gray-400">Тип:</div> <div>${p.type}</div>
+                        <div class="text-gray-400">Материал:</div> <div>${p.material || 'Хлопок'}</div>
+                        <div class="text-gray-400">Цвет:</div> <div>${p.color}</div>
+                        <div class="text-gray-400">Коллаб:</div> <div>${p.collab || 'Нет'}</div>
+                        <div class="text-gray-400">Масса:</div> <div>${p.weight} г</div>
+                        <div class="text-gray-400">Релиз:</div> <div>${p.releaseYear}</div>
+                        <div class="text-gray-400">В наличии:</div> <div class="${p.stock > 0 ? 'text-green-500' : 'text-red-500'} font-bold">${p.stock > 0 ? p.stock + ' шт.' : 'Нет в наличии'}</div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h3 class="font-bold">Описание</h3>
+                        <p class="text-gray-600 leading-relaxed">${p.description}</p>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-[32px] space-y-6">
+                        ${p.stock > 0 ? `
+                            <div class="space-y-1">
+                                <div class="text-4xl font-black">${usd} $</div>
+                                <div class="text-gray-400 text-sm">${rub} RUB / ${uah} UAH</div>
                             </div>
+                        ` : '<div class="text-2xl font-bold text-red-500">НЕТ В НАЛИЧИИ</div>'}
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <select id="buy-size" class="p-4 rounded-2xl bg-white outline-none border-none">
+                                ${p.sizes.split(',').map(s => `<option value="${s}">${s}</option>`).join('')}
+                            </select>
+                            <input type="number" id="buy-qty" value="1" min="1" max="${p.stock}" class="p-4 rounded-2xl bg-white outline-none border-none">
                         </div>
-                    </td>
-                    <td>${item.size}</td>
-                    <td>${item.color}</td>
-                    <td>
-                        <div class="quantity-control">
-                            <button class="quantity-btn" data-index="${index}" data-action="decrease">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="quantity-btn" data-index="${index}" data-action="increase">+</button>
-                        </div>
-                    </td>
-                    <td>$${item.price.toFixed(2)}</td>
-                    <td>
-                        <button class="remove-btn" data-index="${index}">×</button>
-                    </td>
-                `;
-                cartItemsEl.appendChild(row);
-            });
-            
-            // Calculate shipping (900 rubles per kg)
-            const shippingRub = Math.ceil(totalWeight * 900);
-            const shippingUsd = shippingRub / EXCHANGE_RATES.USD_TO_RUB;
-            
-            // Update summary
-            document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('cart-shipping').textContent = `${shippingRub} ₽`;
-            document.getElementById('cart-total').textContent = `$${(subtotal + shippingUsd).toFixed(2)}`;
-            
-            // Add event listeners for quantity controls and remove buttons
-            document.querySelectorAll('.quantity-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const index = e.target.dataset.index;
-                    const action = e.target.dataset.action;
-                    updateCartItemQuantity(index, action);
-                });
-            });
-            
-            document.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const index = e.target.dataset.index;
-                    removeCartItem(index);
-                });
-            });
-        }
-        
-        // Update cart item quantity
-        function updateCartItemQuantity(index, action) {
-            const item = state.cart[index];
-            if (!item) return;
-            
-            if (action === 'increase') {
-                item.quantity += 1;
-            } else if (action === 'decrease' && item.quantity > 1) {
-                item.quantity -= 1;
-            }
-            
-            saveCart();
-            updateCartDisplay();
-        }
-        
-        // Remove cart item
-        function removeCartItem(index) {
-            state.cart.splice(index, 1);
-            saveCart();
-            updateCartDisplay();
-        }
-        
-        // Clear items that were ordered
-        function clearOrderedItems() {
-            // In a real app, we would remove only the items that were part of the order
-            // For demo, we'll clear the entire cart
-            state.cart = [];
-            saveCart();
-        }
-        
-        // Handle checkout
-        function handleCheckout() {
-            if (!state.currentUser) {
-                loginModal.classList.add('active');
-                return;
-            }
-            
-            if (state.cart.length === 0) {
-                alert('Ваша корзина пуста');
-                return;
-            }
-            
-            // Generate order ID
-            const orderId = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-            const trackingNumber = 'BYR' + Math.random().toString(36).substr(2, 9).toUpperCase();
-            
-            // Create order in Firestore
-            const orderData = {
-                id: orderId,
-                userId: state.currentUser.uid,
-                items: [...state.cart],
-                status: 'Ожидает оплату',
-                trackingNumber: trackingNumber,
-                total: parseFloat(document.getElementById('cart-total').textContent.replace('$', '')),
-                shipping: parseFloat(document.getElementById('cart-shipping').textContent),
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            
-            // Save order to Firestore (in a real app)
-            // db.collection('orders').add(orderData);
-            
-            // Show order confirmation modal
-            document.getElementById('order-id-display').textContent = orderId;
-            orderModal.classList.add('active');
-            
-            // In a real app, we would also:
-            // 1. Decrease product stock in database
-            // 2. Send confirmation email
-            // 3. Notify admin via chat
-        }
-        
-        // Send chat message
-        function sendChatMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            const messagesEl = document.getElementById('chat-messages');
-            
-            if (!message) return;
-            
-            if (!state.currentUser) {
-                loginModal.classList.add('active');
-                return;
-            }
-            
-            // Add user message to chat
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-            
-            const messageEl = document.createElement('div');
-            messageEl.className = 'message user';
-            messageEl.innerHTML = `
-                ${message}
-                <div class="message-meta">${now.toLocaleDateString('ru-RU')}, ${timeStr} • ${state.currentUser.uid.substring(0, 6)}</div>
+
+                        <button onclick="addToCart()" class="w-full ${p.stock > 0 ? 'bg-black text-white' : 'bg-orange-500 text-white'} p-5 rounded-2xl font-bold text-lg">
+                            ${p.stock > 0 ? 'Добавить в корзину' : 'Предзаказ'}
+                        </button>
+                    </div>
+                </div>
             `;
-            messagesEl.appendChild(messageEl);
+        }
+
+        function shiftGallery(dir) {
+            productGalleryIndex += dir;
+            if (productGalleryIndex < 0) productGalleryIndex = activeProduct.images.length - 1;
+            if (productGalleryIndex >= activeProduct.images.length) productGalleryIndex = 0;
+            document.getElementById('main-prod-img').src = activeProduct.images[productGalleryIndex];
+        }
+
+        function zoomImg(src) {
+            document.getElementById('zoom-img').src = src;
+            toggleModal('zoom-modal');
+        }
+
+        function addToCart() {
+            if (!currentUser) return showToast("Войдите в аккаунт");
+            const size = document.getElementById('buy-size').value;
+            const qty = parseInt(document.getElementById('buy-qty').value);
             
-            // Clear input and scroll to bottom
-            input.value = '';
-            messagesEl.scrollTop = messagesEl.scrollHeight;
-            
-            // In a real app, save message to Firestore
-            // db.collection('chats').add({...});
-            
-            // Simulate admin response after delay
-            setTimeout(() => {
-                const responseEl = document.createElement('div');
-                responseEl.className = 'message support';
-                responseEl.innerHTML = `
-                    Спасибо за сообщение! Администратор ответит вам в ближайшее время.
-                    <div class="message-meta">Сегодня, ${timeStr}</div>
+            const item = {
+                id: activeProduct.id,
+                name: activeProduct.name,
+                image: activeProduct.images[0],
+                price: activeProduct.price,
+                weight: activeProduct.weight,
+                size: size,
+                color: activeProduct.color,
+                qty: qty,
+                preorder: activeProduct.stock <= 0
+            };
+
+            cart.push(item);
+            localStorage.setItem('byrmalda_cart', JSON.stringify(cart));
+            updateCartUI();
+            showToast("Добавлено в корзину");
+        }
+
+        function updateCartUI() {
+            const body = document.getElementById('cart-table-body');
+            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('cart-count').classList.toggle('hidden', cart.length === 0);
+
+            if (cart.length === 0) {
+                body.innerHTML = '<tr><td colspan="6" class="py-10 text-center text-gray-400">Корзина пуста</td></tr>';
+                return;
+            }
+
+            let totalUsd = 0;
+            let totalWeight = 0;
+
+            body.innerHTML = cart.map((item, idx) => {
+                totalUsd += item.price * item.qty;
+                totalWeight += item.weight * item.qty;
+                return `
+                    <tr class="border-b border-gray-50">
+                        <td class="py-4 flex items-center gap-4">
+                            <img src="${item.image}" class="w-16 h-16 rounded-xl object-cover">
+                            <span class="font-bold">${item.name} ${item.preorder ? '<span class="text-orange-500 text-[10px] block">ПРЕДЗАКАЗ</span>' : ''}</span>
+                        </td>
+                        <td class="py-4">${item.size}</td>
+                        <td class="py-4">${item.color}</td>
+                        <td class="py-4">${item.qty}</td>
+                        <td class="py-4">${item.price * item.qty} $</td>
+                        <td class="py-4 text-right">
+                            <button onclick="removeFromCart(${idx})" class="text-red-500">Удалить</button>
+                        </td>
+                    </tr>
                 `;
-                messagesEl.appendChild(responseEl);
-                messagesEl.scrollTop = messagesEl.scrollHeight;
-                
-                // Update notification badge
-                const supportBtn = document.querySelector('.nav-btn[data-page="support"]');
-                const badge = supportBtn.querySelector('.notification-badge');
-                state.newMessagesCount++;
-                badge.textContent = state.newMessagesCount;
-                supportBtn.classList.add('has-notification');
-            }, 1500);
+            }).join('');
+
+            const deliveryRub = Math.ceil(totalWeight / 1000) * 900;
+            document.getElementById('cart-delivery').innerText = deliveryRub;
+            document.getElementById('cart-total').innerText = totalUsd;
         }
-        
-        // Toggle theme
-        function toggleTheme() {
-            state.theme = document.getElementById('theme-toggle').checked ? 'dark' : 'light';
-            document.body.classList.toggle('dark-theme', state.theme === 'dark');
-            localStorage.setItem('byrmalda-theme', state.theme);
+
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
+            localStorage.setItem('byrmalda_cart', JSON.stringify(cart));
+            updateCartUI();
         }
-        
-        // Submit review
-        function submitReview() {
-            const rating = document.getElementById('review-rating').value;
-            const text = document.getElementById('review-text').value.trim();
-            const errorEl = document.getElementById('review-error');
+
+        async function checkout() {
+            if (cart.length === 0) return;
+            const orderId = 'ORD-' + Math.floor(Math.random()*1000000);
+            const total = document.getElementById('cart-total').innerText;
+            const delivery = document.getElementById('cart-delivery').innerText;
+
+            const newOrder = {
+                orderId: orderId,
+                userId: currentUser.uid,
+                items: cart,
+                total: total,
+                delivery: delivery,
+                status: 'ожидает оплату',
+                createdAt: Date.now(),
+                autoUpdated: false,
+                trackNumber: 'T' + Math.floor(Math.random()*1000000000)
+            };
+
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).set(newOrder);
             
-            if (!rating || !text) {
-                errorEl.textContent = 'Заполните все поля';
-                return;
-            }
-            
-            if (!state.currentUser) {
-                loginModal.classList.add('active');
-                return;
-            }
-            
-            // In a real app, save review to Firestore for moderation
-            // db.collection('reviews').add({
-            //     userId: state.currentUser.uid,
-            //     userName: document.getElementById('profile-name').textContent,
-            //     rating: parseInt(rating),
-            //     text,
-            //     status: 'pending',
-            //     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            // });
-            
-            reviewModal.classList.remove('active');
-            alert('Спасибо за отзыв! Он появится на сайте после проверки администратором.');
-            document.getElementById('review-error').textContent = '';
-            document.getElementById('review-text').value = '';
-            document.getElementById('review-rating').value = '';
-            // Reset stars
-            document.querySelectorAll('#review-modal [data-rating]').forEach(s => {
-                s.textContent = '☆';
-            });
+            showToast("Для совершения оплаты обратитесь в поддержку или напишите нашему админу в тг @fueum");
+            cart = [];
+            localStorage.setItem('byrmalda_cart', '[]');
+            updateCartUI();
+            setView('profile');
         }
-        
-        // Submit complaint
-        function submitComplaint() {
-            const text = document.getElementById('complaint-text').value.trim();
-            const errorEl = document.getElementById('complaint-error');
-            
-            if (!text) {
-                errorEl.textContent = 'Опишите проблему';
-                return;
+
+        let supportInterval = null;
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg || !currentUser) return;
+
+            const isResponse = currentUser.email === adminEmail && msg.startsWith('(');
+            let targetUserId = currentUser.uid;
+
+            if (isResponse) {
+                const match = msg.match(/\((\d+)\)/);
+                // logic for admin response simplified
             }
-            
-            if (!state.currentUser) {
-                loginModal.classList.add('active');
-                return;
-            }
-            
-            // In a real app, save complaint to Firestore
-            // db.collection('complaints').add({
-            //     userId: state.currentUser.uid,
-            //     text,
-            //     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            //     status: 'new'
-            // });
-            
-            complaintModal.classList.remove('active');
-            alert('Жалоба отправлена. Администратор рассмотрит её в ближайшее время.');
-            document.getElementById('complaint-error').textContent = '';
-            document.getElementById('complaint-text').value = '';
+
+            const message = {
+                userId: currentUser.uid,
+                userName: currentUser.name,
+                text: msg,
+                time: new Date().toLocaleTimeString(),
+                date: new Date().toLocaleDateString(),
+                isAdmin: currentUser.email === adminEmail
+            };
+
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('support').add(message);
+            input.value = '';
+            loadMessages();
         }
-        
-        // Upload avatar to ImgBB
-        async function uploadAvatar() {
-            const fileInput = document.getElementById('new-avatar-input');
-            const file = fileInput.files[0];
-            const successEl = document.getElementById('avatar-success');
-            
-            if (!file) {
-                alert('Выберите изображение');
-                return;
-            }
-            
-            if (!file.type.startsWith('image/')) {
-                alert('Пожалуйста, выберите изображение');
-                return;
-            }
-            
-            // Show loading state
-            document.getElementById('avatar-upload-btn').disabled = true;
-            document.getElementById('avatar-upload-btn').textContent = 'Загрузка...';
-            
-            try {
-                // Convert file to base64
-                const base64 = await fileToBase64(file);
-                
-                // Upload to ImgBB
-                const formData = new FormData();
-                formData.append('image', base64.split(',')[1]); // Remove data:image/png;base64,
-                
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMG_BB_API_KEY}`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Save avatar URL to Firestore for moderation
-                    await db.collection('avatarRequests').add({
-                        userId: state.currentUser.uid,
-                        userName: document.getElementById('profile-name').textContent,
-                        avatarUrl: result.data.url,
-                        status: 'pending',
-                        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    // Show success message
-                    successEl.style.display = 'block';
-                    document.getElementById('avatar-upload-btn').textContent = 'Загружено ✓';
-                    
-                    // Close modal after delay
-                    setTimeout(() => {
-                        avatarModal.classList.remove('active');
-                        successEl.style.display = 'none';
-                        document.getElementById('avatar-upload-btn').disabled = false;
-                        document.getElementById('avatar-upload-btn').textContent = 'Загрузить';
-                        fileInput.value = '';
-                    }, 2000);
-                } else {
-                    throw new Error('Ошибка загрузки изображения');
-                }
-            } catch (error) {
-                console.error('Avatar upload error:', error);
-                alert('Ошибка при загрузке аватарки: ' + error.message);
-                document.getElementById('avatar-upload-btn').disabled = false;
-                document.getElementById('avatar-upload-btn').textContent = 'Загрузить';
-            }
+
+        function startSupportInterval() {
+            if (supportInterval) clearInterval(supportInterval);
+            supportInterval = setInterval(loadMessages, 5000);
         }
-        
-        // Helper: Convert file to base64
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-        
-        // Handle search
-        function handleSearch() {
-            const query = document.getElementById('search-input').value.toLowerCase().trim();
-            const resultsEl = document.getElementById('search-results');
-            
-            if (!query) {
-                resultsEl.innerHTML = '<div class="empty-state"><i>🔍</i><p>Введите название товара для поиска</p></div>';
-                return;
-            }
-            
-            // In a real app, query Firestore for products matching the search
-            // For demo, show mock results
-            const mockProducts = [
-                { id: '1', name: 'Футболка Free Drun белая', price: 45, image: null, category: 'tshirts' },
-                { id: '2', name: 'Футболка Free Drun черная', price: 45, image: null, category: 'tshirts' },
-                { id: '3', name: 'Худи Urban Soul', price: 89, image: null, category: 'hoodies' },
-                { id: '4', name: 'Кроссовки Drun Run', price: 120, image: null, category: 'sneakers' }
-            ];
-            
-            const results = mockProducts.filter(p => 
-                p.name.toLowerCase().includes(query) || 
-                p.category.toLowerCase().includes(query)
-            );
-            
-            if (results.length === 0) {
-                resultsEl.innerHTML = '<div class="empty-state"><i>😕</i><p>Товары не найдены</p></div>';
-                return;
-            }
-            
-            resultsEl.innerHTML = '';
-            results.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <div class="card-image">${product.image ? `<img src="${product.image}" alt="${product.name}">` : '🛍️'}</div>
-                    <div class="card-content">
-                        <div class="card-title">${product.name}</div>
-                        <div class="card-price">$${product.price.toFixed(2)}</div>
+
+        async function loadMessages() {
+            const snap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('support').orderBy('time', 'asc').limitToLast(50).get();
+            const win = document.getElementById('chat-window');
+            const isAdmin = currentUser?.email === adminEmail;
+
+            win.innerHTML = snap.docs.map(doc => {
+                const m = doc.data();
+                // Admin logic: show everyone's messages. User logic: show only theirs and admin replies to them
+                if (!isAdmin && m.userId !== currentUser.uid && !m.isAdmin) return '';
+                // Admin messages with (ID) are filtered by user
+                if (!isAdmin && m.isAdmin && !m.text.includes(`(${currentUser.uid.slice(0,7)})`)) return '';
+
+                return `
+                    <div class="flex ${m.isAdmin ? 'justify-start' : 'justify-end'}">
+                        <div class="${m.isAdmin ? 'bg-gray-200 text-black' : 'bg-black text-white'} p-3 rounded-2xl max-w-[80%]">
+                            <div class="text-[10px] opacity-50">${m.userName} | ${m.time}</div>
+                            <div>${m.text}</div>
+                        </div>
                     </div>
                 `;
-                card.addEventListener('click', () => {
-                    // Set current product and show product page
-                    state.currentProduct = product;
-                    document.getElementById('product-title').textContent = product.name;
-                    document.getElementById('price-usd').textContent = `$${product.price.toFixed(2)}`;
-                    updateCurrencyDisplay();
-                    showPage('product');
-                });
-                resultsEl.appendChild(card);
-            });
+            }).join('');
+            win.scrollTop = win.scrollHeight;
         }
-        
-        // Update currency display
-        function updateCurrencyDisplay() {
-            const usd = parseFloat(document.getElementById('price-usd').textContent.replace('$', '')) || 45;
-            document.getElementById('price-rub').textContent = `≈ ${Math.round(usd * EXCHANGE_RATES.USD_TO_RUB).toLocaleString('ru-RU')} ₽`;
-            document.getElementById('price-uah').textContent = `≈ ${Math.round(usd * EXCHANGE_RATES.USD_TO_UAH).toLocaleString('ru-RU')} ₴`;
+
+        function checkAdmin() {
+            if (currentUser.email === adminEmail) {
+                document.getElementById('btn-admin').classList.remove('hidden');
+            }
         }
-        
-        // Email validation helper
-        function isValidEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        async function adminCreateProduct() {
+            const name = document.getElementById('adm-prod-name').value;
+            const files = document.getElementById('adm-prod-imgs').files;
+            const price = document.getElementById('adm-prod-price').value;
+            const stock = document.getElementById('adm-prod-stock').value;
+
+            if (files.length === 0) return showToast("Загрузите фото");
+            
+            // Simplified upload logic
+            const uploadedUrls = [];
+            for(let f of files) {
+                const url = await mockUpload(f);
+                uploadedUrls.push(url);
+            }
+
+            const product = {
+                name,
+                images: uploadedUrls,
+                price: parseFloat(price),
+                stock: parseInt(stock),
+                type: document.getElementById('adm-prod-type').value,
+                sizes: document.getElementById('adm-prod-sizes').value,
+                weight: parseInt(document.getElementById('adm-prod-weight').value),
+                description: document.getElementById('adm-prod-desc').value,
+                releaseYear: 2024,
+                color: 'Black/White',
+                fromUser: false
+            };
+
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('products').add(product);
+            showToast("Товар опубликован!");
+            loadAllProducts();
         }
+
+        async function mockUpload(file) {
+            // Usually we'd use ImgBB API here. Using placeholder for simulation
+            return URL.createObjectURL(file);
+        }
+
+        async function loadUserData() {
+            if (!currentUser) return;
+            document.getElementById('profile-name').innerText = currentUser.name;
+            document.getElementById('profile-id').innerText = currentUser.uid.slice(0, 8);
+            document.getElementById('profile-date').innerText = currentUser.regDate;
+            document.getElementById('profile-email').innerText = currentUser.email;
+            document.getElementById('profile-img').src = currentUser.avatar || 'https://placehold.co/200';
+            document.getElementById('profile-badge').classList.toggle('hidden', !currentUser.verifiedBadge);
+
+            // Load Orders
+            const snap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders')
+                .where('userId', '==', currentUser.uid).get();
+            
+            const list = document.getElementById('orders-list');
+            list.innerHTML = snap.docs.map(doc => {
+                const o = doc.data();
+                const status = calculateStatus(o);
+                return `
+                    <div class="order-card p-4 bg-white flex items-center gap-4">
+                        <img src="${o.items[0].image}" class="w-20 h-20 rounded-xl object-cover">
+                        <div class="flex-1">
+                            <h4 class="font-bold">${o.items.length} товаров - ${o.total}$</h4>
+                            <p class="text-xs text-gray-400">Трек: ${o.trackNumber}</p>
+                            <div class="text-sm mt-1">Статус: <span class="font-bold text-blue-600">${status}</span></div>
+                        </div>
+                        ${o.status === 'ожидает оплату' || o.status === 'создан' ? `
+                            <button onclick="cancelOrder('${o.orderId}')" class="text-red-500 font-bold">×</button>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateStatus(o) {
+            if (o.status === 'ожидает оплату' || o.status === 'отменен') return o.status;
+            if (o.autoUpdated === false && o.status === 'создан') {
+                const now = Date.now();
+                const diff = (now - o.createdAt) / 1000 / 60 / 60; // hours
+                if (diff > 96) return 'передача товара в доставку'; // 4 days approx
+                if (diff > 120) return 'в пути';
+            }
+            return o.status;
+        }
+
+        async function cancelOrder(id) {
+            const doc = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(id).get();
+            const o = doc.data();
+            if (o.status !== 'ожидает оплату' && o.status !== 'создан') {
+                return showToast("Заказ уже нельзя отменить на этом этапе");
+            }
+            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(id).update({ status: 'отменен' });
+            showToast("Заказ отменен");
+            loadUserData();
+        }
+
+        // Init App
+        window.onload = () => {
+            updateCartUI();
+            setView('home');
+        };
+
     </script>
 </body>
 </html>
