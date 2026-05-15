@@ -294,6 +294,10 @@
             width: 100%; padding: 10px; border: 1px solid var(--border);
             background: var(--bg); color: var(--text); font-size: 13px; border-radius: 4px;
         }
+        .opt-static {
+            padding: 10px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 4px; font-weight: 500; min-height: 40px; display: flex; align-items: center;
+        }
         
         .desc { margin: 24px 0; line-height: 1.7; font-size: 14px; color: var(--text-dim); }
         
@@ -586,17 +590,13 @@
                         <div class="stock" id="p-stock"></div>
                         <div id="p-deleted-notice" class="deleted-notice hidden">Товар удален</div>
                         <div class="options" id="p-options">
-                            <div class="opt-group">
+                            <div class="opt-group" id="opt-size-group">
                                 <label>Размер</label>
-                                <select class="opt-select" id="p-size">
-                                    <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option>
-                                </select>
+                                <select class="opt-select" id="p-size"></select>
                             </div>
-                            <div class="opt-group">
+                            <div class="opt-group" id="opt-color-group">
                                 <label>Цвет</label>
-                                <select class="opt-select" id="p-color">
-                                    <option>Белый</option><option>Черный</option><option>Серый</option>
-                                </select>
+                                <select class="opt-select" id="p-color"></select>
                             </div>
                             <div class="opt-group">
                                 <label>Количество</label>
@@ -674,7 +674,8 @@
                         <select class="admin-input" id="adm-aud"><option value="unisex">Унисекс</option><option value="male">Мужчина</option><option value="female">Женщина</option></select>
                     </div>
                     <div class="form-group"><label class="form-label">Материал</label><input class="admin-input" id="adm-mat"></div>
-                    <div class="form-group"><label class="form-label">Цвет</label><input class="admin-input" id="adm-color"></div>
+                    <div class="form-group"><label class="form-label">Цвет (через запятую)</label><input class="admin-input" id="adm-color" placeholder="Черный,Белый"></div>
+                    <div class="form-group"><label class="form-label">Размеры (через запятую)</label><input class="admin-input" id="adm-sizes" placeholder="S,M,L,XL"></div>
                     <div class="form-group"><label class="form-label">Год релиза</label><input type="number" class="admin-input" id="adm-year" placeholder="2026"></div>
                     <div class="form-group"><label class="form-label">Коллаборация</label>
                         <select class="admin-input" id="adm-collab-type" onchange="toggleCollabInput()">
@@ -729,7 +730,7 @@
             <div class="admin-section">
                 <h3>📦 Заказы</h3>
                 <div class="flex gap-8">
-                    <input type="text" class="admin-input" id="adm-oid" placeholder="ID заказа" style="flex:1;min-width:200px">
+                    <input type="text" class="admin-input" id="adm-oid" placeholder="ID или трек-номер заказа" style="flex:1;min-width:200px">
                     <button class="btn btn-sm" onclick="admFindOrder()">Найти</button>
                 </div>
                 <div id="adm-order-res" class="mt-16 hidden"></div>
@@ -920,7 +921,6 @@ const $ = id => document.getElementById(id);
 const show = el => el.classList.remove('hidden');
 const hide = el => el.classList.add('hidden');
 const fmtDate = ts => ts?.toDate?.()?.toLocaleDateString('ru-RU') || '...';
-const fmtPrice = usd => `$${usd.toFixed(2)} • ≈ ${Math.round(usd*RATES.USD_TO_RUB).toLocaleString('ru-RU')} ₽ • ≈ ${Math.round(usd*RATES.USD_TO_UAH).toLocaleString('ru-RU')} ₴`;
 const genId = () => Math.random().toString(36).substring(2, 10).toUpperCase();
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -1173,8 +1173,34 @@ window.openProd = async id => {
         const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', id));
         if (!snap.exists()) return alert('Товар не найден');
         curProd = { ...snap.data(), id };
+        
         $('p-id').textContent = `ID: ${curProd.productId || id}`;
         $('p-name').textContent = curProd.name;
+        
+        // Parse colors and sizes from product data
+        const colors = (curProd.color || 'Белый').split(',').map(c => c.trim()).filter(c => c);
+        const sizes = (curProd.sizes || 'S,M,L,XL').split(',').map(s => s.trim()).filter(s => s);
+        
+        // Fill color dropdown or show static
+        const colorGroup = $('opt-color-group');
+        const colorSelect = $('p-color');
+        if (colors.length === 1) {
+            colorGroup.innerHTML = `<label class="form-label">Цвет</label><div class="opt-static">${colors[0]}</div>`;
+        } else {
+            colorGroup.innerHTML = `<label class="form-label">Цвет</label><select class="opt-select" id="p-color"></select>`;
+            $('p-color').innerHTML = colors.map(c => `<option>${c}</option>`).join('');
+        }
+        
+        // Fill size dropdown or show static
+        const sizeGroup = $('opt-size-group');
+        const sizeSelect = $('p-size');
+        if (sizes.length === 1) {
+            sizeGroup.innerHTML = `<label class="form-label">Размер</label><div class="opt-static">${sizes[0]}</div>`;
+        } else {
+            sizeGroup.innerHTML = `<label class="form-label">Размер</label><select class="opt-select" id="p-size"></select>`;
+            $('p-size').innerHTML = sizes.map(s => `<option>${s}</option>`).join('');
+        }
+        
         $('p-specs').innerHTML = `
             <div class="spec-row"><span class="spec-l">Для кого</span><span class="spec-v">${curProd.audience||'Унисекс'}</span></div>
             <div class="spec-row"><span class="spec-l">Тип</span><span class="spec-v">${curProd.type}</span></div>
@@ -1188,6 +1214,7 @@ window.openProd = async id => {
         $('p-desc').textContent = curProd.desc || '';
         $('p-price-usd').textContent = `$${curProd.price}`;
         $('p-price-conv').textContent = `≈ ${Math.round(curProd.price*RATES.USD_TO_RUB).toLocaleString('ru-RU')} ₽ / ≈ ${Math.round(curProd.price*RATES.USD_TO_UAH).toLocaleString('ru-RU')} ₴`;
+        
         const stockEl = $('p-stock'), btn = $('p-action'), opts = $('p-options'), delNotice = $('p-deleted-notice');
         
         if (curProd.deleted) {
@@ -1196,18 +1223,20 @@ window.openProd = async id => {
             btn.disabled = true;
             hide(opts);
         } else if (curProd.stock > 0) {
+            // IN STOCK - regular order, not preorder
             delNotice.classList.add('hidden');
             stockEl.innerHTML = '<span class="in-stock">✓ В наличии</span>';
             btn.textContent = 'Купить';
             btn.disabled = false;
-            btn.onclick = addToCart;
+            btn.onclick = () => addToCart(false); // false = not preorder
             show(opts);
         } else {
+            // OUT OF STOCK - preorder only
             delNotice.classList.add('hidden');
             stockEl.innerHTML = '<span class="out-stock">✗ Нет в наличии (Предзаказ)</span>';
             btn.textContent = 'Предзаказ';
             btn.disabled = false;
-            btn.onclick = ()=>addToCart(true);
+            btn.onclick = () => addToCart(true); // true = preorder
             hide(opts);
         }
         galIdx = 0; updateGal();
@@ -1224,15 +1253,29 @@ function updateGal() {
 window.setGal = i => { galIdx = i; updateGal(); };
 window.galNav = d => { if (!curProd) return; const len = curProd.images?.length||1; galIdx = (galIdx + d + len) % len; updateGal(); };
 
-window.addToCart = (pre=false) => {
+window.addToCart = (isPreorder=false) => {
     if (!user) { openModal('login-modal'); return; }
+    
+    // Get selected size/color (handle static or select)
+    let size = 'M', color = 'Белый';
+    const sizeEl = $('p-size');
+    const colorEl = $('p-color');
+    if (sizeEl && sizeEl.tagName === 'SELECT') size = sizeEl.value;
+    else if (sizeEl?.closest('.opt-group')?.querySelector('.opt-static')) size = sizeEl.closest('.opt-group').querySelector('.opt-static').textContent;
+    
+    if (colorEl && colorEl.tagName === 'SELECT') color = colorEl.value;
+    else if (colorEl?.closest('.opt-group')?.querySelector('.opt-static')) color = colorEl.closest('.opt-group').querySelector('.opt-static').textContent;
+    
     const item = {
         id: `${curProd.id}-${Date.now()}`, pid: curProd.id, name: curProd.name,
-        img: curProd.images?.[0] || '', size: $('p-size')?.value||'M', color: $('p-color')?.value||'Белый',
-        qty: parseInt($('p-qty')?.value)||1, price: curProd.price, weight: curProd.weight||200, pre, at: new Date().toISOString()
+        img: curProd.images?.[0] || '', size, color,
+        qty: parseInt($('p-qty')?.value)||1, price: curProd.price, weight: curProd.weight||200,
+        isPreorder: isPreorder, at: new Date().toISOString()
     };
     cart.push(item); localStorage.setItem('byrmalda_cart', JSON.stringify(cart));
-    loadCartCount(); alert(`✅ ${pre?'Предзаказ':'Товар'} добавлен!`); navigate('cart');
+    loadCartCount();
+    alert(`✅ ${isPreorder?'Предзаказ':'Заказ'} добавлен!`);
+    navigate('cart');
 };
 
 function loadCartCount() { const n = cart.reduce((s,i)=>s+i.qty,0); $('cart-badge').textContent = n; $('nav-cart').classList.toggle('has-badge',n>0); }
@@ -1246,7 +1289,7 @@ function renderCart() {
         const tot = it.price * it.qty; sub += tot; kg += (it.weight * it.qty)/1000;
         return `<tr>
             <td><input type="number" class="qty-input" value="${it.qty}" min="1" onchange="updCart('${it.id}','qty',this.value)"></td>
-            <td class="flex items-center gap-8"><img class="cart-img" src="${it.img||'https://via.placeholder.com/60/f5f5f5/111?text=📦'}"><div><div style="font-weight:500">${it.name}</div>${it.pre?'<span style="font-size:11px;color:#1976d2;background:#e3f2fd;padding:2px 8px;border-radius:10px">Предзаказ</span>':''}</div></td>
+            <td class="flex items-center gap-8"><img class="cart-img" src="${it.img||'https://via.placeholder.com/60/f5f5f5/111?text=📦'}"><div><div style="font-weight:500">${it.name}</div>${it.isPreorder?'<span style="font-size:11px;color:#1976d2;background:#e3f2fd;padding:2px 8px;border-radius:10px">Предзаказ</span>':'<span style="font-size:11px;color:#16a34a;background:#dcfce7;padding:2px 8px;border-radius:10px">Заказ</span>'}</div></td>
             <td>${it.size}</td><td>${it.color}</td><td>$${it.price}</td>
             <td><button class="btn-cancel" onclick="delCart('${it.id}')">×</button></td>
         </tr>`;
@@ -1265,20 +1308,42 @@ window.confirmCheckout = async () => {
     closeModal('checkout-modal');
     const oid = 'ORD-'+genId();
     const total = parseFloat($('cart-total').textContent.replace('$',''));
+    
+    // Create order with full details
     const order = {
-        id: oid, userId: user.uid, items: [...cart], total,
-        status: 'Ожидает оплату', tracking: 'TRK-'+genId(),
-        createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+        id: oid,
+        userId: user.uid,
+        items: cart.map(it => ({...it})), // clone items
+        total: total,
+        status: 'Ожидает оплату',
+        tracking: 'TRK-'+genId(),
+        adminChangedStatus: false, // flag for auto-update logic
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
     };
+    
     await setDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', oid), order);
+    
+    // Decrease stock for in-stock items (not preorders)
     for (const it of cart) {
-        if (!it.pre) {
+        if (!it.isPreorder) {
             const pd = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', it.pid));
-            if (pd.exists()) { const d = pd.data(); await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', it.pid), { stock: Math.max(0, (d.stock||0) - it.qty) }); }
+            if (pd.exists()) {
+                const d = pd.data();
+                await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', it.pid), {
+                    stock: Math.max(0, (d.stock||0) - it.qty)
+                });
+            }
         }
     }
-    cart = []; localStorage.removeItem('byrmalda_cart'); loadCartCount(); loadOrders();
-    alert(`✅ Заказ #${oid} создан! Статус: «Ожидает оплату». Напишите @fueum для подтверждения.`);
+    
+    // Clear cart and reload
+    cart = [];
+    localStorage.removeItem('byrmalda_cart');
+    loadCartCount();
+    loadOrders(); // Reload profile orders
+    
+    alert(`✅ Заказ #${oid} создан!\nСтатус: «Ожидает оплату»\nТрекинг: ${order.tracking}\n\nНапишите @fueum для подтверждения оплаты.`);
     navigate('profile');
 };
 
@@ -1286,30 +1351,47 @@ async function loadOrders() {
     if (!user) return;
     const c = $('orders-list'); c.innerHTML = '<div class="text-center" style="padding:24px"><div class="loading"></div></div>';
     try {
-        const snap = await getDocs(query(collection(db, 'artifacts/byrmalda-prod/public/data/orders'), where('userId','==',user.uid), orderBy('createdAt','desc'), limit(20)));
+        const snap = await getDocs(query(collection(db, 'artifacts/byrmalda-prod/public/data/orders'), where('userId','==',user.uid), orderBy('createdAt','desc'), limit(50)));
         if (snap.empty) { c.innerHTML = '<div class="text-center" style="padding:32px;color:var(--text-dim)">Заказов пока нет</div>'; return; }
+        
         c.innerHTML = snap.docs.map(d => {
-            const o = d.data(); const st = o.status||'Ожидает оплату';
-            const cls = { 'Ожидает оплату':'st-awaiting', 'Создан':'st-created', 'Передача товара в доставку':'st-shipping', 'В пути':'st-transit', 'Доставлен':'st-delivered', 'Отменён':'st-cancelled' }[st] || 'st-awaiting';
+            const o = d.data();
+            const st = o.status || 'Ожидает оплату';
+            const cls = {
+                'Ожидает оплату':'st-awaiting', 'Создан':'st-created',
+                'Передача товара в доставку':'st-shipping', 'В пути':'st-transit',
+                'Доставлен':'st-delivered', 'Отменён':'st-cancelled'
+            }[st] || 'st-awaiting';
             const canCancel = st === 'Создан';
-            return `<div class="order-card" onclick="openProd('${o.items?.[0]?.pid}')">
-                <div class="order-img">📦</div>
+            const firstItem = o.items?.[0] || {};
+            
+            return `<div class="order-card" onclick="openProd('${firstItem.pid}')">
+                <div class="order-img">${firstItem.img?`<img src="${firstItem.img}" style="width:100%;height:100%;object-fit:cover">`:'📦'}</div>
                 <div class="order-info">
-                    <div class="order-name">${o.items?.[0]?.name||'Товар'}</div>
+                    <div class="order-name">${firstItem.name||'Товар'}</div>
                     <span class="order-status ${cls}">${st}</span>
-                    <div class="order-meta"><div>Заказ: #${o.id}</div><div>Трекинг: ${o.tracking||'-'}</div><div>Дата: ${fmtDate(o.createdAt)}</div></div>
+                    <div class="order-meta">
+                        <div>Заказ: #${o.id}</div>
+                        <div>Трекинг: ${o.tracking||'-'}</div>
+                        <div>Сумма: $${o.total?.toFixed(2)||'0.00'}</div>
+                        <div>Дата: ${fmtDate(o.createdAt)}</div>
+                    </div>
                 </div>
-                <div class="order-actions"><button class="btn-cancel" ${!canCancel?'disabled':''} onclick="event.stopPropagation();cancelOrder('${o.id}','${st}')">×</button></div>
+                <div class="order-actions">
+                    <button class="btn-cancel" ${!canCancel?'disabled':''} title="${canCancel?'Отменить заказ':'Нельзя отменить на этом этапе'}" onclick="event.stopPropagation();cancelOrder('${o.id}','${st}')">×</button>
+                </div>
             </div>`;
         }).join('');
     } catch(e) { console.error(e); c.innerHTML = '<div class="text-center" style="padding:24px;color:var(--error)">Ошибка загрузки</div>'; }
 }
 
 window.cancelOrder = async (oid, st) => {
-    if (st !== 'Создан') { alert('❌ Нельзя отменить на этом этапе'); return; }
-    if (!confirm('Отменить заказ?')) return;
+    if (st !== 'Создан') { alert('❌ Нельзя отменить заказ на этом этапе'); return; }
+    if (!confirm('Отменить этот заказ?')) return;
     try {
-        await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', oid), { status: 'Отменён', updatedAt: serverTimestamp() });
+        await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', oid), {
+            status: 'Отменён', updatedAt: serverTimestamp()
+        });
         alert('✅ Заказ отменён'); loadOrders();
     } catch(e) { console.error(e); alert('❌ Ошибка'); }
 };
@@ -1318,7 +1400,7 @@ async function loadChat() {
     if (!user) return;
     const c = $('chat-msgs'); c.innerHTML = '';
     try {
-        const q = query(collection(db, 'artifacts/byrmalda-prod/public/data/support'), orderBy('ts','asc'), limit(50));
+        const q = query(collection(db, 'artifacts/byrmalda-prod/public/data/support'), orderBy('ts','asc'), limit(100));
         const snap = await getDocs(q);
         snap.forEach(d => addMsgToUI(d.data()));
         c.scrollTop = c.scrollHeight;
@@ -1329,7 +1411,9 @@ function addMsgToUI(m) {
     const isUser = m.uid === user?.uid, isAdmin = m.isAdmin;
     const el = document.createElement('div');
     el.className = `msg ${isUser?'user':'admin'}`;
-    el.innerHTML = `${m.text}<div class="msg-meta">${isAdmin?'Админ':(m.name||'Пользователь')} • ${m.ts?.toDate?.().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})||''}${!isUser&&!isAdmin?` • UID: ${m.uid}`:''}</div>`;
+    // Show full UID for admin to reply
+    const uidDisplay = !isUser && !isAdmin && m.uid ? ` • UID: ${m.uid}` : '';
+    el.innerHTML = `${m.text}<div class="msg-meta">${isAdmin?'Админ':(m.name||'Пользователь')} • ${m.ts?.toDate?.().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})||''}${uidDisplay}</div>`;
     $('chat-msgs').appendChild(el);
     $('chat-msgs').scrollTop = $('chat-msgs').scrollHeight;
     if (!document.getElementById('support').classList.contains('active') && !isUser) { chatUnread++; updateSupportBadge(); }
@@ -1339,7 +1423,13 @@ function updateSupportBadge() { $('support-badge').textContent = chatUnread; $('
 
 window.sendMsg = async () => {
     const txt = $('chat-input').value.trim(); if (!txt || !user) return;
-    const msg = { uid: user.uid, name: userData?.name || user.email.split('@')[0], text: txt, ts: serverTimestamp(), isAdmin: user.email === ADMIN_EMAIL };
+    const msg = {
+        uid: user.uid,
+        name: userData?.name || user.email.split('@')[0],
+        text: txt,
+        ts: serverTimestamp(),
+        isAdmin: user.email === ADMIN_EMAIL
+    };
     await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/support'), msg);
     $('chat-input').value = '';
     addMsgToUI({ ...msg, ts: new Date() });
@@ -1513,10 +1603,10 @@ window.admApproveSuggestion = async id => {
     if (!snap.exists()) return;
     const s = snap.data();
     await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/products'), {
-        name: s.name, category: s.category, type: s.type, price: s.price, stock: 10, weight: s.weight||200,
-        audience: s.audience||'unisex', material: s.material||'', color: s.color||'', collab: s.collab||'Нет',
-        year: new Date().getFullYear(), desc: s.desc||'', images: s.img?[s.img]:[], published: true, deleted: false,
-        fromUser: true, suggestedBy: s.uid, productId: genId(), createdAt: serverTimestamp()
+        productId: genId(), name: s.name, category: s.category, type: s.type, price: s.price, stock: 10, weight: s.weight||200,
+        audience: s.audience||'unisex', material: s.material||'', color: s.color||'', sizes: s.sizes||'S,M,L',
+        collab: s.collab||'Нет', year: new Date().getFullYear(), desc: s.desc||'', images: s.img?[s.img]:[],
+        published: true, deleted: false, fromUser: true, suggestedBy: s.uid, createdAt: serverTimestamp()
     });
     await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id), { status: 'approved' });
     await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', s.uid), { hasVerifiedProduct: true });
@@ -1574,11 +1664,12 @@ window.admCreateProduct = async () => {
     const productId = genId();
     await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/products'), {
         productId, name, category: cat, type, price, stock, weight, audience: $('adm-aud').value,
-        material: $('adm-mat').value, color: $('adm-color').value, collab, year, desc: $('adm-desc').value,
-        images, published: true, deleted: false, fromUser: false, createdAt: serverTimestamp()
+        material: $('adm-mat').value, color: $('adm-color').value, sizes: $('adm-sizes').value || 'S,M,L,XL',
+        collab, year, desc: $('adm-desc').value, images, published: true, deleted: false, fromUser: false,
+        createdAt: serverTimestamp()
     });
     alert(`✅ Товар опубликован! ID: ${productId}`);
-    ['adm-name','adm-type','adm-price','adm-stock','adm-weight','adm-mat','adm-color','adm-desc','adm-collab-name'].forEach(id => $(id).value = '');
+    ['adm-name','adm-type','adm-price','adm-stock','adm-weight','adm-mat','adm-color','adm-sizes','adm-desc','adm-collab-name'].forEach(id => $(id).value = '');
     $('adm-photos').value = '';
     hide($('adm-collab-group'));
 };
@@ -1642,27 +1733,71 @@ window.admUnblockUser = async () => {
 };
 
 window.admFindOrder = async () => {
-    const oid = $('adm-oid').value.trim(); if (!oid) { alert('Введите ID заказа'); return; }
+    const oid = $('adm-oid').value.trim(); if (!oid) { alert('Введите ID или трек-номер'); return; }
     const res = $('adm-order-res'); res.classList.remove('hidden');
     try {
-        const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', oid));
+        // Try find by order ID first, then by tracking
+        let snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', oid));
+        if (!snap.exists()) {
+            const q = query(collection(db, 'artifacts/byrmalda-prod/public/data/orders'), where('tracking','==',oid));
+            const results = await getDocs(q);
+            if (!results.empty) snap = results.docs[0];
+        }
         if (!snap.exists()) { res.innerHTML = '<div style="color:var(--error)">Заказ не найден</div>'; return; }
+        
         const o = snap.data();
+        const itemsHtml = o.items?.map(i => `
+            <div style="display:flex;gap:10px;margin:8px 0;padding:8px;background:var(--bg-soft);border-radius:4px">
+                <img src="${i.img||'https://via.placeholder.com/50/f5f5f5/111?text=📦'}" style="width:50px;height:50px;object-fit:cover;border-radius:4px">
+                <div>
+                    <div style="font-weight:500">${i.name}</div>
+                    <div style="font-size:11px;color:var(--text-dim)">Размер: ${i.size} • Цвет: ${i.color} • ${i.qty} шт</div>
+                </div>
+            </div>
+        `).join('') || '-';
+        
         res.innerHTML = `
             <div style="background:var(--bg);padding:16px;border-radius:6px">
                 <div style="margin-bottom:12px"><strong>Заказ:</strong> #${o.id}</div>
+                <div style="margin-bottom:12px"><strong>Трекинг:</strong> ${o.tracking||'-'}</div>
                 <div style="margin-bottom:12px"><strong>Статус:</strong> <span style="background:#d1ecf1;color:#0c5460;padding:4px 10px;border-radius:20px">${o.status||'Ожидает оплату'}</span></div>
                 <div style="margin-bottom:12px"><strong>Покупатель оплатил:</strong> 
                     <button class="btn btn-success btn-sm" style="margin-right:8px" onclick="admSetOrderStatus('${o.id}','Создан')">Да</button>
-                    <button class="btn btn-outline btn-sm" onclick="alert('Ожидание оплаты...')">Нет</button>
+                    <button class="btn btn-outline btn-sm" onclick="alert('⏳ Ожидание оплаты от покупателя...')">Нет</button>
                 </div>
-                <div><strong>Товары:</strong> ${o.items?.map(i=>`${i.name} ×${i.qty}`).join(', ')||'-'}</div>
-                <div style="margin-top:12px;font-size:12px;color:var(--text-dim)">Трекинг: ${o.tracking||'-'} • Создан: ${fmtDate(o.createdAt)}</div>
+                <div style="margin:12px 0"><strong>Товары:</strong></div>
+                ${itemsHtml}
+                <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+                    <strong>Итого:</strong> $${o.total?.toFixed(2)||'0.00'}<br>
+                    <span style="font-size:12px;color:var(--text-dim)">Создан: ${fmtDate(o.createdAt)}</span>
+                </div>
+                <div style="margin-top:12px">
+                    <label style="font-size:11px;color:var(--text-dim);display:block;margin-bottom:4px">Изменить статус:</label>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="btn btn-sm" style="width:auto" onclick="admSetOrderStatus('${o.id}','Создан')">Создан</button>
+                        <button class="btn btn-sm" style="width:auto" onclick="admSetOrderStatus('${o.id}','Передача товара в доставку')">В доставку</button>
+                        <button class="btn btn-sm" style="width:auto" onclick="admSetOrderStatus('${o.id}','В пути')">В пути</button>
+                        <button class="btn btn-sm" style="width:auto" onclick="admSetOrderStatus('${o.id}','Доставлен')">Доставлен</button>
+                        <button class="btn btn-danger btn-sm" style="width:auto" onclick="admSetOrderStatus('${o.id}','Отменён')">Отменён</button>
+                    </div>
+                </div>
             </div>
         `;
-    } catch(e) { console.error(e); res.innerHTML = '<div style="color:var(--error)">Ошибка</div>'; }
+    } catch(e) { console.error(e); res.innerHTML = '<div style="color:var(--error)">Ошибка: '+e.message+'</div>'; }
 };
-window.admSetOrderStatus = async (oid, st) => { await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', oid), { status: st, updatedAt: serverTimestamp() }); alert(`✅ Статус изменён на «${st}»`); admFindOrder(); };
+
+window.admSetOrderStatus = async (oid, newStatus) => {
+    try {
+        await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', oid), {
+            status: newStatus,
+            updatedAt: serverTimestamp(),
+            adminChangedStatus: true // Mark that admin manually changed it
+        });
+        alert(`✅ Статус изменён на «${newStatus}»`);
+        admFindOrder(); // Refresh view
+        loadOrders(); // Refresh user's order list if on profile
+    } catch(e) { console.error(e); alert('❌ Ошибка: '+e.message); }
+};
 
 window.openSuggest = () => { if (!user) openModal('login-modal'); else openModal('suggest-modal'); };
 window.submitSuggestion = async () => {
@@ -1690,15 +1825,34 @@ async function autoUpdateOrders() {
     if (user?.email !== ADMIN_EMAIL) return;
     try {
         const now = Date.now();
+        
+        // Update "Создан" → "Передача товара в доставку" after 1-4 days (if admin hasn't changed)
         const created = await getDocs(query(collection(db, 'artifacts/byrmalda-prod/public/data/orders'), where('status','==','Создан')));
         created.forEach(async d => {
-            const o = d.data(); const t = o.createdAt?.toDate?.().getTime();
-            if (t && now - t > 4*24*60*60*1000) await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', d.id), { status: 'Передача товара в доставку', updatedAt: serverTimestamp() });
+            const o = d.data();
+            // Skip if admin manually changed status
+            if (o.adminChangedStatus) return;
+            const t = o.createdAt?.toDate?.().getTime();
+            if (t && now - t > 4*24*60*60*1000) { // 4 days
+                await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', d.id), {
+                    status: 'Передача товара в доставку',
+                    updatedAt: serverTimestamp()
+                });
+            }
         });
+        
+        // Update "Передача товара в доставку" → "В пути" after 12-15 hours (if admin hasn't changed)
         const shipping = await getDocs(query(collection(db, 'artifacts/byrmalda-prod/public/data/orders'), where('status','==','Передача товара в доставку')));
         shipping.forEach(async d => {
-            const o = d.data(); const t = o.updatedAt?.toDate?.().getTime();
-            if (t && now - t > 15*60*60*1000) await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', d.id), { status: 'В пути', updatedAt: serverTimestamp() });
+            const o = d.data();
+            if (o.adminChangedStatus) return;
+            const t = o.updatedAt?.toDate?.().getTime();
+            if (t && now - t > 15*60*60*1000) { // 15 hours
+                await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', d.id), {
+                    status: 'В пути',
+                    updatedAt: serverTimestamp()
+                });
+            }
         });
     } catch(e) { console.error('autoUpdate:', e); }
 }
