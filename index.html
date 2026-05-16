@@ -450,6 +450,29 @@
         }
         .review-delete:hover { opacity: 1; }
         
+        /* 🔁 Стили для доставки */
+        .delivery-section {
+            background: var(--bg-soft); border-radius: var(--radius); padding: 20px; margin: 24px 0;
+            border: 1px solid var(--border);
+        }
+        .delivery-option {
+            display: flex; align-items: center; gap: 12px; margin: 12px 0; padding: 12px;
+            background: var(--bg); border-radius: 8px; cursor: pointer;
+            border: 2px solid transparent; transition: border-color 0.2s;
+        }
+        .delivery-option:hover { border-color: var(--accent); }
+        .delivery-option.selected { border-color: var(--accent); background: var(--bg-soft); }
+        .delivery-option input { width: 18px; height: 18px; cursor: pointer; }
+        .delivery-fields {
+            margin-top: 16px; padding: 16px; background: var(--bg);
+            border-radius: 8px; border: 1px solid var(--border);
+        }
+        .delivery-warning {
+            margin-top: 16px; padding: 12px; background: #fef3c7;
+            border-left: 4px solid #f59e0b; font-size: 12px; color: #92400e;
+            border-radius: 4px;
+        }
+        
         .hidden { display: none !important; }
         .text-center { text-align: center; }
         .mt-16 { margin-top: 16px; }
@@ -560,6 +583,48 @@
                 </div>
             </div>
             
+            <!-- 🔁 Блок адреса доставки -->
+            <div class="delivery-section" id="delivery-section" style="display:none">
+                <h3 style="margin-bottom:16px">📦 Адрес доставки</h3>
+                
+                <div class="delivery-option" onclick="selectDelivery('cdek')">
+                    <input type="radio" name="delivery" id="del-cdek" value="cdek">
+                    <label for="del-cdek" style="cursor:pointer;font-weight:500">🇷🇺 СДЭК (Россия)</label>
+                </div>
+                <div class="delivery-fields hidden" id="fields-cdek">
+                    <div class="form-group"><label class="form-label">Город *</label><input type="text" class="form-input" id="cdek-city"></div>
+                    <div class="form-group"><label class="form-label">Улица *</label><input type="text" class="form-input" id="cdek-street"></div>
+                    <div class="form-group"><label class="form-label">Дом *</label><input type="text" class="form-input" id="cdek-house"></div>
+                </div>
+                
+                <div class="delivery-option" onclick="selectDelivery('ua')">
+                    <input type="radio" name="delivery" id="del-ua" value="ua">
+                    <label for="del-ua" style="cursor:pointer;font-weight:500">🇺🇦 UaExpress (Украина)</label>
+                </div>
+                <div class="delivery-fields hidden" id="fields-ua">
+                    <div class="form-group"><label class="form-label">Город *</label><input type="text" class="form-input" id="ua-city"></div>
+                    <div class="form-group"><label class="form-label">Улица *</label><input type="text" class="form-input" id="ua-street"></div>
+                    <div class="form-group"><label class="form-label">Дом *</label><input type="text" class="form-input" id="ua-house"></div>
+                </div>
+                
+                <div class="delivery-option" onclick="selectDelivery('usa')">
+                    <input type="radio" name="delivery" id="del-usa" value="usa">
+                    <label for="del-usa" style="cursor:pointer;font-weight:500">🇺🇸 USmall (США)</label>
+                </div>
+                <div class="delivery-fields hidden" id="fields-usa">
+                    <div class="form-group"><label class="form-label">City *</label><input type="text" class="form-input" id="usa-city"></div>
+                    <div class="form-group"><label class="form-label">Street *</label><input type="text" class="form-input" id="usa-street"></div>
+                    <div class="form-group"><label class="form-label">House/Number *</label><input type="text" class="form-input" id="usa-house"></div>
+                </div>
+                
+                <div class="delivery-warning">
+                    ⚠️ <strong>Внимание:</strong> Если адрес пункта выдачи указан неверно, заказ будет утилизирован без возврата средств. Пожалуйста, указывайте точные и честные адреса ПВЗ.
+                </div>
+                
+                <button class="btn mt-16" onclick="saveDeliveryAddress()">💾 Сохранить адрес</button>
+                <div class="success hidden" id="delivery-success" style="margin-top:12px">✅ Адрес сохранён!</div>
+            </div>
+            
             <h3 class="section-title">Мои заказы</h3>
             <div class="orders-list" id="orders-list">
                 <div class="text-center" style="padding:32px;color:var(--text-dim)">Загрузка заказов...</div>
@@ -656,6 +721,10 @@
                 <button class="setting-btn" onclick="openReviewModal()"><span>⭐ Оставить отзыв</span><span>→</span></button>
                 <button class="setting-btn" onclick="showSizeChart('clothing')"><span>📏 Размерная сетка (одежда)</span><span>→</span></button>
                 <button class="setting-btn" onclick="showSizeChart('footwear')"><span>👟 Размерная сетка (обувь)</span><span>→</span></button>
+                <!-- 🔁 Кнопка выхода -->
+                <button class="setting-btn" onclick="confirmLogout()" style="border-color:var(--error);color:var(--error)">
+                    <span>🚪 Выйти из аккаунта</span><span>→</span>
+                </button>
             </div>
         </section>
 
@@ -850,6 +919,20 @@
     </div>
 </div>
 
+<!-- 🔁 Модальное окно подтверждения выхода -->
+<div class="modal" id="logout-confirm-modal">
+    <div class="modal-content" style="text-align:center">
+        <span class="modal-close" onclick="closeModal('logout-confirm-modal')">&times;</span>
+        <div style="font-size:42px;margin:16px 0">🚪</div>
+        <div class="modal-title">Выйти из аккаунта?</div>
+        <p style="color:var(--text-dim);margin-bottom:24px">Вы уверены, что хотите выйти? Все несохранённые изменения будут потеряны.</p>
+        <div class="btn-group" style="justify-content:center">
+            <button class="btn btn-danger" onclick="doLogout()">Да, выйти</button>
+            <button class="btn btn-outline" onclick="closeModal('logout-confirm-modal')">Отмена</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal" id="avatar-modal">
     <div class="modal-content">
         <span class="modal-close" onclick="closeModal('avatar-modal')">&times;</span>
@@ -1039,9 +1122,11 @@ window.addEventListener('DOMContentLoaded', async () => {
             loadOrders();
             loadChat();
             checkReviewSubmission();
+            renderDeliveryAddress(); // 🔁 Загружаем адрес доставки
         } else {
             user = userData = null;
             resetAuthUI();
+            hide($('delivery-section'));
         }
     });
     loadCartCount();
@@ -1056,7 +1141,15 @@ async function loadUser() {
         const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid));
         userData = snap.exists() ? snap.data() : await createUserDoc();
         renderProfile();
-    } catch(e) { console.error('loadUser:',e); }
+    } catch(e) { 
+        console.error('loadUser:',e);
+        // 🔁 Если ошибка прав доступа — создаём документ
+        if (e.code === 'permission-denied' || e.code === 'missing-permissions') {
+            await createUserDoc();
+            userData = { uid: user.uid, email: user.email, name: user.displayName || user.email.split('@')[0] };
+            renderProfile();
+        }
+    }
 }
 
 async function createUserDoc() {
@@ -1064,9 +1157,12 @@ async function createUserDoc() {
         uid: user.uid, email: user.email, name: user.displayName || user.email.split('@')[0],
         avatar: null, avatarPending: null, registrationDate: serverTimestamp(),
         isBlocked: false, hasVerifiedProduct: false, language: 'ru', theme: 'light',
-        hasSubmittedReview: false
+        hasSubmittedReview: false,
+        // 🔁 Поля для доставки
+        deliveryCountry: null,
+        deliveryAddress: { cdek: null, ua: null, usa: null }
     };
-    await setDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), data);
+    await setDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), data, { merge: true });
     return data;
 }
 
@@ -1080,11 +1176,14 @@ function renderProfile() {
         $('avatar-display').innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;object-fit:cover">`;
     }
     if (userData.hasVerifiedProduct) $('profile-name').innerHTML = `<span class="verified">✓</span> ${userData.name}`;
+    
+    // 🔁 Показываем блок доставки если пользователь авторизован
+    if (user) show($('delivery-section'));
 }
 
 function updateAuthUI() {
     $('auth-btn').textContent = 'Выйти';
-    $('auth-btn').onclick = doLogout;
+    $('auth-btn').onclick = () => openModal('logout-confirm-modal');
     $('user-email').textContent = user.email;
 }
 
@@ -1209,18 +1308,20 @@ window.regStep3 = async () => {
             handleCodeInApp: true // обрабатывать в приложении
         });
         
+        // 🔁 Создаём документ пользователя с полями доставки
         await setDoc(doc(db, 'artifacts/byrmalda-prod/users', cred.user.uid), {
             uid: cred.user.uid, email, name, avatar: null, avatarPending: null,
             registrationDate: serverTimestamp(), isBlocked: false, hasVerifiedProduct: false,
-            language: 'ru', theme: 'light', hasSubmittedReview: false
-        });
+            language: 'ru', theme: 'light', hasSubmittedReview: false,
+            deliveryCountry: null,
+            deliveryAddress: { cdek: null, ua: null, usa: null }
+        }, { merge: true });
+        
         await updateProfile(cred.user, { displayName: name });
         
         $('reg-step-3').classList.add('hidden');
         $('reg-ok').classList.remove('hidden');
         
-        // 🔁 НЕ делаем signOut — пусть пользователь останется авторизованным
-        // Он сможет пользоваться сайтом, но функционал будет ограничен пока не подтвердит почту
     } catch(e) {
         console.error(e.code);
         if (e.code === 'auth/email-already-in-use') $('reg-err').textContent = 'Email уже занят';
@@ -1237,7 +1338,21 @@ function showStep(n) {
     $('reg-title').textContent = ['Регистрация','Подтверждение почты','Завершение'][n-1];
 }
 
-window.doLogout = async () => { await signOut(auth); cart = []; localStorage.removeItem('byrmalda_cart'); loadCartCount(); navigate('home'); };
+// 🔁 Подтверждение выхода
+window.confirmLogout = () => {
+    if (!user) { openModal('login-modal'); return; }
+    openModal('logout-confirm-modal');
+};
+
+// 🔁 Выход из аккаунта
+window.doLogout = async () => { 
+    closeModal('logout-confirm-modal');
+    await signOut(auth); 
+    cart = []; 
+    localStorage.removeItem('byrmalda_cart'); 
+    loadCartCount(); 
+    navigate('home'); 
+};
 
 function showBlock() {
     const m = document.createElement('div'); m.className = 'modal active';
@@ -1259,7 +1374,7 @@ window.navigate = page => {
     if (page === 'cart') renderCart();
     if (page === 'catalog') genCatalog();
     if (page === 'search') $('search-input').value = '';
-    if (page === 'profile' && user) loadOrders();
+    if (page === 'profile' && user) { loadOrders(); renderDeliveryAddress(); }
     if (page === 'reviews') loadPublicReviews();
     if (page === 'admin' && user?.email === ADMIN_EMAIL) loadAdminPanels();
     if (window.innerWidth <= 1024) $('sidebar').classList.remove('expanded');
@@ -2162,20 +2277,122 @@ async function autoUpdateOrders() {
     } catch(e) { console.error('autoUpdate:', e); }
 }
 
+// ==================== 🔁 НОВЫЕ ФУНКЦИИ: АДРЕС ДОСТАВКИ ====================
+
+// 🔹 Выбор варианта доставки
+window.selectDelivery = (country) => {
+    // Снимаем выделение со всех
+    document.querySelectorAll('.delivery-option').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('.delivery-fields').forEach(el => hide(el));
+    
+    // Выделяем выбранный
+    $(`del-${country}`).checked = true;
+    $(`del-${country}`).closest('.delivery-option').classList.add('selected');
+    show($(`fields-${country}`));
+    
+    // Заполняем поля если адрес уже сохранён
+    if (userData?.deliveryAddress?.[country]) {
+        const addr = userData.deliveryAddress[country];
+        if (country === 'cdek') {
+            $('cdek-city').value = addr.city || '';
+            $('cdek-street').value = addr.street || '';
+            $('cdek-house').value = addr.house || '';
+        } else if (country === 'ua') {
+            $('ua-city').value = addr.city || '';
+            $('ua-street').value = addr.street || '';
+            $('ua-house').value = addr.house || '';
+        } else if (country === 'usa') {
+            $('usa-city').value = addr.city || '';
+            $('usa-street').value = addr.street || '';
+            $('usa-house').value = addr.house || '';
+        }
+    }
+};
+
+// 🔹 Загрузка адреса доставки в профиль
+window.renderDeliveryAddress = () => {
+    if (!user || !userData) return;
+    
+    show($('delivery-section'));
+    
+    const country = userData.deliveryCountry;
+    if (country && userData.deliveryAddress?.[country]) {
+        selectDelivery(country);
+    }
+};
+
+// 🔹 Сохранение адреса доставки
+window.saveDeliveryAddress = async () => {
+    if (!user) { alert('❌ Сначала войдите в аккаунт'); return; }
+    
+    const country = document.querySelector('input[name="delivery"]:checked')?.value;
+    if (!country) { alert('❌ Выберите страну доставки'); return; }
+    
+    let city, street, house;
+    if (country === 'cdek') {
+        city = $('cdek-city').value.trim();
+        street = $('cdek-street').value.trim();
+        house = $('cdek-house').value.trim();
+    } else if (country === 'ua') {
+        city = $('ua-city').value.trim();
+        street = $('ua-street').value.trim();
+        house = $('ua-house').value.trim();
+    } else if (country === 'usa') {
+        city = $('usa-city').value.trim();
+        street = $('usa-street').value.trim();
+        house = $('usa-house').value.trim();
+    }
+    
+    if (!city || !street || !house) {
+        alert('❌ Заполните все поля: город, улица, дом');
+        return;
+    }
+    
+    try {
+        // Обновляем данные пользователя
+        await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), {
+            deliveryCountry: country,
+            deliveryAddress: {
+                cdek: country === 'cdek' ? { city, street, house } : (userData?.deliveryAddress?.cdek || null),
+                ua: country === 'ua' ? { city, street, house } : (userData?.deliveryAddress?.ua || null),
+                usa: country === 'usa' ? { city, street, house } : (userData?.deliveryAddress?.usa || null)
+            },
+            updatedAt: serverTimestamp()
+        });
+        
+        // Обновляем локальные данные
+        userData.deliveryCountry = country;
+        if (!userData.deliveryAddress) userData.deliveryAddress = {};
+        userData.deliveryAddress[country] = { city, street, house };
+        
+        // Показываем успех
+        $('delivery-success').classList.remove('hidden');
+        setTimeout(() => $('delivery-success').classList.add('hidden'), 3000);
+        
+        // Обновляем профиль
+        renderProfile();
+        
+    } catch(e) {
+        console.error('saveDeliveryAddress error:', e);
+        alert('❌ Ошибка сохранения: ' + e.message);
+    }
+};
+
 function setupListeners() {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active')); });
 }
 
 Object.assign(window, {
-    navigate, openModal, closeModal, openLogin, switchReg, doLogin, regStep1, regStep2, regStep3, doLogout,
+    navigate, openModal, closeModal, openLogin, switchReg, doLogin, regStep1, regStep2, regStep3, doLogout, confirmLogout,
     openAvatarModal, submitAvatar, filterType, handleSearch, openProd, setGal, galNav, addToCart, updCart, delCart, checkout, confirmCheckout,
     cancelOrder, sendMsg, toggleTheme, toggleLang, openReviewModal, setRating, submitReview, openReport, submitReport, showSizeChart,
     admCreateProduct, admLoadProduct, admSaveProduct, admDeleteProduct, admBlockUser, admUnblockUser, admFindOrder, admSetOrderStatus,
     admApproveReview, admRejectReview, admDeleteReview, admApproveAvatar, admRejectAvatar, admApproveSuggestion, admRejectSuggestion, admEditSuggestion,
-    admMarkReportViewed, openSuggest, submitSuggestion, toggleCollabInput, toggleEditCollabInput
+    admMarkReportViewed, openSuggest, submitSuggestion, toggleCollabInput, toggleEditCollabInput,
+    selectDelivery, saveDeliveryAddress, renderDeliveryAddress
 });
 
-console.log('🚀 BYRMALDA loaded | 🔐 App Check + ✅ Edit product form FULL');
+console.log('🚀 BYRMALDA loaded | 🔐 App Check + ✅ Delivery Address + Logout Confirm');
 </script>
 </body>
 </html>
