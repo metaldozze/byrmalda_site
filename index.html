@@ -452,6 +452,29 @@ cursor: pointer; font-size: 18px; opacity: 0.6; transition: opacity 0.2s;
 .gap-8 { gap: 8px; }
 .gap-12 { gap: 12px; }
 .w-full { width: 100%; }
+
+/* 🔁 СТИЛИ ДЛЯ БАННЕРА */
+.ban-overlay {
+position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+z-index: 9999; display: flex; align-items: center; justify-content: center;
+flex-direction: column; padding: 40px; text-align: center;
+}
+.ban-content {
+max-width: 600px; background: var(--bg); padding: 48px;
+border-radius: var(--radius); box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.ban-icon { font-size: 72px; margin-bottom: 24px; }
+.ban-title {
+font-size: 28px; font-weight: 700; color: var(--error);
+margin-bottom: 16px; text-transform: uppercase; letter-spacing: 2px;
+}
+.ban-text { font-size: 16px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.6; }
+.ban-timer {
+font-size: 32px; font-weight: 700; color: var(--accent);
+font-family: 'Courier New', monospace; margin: 24px 0;
+padding: 16px; background: var(--bg-soft); border-radius: var(--radius);
+}
+.ban-timer-label { font-size: 13px; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
 @media (max-width: 1024px) {
 .sidebar { width: 64px; }
 .sidebar.expanded, .sidebar:hover { width: 220px; }
@@ -515,7 +538,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <section id="home" class="page active">
 <div class="hero">
 <div class="hero-carousel" id="hero-carousel">
-<!-- 🔁 ВСТАВЬТЕ ССЫЛКИ НА ФОТО В МАССИВ heroImages В JS (строки ~850) -->
 <img class="hero-slide active" src="" alt="Show 1">
 <img class="hero-slide" src="" alt="Show 2">
 <img class="hero-slide" src="" alt="Show 3">
@@ -557,7 +579,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 </div>
 </div>
-<!-- 🔁 ДОСТАВКА - ИСПРАВЛЕНО -->
 <div class="delivery-box hidden" id="delivery-box">
 <div class="delivery-info">
 <div class="delivery-provider" id="del-provider">Доставка не указана</div>
@@ -735,7 +756,21 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 <div class="admin-section">
 <h3>👥 Пользователи</h3>
-<div class="flex gap-8"><input type="text" class="admin-input" id="adm-uid" placeholder="UID пользователя" style="flex:1"><button class="btn btn-danger btn-sm" onclick="admBlockUser()">Заблок.</button><button class="btn btn-success btn-sm" onclick="admUnblockUser()">Разблок.</button></div>
+<div class="flex gap-8" style="flex-wrap:wrap;margin-bottom:12px">
+<input type="text" class="admin-input" id="adm-uid" placeholder="UID пользователя" style="flex:1;min-width:200px">
+<button class="btn btn-danger btn-sm" onclick="admBlockUser()">Заблокировать навсегда</button>
+<button class="btn btn-success btn-sm" onclick="admUnblockUser()">Разблокировать</button>
+</div>
+<div class="flex gap-8" style="flex-wrap:wrap;margin-bottom:12px">
+<input type="text" class="admin-input" id="adm-temp-ban-uid" placeholder="UID для временного бана" style="flex:1;min-width:200px">
+<input type="text" class="admin-input" id="adm-temp-ban-time" placeholder="ДД:ЧЧ:ММ:СС" style="width:150px">
+<button class="btn btn-danger btn-sm" onclick="admTempBanUser()">Заблокировать на время</button>
+</div>
+<div class="flex gap-8" style="flex-wrap:wrap">
+<input type="text" class="admin-input" id="adm-unban-after-uid" placeholder="UID для отложенной разблокировки" style="flex:1;min-width:200px">
+<input type="text" class="admin-input" id="adm-unban-after-time" placeholder="ДД:ЧЧ:ММ:СС" style="width:150px">
+<button class="btn btn-success btn-sm" onclick="admUnbanAfterUser()">Разблокировать через</button>
+</div>
 </div>
 <div class="admin-section">
 <h3>📦 Заказы</h3>
@@ -749,6 +784,24 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </section>
 </main>
 </div>
+
+<!-- 🔁 БАННЕР БЛОКИРОВКИ -->
+<div id="ban-overlay" class="ban-overlay hidden">
+<div class="ban-content">
+<div class="ban-icon">🚫</div>
+<div class="ban-title">Аккаунт заблокирован</div>
+<div class="ban-text" id="ban-message">Ваш аккаунт был заблокирован администрацией.</div>
+<div id="ban-timer-section" class="hidden">
+<div class="ban-timer-label">Разблокировка через:</div>
+<div class="ban-timer" id="ban-timer">00:00:00:00</div>
+<div class="ban-text" id="ban-reload-msg" style="display:none;margin-top:16px;color:var(--success);font-weight:600">
+✅ Время истекло! Перезагрузите страницу для разблокировки.
+</div>
+</div>
+<button class="btn btn-danger mt-16" onclick="logoutFromBan()">Выйти из аккаунта</button>
+</div>
+</div>
+
 <!-- MODALS -->
 <div class="modal" id="login-modal">
 <div class="modal-content">
@@ -872,7 +925,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div id="sz-content"></div>
 </div>
 </div>
-<!-- 🔁 Модальное окно выбора доставки -->
 <div class="modal" id="delivery-modal">
 <div class="modal-content">
 <span class="modal-close" onclick="closeModal('delivery-modal')">&times;</span>
@@ -881,7 +933,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <label class="form-label">Служба доставки</label>
 <div class="delivery-option" onclick="selectDelivery('cdek')" style="margin:8px 0;padding:12px;background:var(--bg);border:2px solid transparent;border-radius:8px;cursor:pointer">
 <input type="radio" name="del-opt" id="d-cdek" value="cdek">
-<label for="d-cdek" style="cursor:pointer;margin-left:8px;font-weight:500">🇷🇺 СДЭК (Россия)</label>
+<label for="d-cdek" style="cursor:pointer;margin-left:8px;font-weight:500">🇷 СДЭК (Россия)</label>
 </div>
 <div class="delivery-option" onclick="selectDelivery('ua')" style="margin:8px 0;padding:12px;background:var(--bg);border:2px solid transparent;border-radius:8px;cursor:pointer">
 <input type="radio" name="del-opt" id="d-ua" value="ua">
@@ -889,7 +941,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 <div class="delivery-option" onclick="selectDelivery('usa')" style="margin:8px 0;padding:12px;background:var(--bg);border:2px solid transparent;border-radius:8px;cursor:pointer">
 <input type="radio" name="del-opt" id="d-usa" value="usa">
-<label for="d-usa" style="cursor:pointer;margin-left:8px;font-weight:500">🇺🇸 USmall (США)</label>
+<label for="d-usa" style="cursor:pointer;margin-left:8px;font-weight:500">🇺 USmall (США)</label>
 </div>
 </div>
 <div id="del-fields" class="hidden" style="margin-top:16px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:8px">
@@ -904,7 +956,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut, updateProfile, applyActionCode } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, limit, updateDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, limit, updateDoc, deleteDoc, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check.js";
 
@@ -925,9 +977,8 @@ const auth = getAuth(app), db = getFirestore(app), storage = getStorage(app);
 const IMGBB_KEY = "eeef3479094c5cf6bf42607927565065";
 const ADMIN_EMAIL = "sobakastalina123@gmail.com";
 const RATES = { USD_TO_RUB: 90, USD_TO_UAH: 37 };
-let user = null, userData = null, curProd = null, galIdx = 0, chatUnread = 0, lang = 'ru', theme = localStorage.getItem('theme') || 'light', revStars = 0, carouselIdx = 0, carouselTimer = null;
+let user = null, userData = null, curProd = null, galIdx = 0, chatUnread = 0, lang = 'ru', theme = localStorage.getItem('theme') || 'light', revStars = 0, carouselIdx = 0, carouselTimer = null, banTimerInterval = null;
 
-// 🔁 ВСТАВЬТЕ ССЫЛКИ НА ФОТО ЗДЕСЬ:
 const heroImages = [
   "https://raw.githubusercontent.com/lookup-mrktplce/xcdzxc/main/IMG_20260515_101118.png",
   "https://raw.githubusercontent.com/lookup-mrktplce/xcdzxc/main/IMG_20260515_103613.png",
@@ -941,7 +992,71 @@ const hide = el => el.classList.add('hidden');
 const fmtDate = ts => ts?.toDate?.()?.toLocaleDateString('ru-RU') || '...';
 const genId = () => Math.random().toString(36).substring(2, 10).toUpperCase();
 
-// Carousel Logic
+// 🔁 ФУНКЦИИ ДЛЯ ТАЙМЕРА БАНА
+function parseTimeStr(timeStr) {
+const parts = timeStr.split(':').map(p => parseInt(p) || 0);
+while (parts.length < 4) parts.unshift(0);
+return { days: parts[0], hours: parts[1], minutes: parts[2], seconds: parts[3] };
+}
+function timeToSeconds(timeObj) {
+return timeObj.days * 86400 + timeObj.hours * 3600 + timeObj.minutes * 60 + timeObj.seconds;
+}
+function secondsToTimeStr(totalSeconds) {
+const days = Math.floor(totalSeconds / 86400);
+const hours = Math.floor((totalSeconds % 86400) / 3600);
+const minutes = Math.floor((totalSeconds % 3600) / 60);
+const seconds = totalSeconds % 60;
+return `${String(days).padStart(2,'0')}:${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+}
+function startBanTimer(untilTimestamp) {
+if (banTimerInterval) clearInterval(banTimerInterval);
+const updateTimer = () => {
+const now = Date.now();
+const remaining = Math.max(0, untilTimestamp - now);
+if (remaining === 0) {
+$('ban-timer').textContent = '00:00:00:00';
+$('ban-reload-msg').style.display = 'block';
+if (banTimerInterval) clearInterval(banTimerInterval);
+return;
+}
+const totalSeconds = Math.floor(remaining / 1000);
+$('ban-timer').textContent = secondsToTimeStr(totalSeconds);
+};
+updateTimer();
+banTimerInterval = setInterval(updateTimer, 1000);
+}
+
+// 🔁 ПРОВЕРКА БАНА ПРИ ВХОДЕ
+async function checkAndShowBan() {
+if (!user || !userData) return;
+const isBanned = userData.isBanned || false;
+const banUntil = userData.banUntil || null;
+const banDuration = userData.banDuration || null;
+const banType = userData.banType || 'permanent';
+if (isBanned) {
+show($('ban-overlay'));
+if (banType === 'temporary' && banUntil) {
+$('ban-message').textContent = 'Ваш аккаунт временно заблокирован.';
+show($('ban-timer-section'));
+startBanTimer(banUntil);
+} else if (banType === 'unban-after' && banUntil) {
+$('ban-message').textContent = 'Ваш аккаунт заблокирован. Разблокировка запланирована.';
+show($('ban-timer-section'));
+startBanTimer(banUntil);
+} else {
+$('ban-message').textContent = 'Ваш аккаунт заблокирован администрацией.\nДля разблокировки обратитесь: @fueum';
+hide($('ban-timer-section'));
+}
+$('profile').style.pointerEvents = 'none';
+$('profile').style.opacity = '0.3';
+} else {
+hide($('ban-overlay'));
+$('profile').style.pointerEvents = 'auto';
+$('profile').style.opacity = '1';
+if (banTimerInterval) clearInterval(banTimerInterval);
+}
+}
+
 function initCarousel() {
 const slides = document.querySelectorAll('.hero-slide');
 slides.forEach((s,i) => s.src = heroImages[i % heroImages.length]);
@@ -976,8 +1091,10 @@ user = u; await loadUser(); updateAuthUI();
 if (u.email === ADMIN_EMAIL) { show($('nav-admin')); hide($('nav-suggest')); loadAdminPanels(); }
 else { hide($('nav-admin')); show($('nav-suggest')); }
 loadOrders(); loadChat(); checkReviewStatus(); renderDelivery();
+await checkAndShowBan();
 } else {
-user = userData = null; resetAuthUI(); hide($('delivery-box'));
+user = userData = null; resetAuthUI(); hide($('delivery-box')); hide($('ban-overlay'));
+if (banTimerInterval) clearInterval(banTimerInterval);
 }
 });
 loadCartCount(); genCatalog(); setupListeners(); setInterval(autoUpdateOrders, 300000);
@@ -1000,7 +1117,8 @@ uid: user.uid, email: user.email, name: user.displayName || user.email.split('@'
 avatar: null, avatarPending: null, registrationDate: serverTimestamp(),
 isBlocked: false, hasVerifiedProduct: false, language: 'ru', theme: 'light',
 reviewStatus: 'none', deliveryCountry: null, deliveryAddress: { cdek: null, ua: null, usa: null },
-cart: []
+cart: [],
+isBanned: false, banType: null, banUntil: null, banDuration: null
 };
 await setDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), d, { merge: true });
 return d;
@@ -1055,6 +1173,7 @@ function showStep(n) { [1,2].forEach(i => $(`reg-step-${i}`).classList.add('hidd
 
 window.confirmLogout = () => { if (!user) openModal('login-modal'); else openModal('logout-confirm-modal'); };
 window.doLogout = async () => { closeModal('logout-confirm-modal'); await signOut(auth); userData = null; loadCartCount(); navigate('home'); };
+window.logoutFromBan = async () => { await signOut(auth); hide($('ban-overlay')); userData = null; resetAuthUI(); navigate('home'); };
 function showBlock() {
 const m = document.createElement('div'); m.className = 'modal active';
 m.innerHTML = `<div class="modal-content text-center"><h3 style="margin-bottom:12px">🚫 Аккаунт заблокирован</h3><p style="color:var(--text-dim);margin-bottom:20px">Разблокировка: <a href="https://t.me/fueum" target="_blank" style="color:#0088cc;font-weight:600">@fueum</a></p><button class="btn" onclick="this.closest('.modal').remove()">Понятно</button></div>`;
@@ -1062,13 +1181,14 @@ document.body.appendChild(m); m.onclick = e => { if (e.target === m) m.remove();
 }
 
 window.navigate = page => {
+if (userData?.isBanned && page !== 'profile') { alert('❌ Ваш аккаунт заблокирован'); return; }
 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 $(page).classList.add('active');
 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 const nb = $(`nav-${page}`); if (nb) nb.classList.add('active');
 if (page==='cart') renderCart(); if (page==='catalog') genCatalog();
 if (page==='search') $('search-input').value='';
-if (page==='profile' && user) { loadOrders(); renderDelivery(); }
+if (page==='profile' && user) { loadOrders(); renderDelivery(); checkAndShowBan(); }
 if (page==='reviews') loadPublicReviews();
 if (page==='admin' && user?.email===ADMIN_EMAIL) loadAdminPanels();
 if (window.innerWidth <= 1024) $('sidebar').classList.remove('expanded');
@@ -1077,7 +1197,7 @@ if (page==='support') { chatUnread=0; updateSupportBadge(); loadChat(); }
 window.openModal = id => $(id).classList.add('active'); window.closeModal = id => $(id).classList.remove('active');
 document.querySelectorAll('.modal').forEach(m => m.onclick = e => { if (e.target===m) m.classList.remove('active'); });
 
-// 🛒 КОРЗИНА (Синхронизация с DB)
+// 🛒 КОРЗИНА
 window.addToCart = async () => {
 if (!user) { openModal('login-modal'); return; }
 if (!userData) return;
@@ -1175,11 +1295,10 @@ galIdx=0; updateGal(); navigate('product');
 function updateGal() { if(!curProd)return; const imgs=curProd.images&&curProd.images.length?curProd.images:['https://via.placeholder.com/600/f5f5f5/111?text=BYRMALDA']; $('p-main-img').src=imgs[galIdx]; $('p-thumbs').innerHTML=imgs.map((src,i)=>`<img src="${src}" class="thumb ${i===galIdx?'active':''}" onclick="setGal(${i})">`).join(''); }
 window.setGal=i=>{galIdx=i;updateGal();}; window.galNav=d=>{if(!curProd)return;const len=curProd.images?.length||1;galIdx=(galIdx+d+len)%len;updateGal();};
 
-// 🚀 ОФОРМЛЕНИЕ ЗАКАЗА (Проверка остатков)
+// 🚀 ОФОРМЛЕНИЕ ЗАКАЗА
 window.checkout = async () => {
 if(!user){openModal('login-modal');return;} if(!userData?.cart.length){alert('Корзина пуста');return;}
 if(!userData?.deliveryCountry || !userData?.deliveryAddress?.[userData.deliveryCountry]){ alert('Укажите адрес доставки в профиле'); navigate('profile'); return; }
-// Проверка остатков
 for(const item of userData.cart) {
 const pSnap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', item.pid));
 if(!pSnap.exists()) continue;
@@ -1195,7 +1314,6 @@ closeModal('checkout-modal');
 const oid='ORD-'+genId(), total=parseFloat($('cart-total').textContent.replace('$',''));
 const order={id:oid,userId:user.uid,items:[...userData.cart],total,status:'Ожидает оплату',tracking:'TRK-'+genId(),adminChangedStatus:false,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),deliveryAddress:userData.deliveryAddress[userData.deliveryCountry],deliveryCountry:userData.deliveryCountry};
 await setDoc(doc(db,'artifacts/byrmalda-prod/public/data/orders',oid),order);
-// Списание остатков
 for(const it of order.items) {
 const pSnap=await getDoc(doc(db,'artifacts/byrmalda-prod/public/data/products',it.pid));
 if(pSnap.exists()){
@@ -1259,7 +1377,7 @@ function updateSupportBadge() { $('support-badge').textContent=chatUnread; $('na
 
 // ⚙️ НАСТРОЙКИ & ОТЗЫВЫ
 window.toggleTheme=()=>{theme=theme==='light'?'dark':'light';localStorage.setItem('theme',theme);applyTheme();};
-function applyTheme(){document.documentElement.setAttribute('data-theme',theme);$('theme-ind').textContent=theme==='dark'?'🌙':'☀️';}
+function applyTheme(){document.documentElement.setAttribute('data-theme',theme);$('theme-ind').textContent=theme==='dark'?'🌙':'️';}
 window.toggleLang=()=>{lang=lang==='ru'?'en':'ru';$('cur-lang').textContent=lang.toUpperCase();};
 async function checkReviewStatus(){if(!user)return;userData.reviewStatus='none';}
 window.openReviewModal=()=>{
@@ -1343,8 +1461,29 @@ if(files.length>0){const cur=JSON.parse($('adm-edit-form').dataset.curImgs||'[]'
 await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/products',docId),u); alert('✅ Сохранено'); hide($('adm-edit-form'));
 };
 window.admDeleteProduct=async()=>{const pid=$('adm-delete-id').value.trim();if(!pid)return;if(!confirm('Удалить?'))return;await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/products',pid),{deleted:true,published:false});alert('✅ Удален');$('adm-delete-id').value='';};
-window.admBlockUser=async()=>{const uid=$('adm-uid').value.trim();if(!uid)return;await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{isBlocked:true});alert('✅ Заблокирован');};
-window.admUnblockUser=async()=>{const uid=$('adm-uid').value.trim();if(!uid)return;await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{isBlocked:false});alert('✅ Разблокирован');};
+
+// 🔁 СИСТЕМА БАНОВ
+window.admBlockUser=async()=>{const uid=$('adm-uid').value.trim();if(!uid)return;await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{isBanned:true,banType:'permanent',banUntil:null,banDuration:null});alert('✅ Пользователь заблокирован навсегда');};
+window.admUnblockUser=async()=>{const uid=$('adm-uid').value.trim();if(!uid)return;await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{isBanned:false,banType:null,banUntil:null,banDuration:null});alert('✅ Пользователь разблокирован');};
+window.admTempBanUser=async()=>{
+const uid=$('adm-temp-ban-uid').value.trim();const timeStr=$('adm-temp-ban-time').value.trim();
+if(!uid||!timeStr){alert('Введите UID и время');return;}
+const timeObj=parseTimeStr(timeStr);const totalSeconds=timeToSeconds(timeObj);
+if(totalSeconds<=0){alert('Неверное время');return;}
+const banUntil=Date.now()+totalSeconds*1000;
+await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{isBanned:true,banType:'temporary',banUntil,banDuration:timeStr});
+alert(`✅ Пользователь заблокирован на ${timeStr}`);
+};
+window.admUnbanAfterUser=async()=>{
+const uid=$('adm-unban-after-uid').value.trim();const timeStr=$('adm-unban-after-time').value.trim();
+if(!uid||!timeStr){alert('Введите UID и время');return;}
+const timeObj=parseTimeStr(timeStr);const totalSeconds=timeToSeconds(timeObj);
+if(totalSeconds<=0){alert('Неверное время');return;}
+const banUntil=Date.now()+totalSeconds*1000;
+await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{isBanned:true,banType:'unban-after',banUntil,banDuration:timeStr});
+alert(`✅ Разблокировка запланирована через ${timeStr}`);
+};
+
 window.admFindOrder=async()=>{
 const oid=$('adm-oid').value.trim();if(!oid)return;
 let snap=await getDoc(doc(db,'artifacts/byrmalda-prod/public/data/orders',oid));
@@ -1376,11 +1515,11 @@ async function loadPendingAvatars(){
 const c=$('adm-avatars-mod');c.innerHTML='<div class="text-center"><div class="loading"></div></div>';
 if(user?.email!==ADMIN_EMAIL){c.innerHTML='Доступ только для администратора';return;}
 const snap=await getDocs(query(collection(db,'artifacts/byrmalda-prod/users'),where('avatarStatus','==','pending')));
-c.innerHTML=snap.docs.map(d=>{const u=d.data();return `<div class="mod-item flex items-center gap-12"><img src="${u.avatarPending}" style="width:56px;height:56px;border-radius:50%;object-fit:cover"><div style="flex:1"><div style="font-weight:500">${u.name}</div><div style="font-size:11px;color:var(--text-dim)">${u.uid}</div></div><div class="actions"><button class="btn btn-success btn-sm" onclick="admApproveAvatar('${u.uid}','${u.avatarPending}')">Одобрить</button><button class="btn btn-danger btn-sm" onclick="admRejectAvatar('${u.uid}')">Отклонить</button></div></div>`;}).join('')||'Нет заявок';
+c.innerHTML=snap.docs.map(d=>{const u=d.data();return `<div class="mod-item flex items-center gap-12"><img src="${u.avatarPending}" style="width:120px;height:120px;border-radius:8px;object-fit:cover"><div style="flex:1"><div style="font-weight:500">${u.name}</div><div style="font-size:11px;color:var(--text-dim)">${u.uid}</div></div><div class="actions"><button class="btn btn-success btn-sm" onclick="admApproveAvatar('${u.uid}','${u.avatarPending}')">Одобрить</button><button class="btn btn-danger btn-sm" onclick="admRejectAvatar('${u.uid}')">Отклонить</button></div></div>`;}).join('')||'Нет заявок';
 }
 window.admApproveAvatar=async(uid,url)=>{await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{avatar:url,avatarPending:null,avatarStatus:'approved'});loadPendingAvatars();};
 window.admRejectAvatar=async uid=>{await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{avatarPending:null,avatarStatus:'rejected'});loadPendingAvatars();};
-window.submitAvatar=async()=>{const file=$('av-file').files[0];if(!file){alert('Выберите файл');return;}const fd=new FormData();fd.append('image',file);fd.append('key',IMGBB_KEY);const res=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd});const d=await res.json();if(!d.success)throw new Error('ImgBB error');await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid),{avatarPending:d.data.url,avatarStatus:'pending',avatarSubmittedAt:serverTimestamp()});alert('✅ Отправлено');closeModal('avatar-modal');loadPendingAvatars();};
+window.submitAvatar=async()=>{const file=$('av-file').files[0];if(!file){alert('Выберите файл');return;}const fd=new FormData();fd.append('image',file);fd.append('key',IMGBB_KEY);const res=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd});const d=await res.json();if(!d.success)throw new Error('ImgBB error');await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid),{avatarPending:d.data.url,avatarStatus:'pending',avatarSubmittedAt:serverTimestamp()});alert('✅ Отправлено на модерацию');closeModal('avatar-modal');loadPendingAvatars();};
 
 async function loadPendingSuggestions(){
 const c=$('adm-suggestions');c.innerHTML='<div class="text-center"><div class="loading"></div></div>';
@@ -1410,8 +1549,8 @@ if(user?.email!==ADMIN_EMAIL)return;try{const now=Date.now();const created=await
 }
 function setupListeners(){document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active'));});}
 
-Object.assign(window, {navigate, openModal, closeModal, openLogin, switchReg, doLogin, regStep1, regStep2, openAvatarModal, submitAvatar, filterType, handleSearch, openProd, setGal, galNav, addToCart, updCart, delCart, checkout, confirmCheckout, cancelOrder, sendMsg, toggleTheme, toggleLang, openReviewModal, setRating, submitReview, openReport, submitReport, showSizeChart, admCreateProduct, admLoadProduct, admSaveProduct, admDeleteProduct, admBlockUser, admUnblockUser, admFindOrder, admSetOrderStatus, admApproveReview, admRejectReview, admDeleteReview, admApproveAvatar, admRejectAvatar, admApproveSuggestion, admRejectSuggestion, openSuggest, submitSuggestion, toggleCollabInput, toggleEditCollabInput, openDeliveryModal, selectDelivery, saveDelivery, carouselNav, confirmLogout, doLogout});
-console.log('🚀 BYRMALDA loaded. Все системы работают.');
+Object.assign(window, {navigate, openModal, closeModal, openLogin, switchReg, doLogin, regStep1, regStep2, openAvatarModal, submitAvatar, filterType, handleSearch, openProd, setGal, galNav, addToCart, updCart, delCart, checkout, confirmCheckout, cancelOrder, sendMsg, toggleTheme, toggleLang, openReviewModal, setRating, submitReview, openReport, submitReport, showSizeChart, admCreateProduct, admLoadProduct, admSaveProduct, admDeleteProduct, admBlockUser, admUnblockUser, admTempBanUser, admUnbanAfterUser, admFindOrder, admSetOrderStatus, admApproveReview, admRejectReview, admDeleteReview, admApproveAvatar, admRejectAvatar, admApproveSuggestion, admRejectSuggestion, openSuggest, submitSuggestion, toggleCollabInput, toggleEditCollabInput, openDeliveryModal, selectDelivery, saveDelivery, carouselNav, confirmLogout, doLogout, logoutFromBan});
+console.log('🚀 BYRMALDA loaded. Бан система активна.');
 </script>
 </body>
 </html>
