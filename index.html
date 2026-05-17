@@ -1945,20 +1945,37 @@ await addDoc(collection(db,'artifacts/byrmalda-prod/public/data/reviews'),{uid:u
 userData.reviewStatus='pending'; await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid),{reviewStatus:'pending'});
 alert('✅ Отзыв отправлен на модерацию'); closeModal('review-modal'); $('rev-text').value=''; revStars=0;
 };
-window.openReport=()=>{openModal('report-modal');};
-window.submitReport=async()=>{const t=$('rep-text').value.trim();if(!t)return;await addDoc(collection(db,'artifacts/byrmalda-prod/public/data/reports'),{uid:user.uid,name:userData?.name||'Пользователь',text:t,ts:serverTimestamp(),status:'new'});alert('✅ Жалоба отправлена');closeModal('report-modal');$('rep-text').value='';};
+window.openReport=()=>{
+    if(!user){ openModal('login-modal'); return; } // Защита: просим войти
+    openModal('report-modal');
+};
+window.submitReport=async()=>{
+    if(!user){ alert('Войдите в аккаунт'); return; } // Дополнительная защита
+    const t=$('rep-text').value.trim();
+    if(!t)return;
+    await addDoc(collection(db,'artifacts/byrmalda-prod/public/data/reports'),{
+        uid:user.uid,
+        name:userData?.name||'Пользователь',
+        text:t,
+        ts:serverTimestamp(),
+        status:'new'
+    });
+    alert('✅ Жалоба отправлена');
+    closeModal('report-modal');
+    $('rep-text').value='';
+};
 window.showSizeChart=type=>{
-const c=$('sz-content');
-if(type==='clothing'){$('sz-title').textContent='Размерная сетка одежды';c.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="border-bottom:1px solid var(--border)"><th style="padding:10px;text-align:left">RU</th><th>Грудь</th><th>Талия</th><th>Бёдра</th></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">XS</td><td>81-86</td><td>66-71</td><td>86-91</td></tr><tr style="border-bottom:1px solid var(--border)"><td>S</td><td>86-91</td><td>71-76</td><td>91-96</td></tr><tr style="border-bottom:1px solid var(--border)"><td>M</td><td>91-96</td><td>76-81</td><td>96-101</td></tr><tr style="border-bottom:1px solid var(--border)"><td>L</td><td>96-101</td><td>81-86</td><td>101-106</td></tr><tr><td>XL</td><td>101-106</td><td>86-91</td><td>106-111</td></tr></table>`;}
-else{
-$('sz-title').textContent='Размерная сетка обуви';
-c.innerHTML=`
+    const c=$('sz-content');
+    if(type==='clothing'){
+        $('sz-title').textContent='Размерная сетка одежды';
+        c.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="border-bottom:1px solid var(--border)"><th style="padding:10px;text-align:left">RU</th><th>Грудь</th><th>Талия</th><th>Бёдра</th></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">XS</td><td>81-86</td><td>66-71</td><td>86-91</td></tr><tr style="border-bottom:1px solid var(--border)"><td>S</td><td>86-91</td><td>71-76</td><td>91-96</td></tr><tr style="border-bottom:1px solid var(--border)"><td>M</td><td>91-96</td><td>76-81</td><td>96-101</td></tr><tr style="border-bottom:1px solid var(--border)"><td>L</td><td>96-101</td><td>81-86</td><td>101-106</td></tr><tr><td>XL</td><td>101-106</td><td>86-91</td><td>106-111</td></tr></table>`;
+    }
+    else{
+        $('sz-title').textContent='Размерная сетка обуви';
+        c.innerHTML=`
 <table style="width:100%;border-collapse:collapse;font-size:13px">
   <tr style="border-bottom:1px solid var(--border)">
-    <th style="padding:10px;text-align:left">RU</th>
-    <th>EU</th>
-    <th>US</th>
-    <th>Стопа (см)</th>
+    <th style="padding:10px;text-align:left">RU</th><th>EU</th><th>US</th><th>Стопа (см)</th>
   </tr>
   <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">36</td><td>36</td><td>5.5</td><td>23</td></tr>
   <tr style="border-bottom:1px solid var(--border)"><td>37</td><td>37</td><td>6.5</td><td>23.5</td></tr>
@@ -1972,7 +1989,8 @@ c.innerHTML=`
   <tr style="border-bottom:1px solid var(--border)"><td>45</td><td>45</td><td>14</td><td>28.5</td></tr>
   <tr><td>46</td><td>46</td><td>15</td><td>29</td></tr>
 </table>`;
-}
+    }
+    openModal('sizechart-modal'); // ⚠️ Эта строка была пропущена, добавь её обязательно!
 };
 // 🚚 ДОСТАВКА
 window.renderDelivery=()=>{
