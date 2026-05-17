@@ -1472,7 +1472,7 @@ renderCart(); loadCartCount();
 
 // 🔍 КАТАЛОГ & ПОИСК
 function genCatalog() {
-const cats = [{id:'tshirts',n:'Футболки',ic:'👕',t:'футболка'},{id:'hoodies',n:'Толстовки',ic:'🧥',t:'толстовка'},{id:'sneakers',n:'Кроссовки',ic:'👟',t:'кроссовки'},{id:'acc',n:'Аксессуары',ic:'🎒',t:'аксессуар'},{id:'pants',n:'Штаны',ic:'👖',t:'штаны'},{id:'shorts',n:'Шорты',ic:'🩳',t:'шорты'},{id:'jackets',n:'Куртки',ic:'🧥',t:'куртка'},{id:'archive',n:'Архив',ic:'📁',t:'archive'}];
+const cats = [{id:'tshirts',n:'Футболки',ic:'👕',t:'футболка'},{id:'hoodies',n:'Толстовки',ic:'🧥',t:'толстовка'},{id:'longsleeve',n:'Лонгсливы',ic:'',t:'лонгслив'},{id:'sneakers',n:'Кроссовки',ic:'👟',t:'кроссовки'},{id:'acc',n:'Аксессуары',ic:'🎒',t:'аксессуар'},{id:'pants',n:'Штаны',ic:'👖',t:'штаны'},{id:'shorts',n:'Шорты',ic:'🩳',t:'шорты'},{id:'jackets',n:'Куртки',ic:'🧥',t:'куртка'},{id:'archive',n:'Архив',ic:'📁',t:'archive'}];
 $('catalog-grid').innerHTML = cats.map(c => `<div class="cat-card" onclick="filterType('${c.t}')"><div class="card-img">${c.ic}</div><div class="card-body"><div class="card-title">${c.n}</div></div></div>`).join('');
 }
 window.filterType = async type => { navigate('search'); $('search-input').value=type; await searchProds(type); };
