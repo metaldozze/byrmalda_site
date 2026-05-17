@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -201,31 +201,29 @@ font-size: 22px; margin-bottom: 4px; display: flex; align-items: center; gap: 8p
 .verified { color: var(--success); font-size: 16px; }
 .profile-meta { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
 .profile-meta div { margin: 2px 0; }
-.creator-name { font-weight: 600; }
-.creator-lvl1 { color: #3b82f6; }
-.creator-lvl2 { color: #f59e0b; }
-.creator-lvl3 { color: #22c55e; }
-.creator-lvl4 { color: #ef4444; }
-.creator-lvl5 { 
-  background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #ff0080);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientShift 3s ease infinite;
+/* 🔁 ДОСТАВКА - СРАЗУ ПОД ПРОФИЛЕМ */
+.delivery-section {
+background: var(--bg-soft); border-radius: var(--radius); padding: 20px; margin: 0 0 24px;
+border: 1px solid var(--border);
 }
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.delivery-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+.delivery-option {
+display: flex; align-items: center; gap: 12px; margin: 12px 0; padding: 12px;
+background: var(--bg); border-radius: 8px; cursor: pointer;
+border: 2px solid transparent; transition: border-color 0.2s;
 }
-.delivery-box {
-background: var(--bg-soft); border-radius: var(--radius); padding: 16px; 
-margin: 0 0 24px; border: 1px solid var(--border);
-display: flex; justify-content: space-between; align-items: center;
+.delivery-option:hover { border-color: var(--accent); }
+.delivery-option.selected { border-color: var(--accent); background: var(--bg-soft); }
+.delivery-option input { width: 18px; height: 18px; cursor: pointer; }
+.delivery-fields {
+margin-top: 16px; padding: 16px; background: var(--bg);
+border-radius: 8px; border: 1px solid var(--border);
 }
-.delivery-info { display: flex; flex-direction: column; gap: 4px; }
-.delivery-provider { font-weight: 600; font-size: 14px; text-transform: uppercase; }
-.delivery-addr { font-size: 12px; color: var(--text-dim); }
+.delivery-warning {
+margin-top: 16px; padding: 12px; background: #fef3c7;
+border-left: 4px solid #f59e0b; font-size: 12px; color: #92400e;
+border-radius: 4px;
+}
 .section-title {
 font-size: 18px; font-weight: 500; margin: 28px 0 18px;
 padding-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -329,6 +327,7 @@ padding: 10px; background: var(--bg); border: 1px solid var(--border);
 border-radius: 4px; font-weight: 500; min-height: 40px; display: flex; align-items: center;
 }
 .desc { margin: 24px 0; line-height: 1.7; font-size: 14px; color: var(--text-dim); }
+/* 🔁 ПРЕДУПРЕЖДЕНИЕ О ТОВАРЕ ОТ ПОЛЬЗОВАТЕЛЯ */
 .user-product-warning {
 background: #fef3c7; color: #92400e; padding: 12px; border-radius: var(--radius);
 margin: 16px 0; font-size: 13px; border-left: 4px solid #f59e0b;
@@ -337,10 +336,29 @@ margin: 16px 0; font-size: 13px; border-left: 4px solid #f59e0b;
 background: #dbeafe; color: #1e40af; padding: 8px; border-radius: 4px;
 margin-top: 8px; font-size: 12px; font-style: italic;
 }
+/* 🔁 СКИДКА ДЛЯ КРЕАТОРА 5 УРОВНЯ */
 .creator-discount {
 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 color: white; padding: 8px 16px; border-radius: 20px;
 font-size: 12px; font-weight: 600; display: inline-block; margin: 8px 0;
+}
+/* 🔁 СТИЛЬ ДЛЯ НИКА КРЕАТОРА */
+.creator-name { font-weight: 600; }
+.creator-lvl1 { color: #3b82f6; }
+.creator-lvl2 { color: #f59e0b; }
+.creator-lvl3 { color: #22c55e; }
+.creator-lvl4 { color: #ef4444; }
+.creator-lvl5 { 
+  background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #ff0080);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 3s ease infinite;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 .catalog-grid, .results-grid {
 display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -539,8 +557,6 @@ padding: 16px; background: var(--bg-soft); border-radius: var(--radius);
 .sidebar.expanded + .main { margin-left: 220px; }
 }
 @media (max-width: 768px) {
-.hero { flex-direction: column; }
-.hero-carousel { width: 100%; height: 400px; }
 .sidebar {
 width: 100%; height: auto; position: relative; flex-direction: row;
 padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border);
@@ -624,9 +640,8 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </section>
 <section id="profile" class="page">
 <div class="profile-header">
-<div class="avatar-wrap" id="avatar-wrap">
+<div class="avatar-wrap" onclick="openAvatarModal()">
 <div class="avatar" id="avatar-display">👤</div>
-<div class="avatar-edit-btn" onclick="openAvatarModal()" title="Изменить аватарку">✏️</div>
 </div>
 <div class="profile-info">
 <h2 id="profile-name">Гость</h2>
@@ -634,16 +649,46 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div>ID: <span id="profile-id">-</span></div>
 <div>Дата: <span id="profile-date">-</span></div>
 <div>Почта: <span id="profile-email">-</span></div>
+<!-- 🔁 ЛИМИТ ПРЕДЛОЖЕНИЙ В ПРОФИЛЕ -->
 <div id="creator-limit-display" class="hidden" style="margin-top:8px;font-size:12px;color:var(--text-dim)"></div>
 </div>
 </div>
 </div>
-<div class="delivery-box hidden" id="delivery-box">
-<div class="delivery-info">
-<div class="delivery-provider" id="del-provider">Доставка не указана</div>
-<div class="delivery-addr" id="del-addr"></div>
+<!-- 🔁 ДОСТАВКА - СРАЗУ ПОД ПРОФИЛЕМ -->
+<div class="delivery-section" id="delivery-section" style="display:none">
+<div class="delivery-title">📦 Адрес доставки</div>
+<div class="delivery-option" onclick="selectDelivery('cdek')">
+<input type="radio" name="delivery" id="del-cdek" value="cdek">
+<label for="del-cdek" style="cursor:pointer;font-weight:500">🇷🇺 СДЭК (Россия)</label>
 </div>
-<button class="btn btn-sm" style="width:auto" onclick="openDeliveryModal()">Изменить</button>
+<div class="delivery-fields hidden" id="fields-cdek">
+<div class="form-group"><label class="form-label">Город *</label><input type="text" class="form-input" id="cdek-city"></div>
+<div class="form-group"><label class="form-label">Улица *</label><input type="text" class="form-input" id="cdek-street"></div>
+<div class="form-group"><label class="form-label">Дом *</label><input type="text" class="form-input" id="cdek-house"></div>
+</div>
+<div class="delivery-option" onclick="selectDelivery('ua')">
+<input type="radio" name="delivery" id="del-ua" value="ua">
+<label for="del-ua" style="cursor:pointer;font-weight:500">🇺🇦 UaExpress (Украина)</label>
+</div>
+<div class="delivery-fields hidden" id="fields-ua">
+<div class="form-group"><label class="form-label">Город *</label><input type="text" class="form-input" id="ua-city"></div>
+<div class="form-group"><label class="form-label">Улица *</label><input type="text" class="form-input" id="ua-street"></div>
+<div class="form-group"><label class="form-label">Дом *</label><input type="text" class="form-input" id="ua-house"></div>
+</div>
+<div class="delivery-option" onclick="selectDelivery('usa')">
+<input type="radio" name="delivery" id="del-usa" value="usa">
+<label for="del-usa" style="cursor:pointer;font-weight:500">🇺🇸 USmall (США)</label>
+</div>
+<div class="delivery-fields hidden" id="fields-usa">
+<div class="form-group"><label class="form-label">City *</label><input type="text" class="form-input" id="usa-city"></div>
+<div class="form-group"><label class="form-label">Street *</label><input type="text" class="form-input" id="usa-street"></div>
+<div class="form-group"><label class="form-label">House/Number *</label><input type="text" class="form-input" id="usa-house"></div>
+</div>
+<div class="delivery-warning">
+⚠️ <strong>Внимание:</strong> Если адрес пункта выдачи указан неверно, заказ будет утилизирован без возврата средств. Пожалуйста, указывайте точные и честные адреса ПВЗ.
+</div>
+<button class="btn mt-16" onclick="saveDeliveryAddress()">💾 Сохранить адрес</button>
+<div class="success hidden" id="delivery-success" style="margin-top:12px">✅ Адрес сохранён!</div>
 </div>
 <h3 class="section-title">Мои заказы</h3>
 <div class="orders-list" id="orders-list">
@@ -674,12 +719,14 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div class="p-info">
 <div class="product-id" id="p-id">ID: -</div>
 <h1 id="p-name">Название</h1>
+<!-- 🔁 ПРЕДУПРЕЖДЕНИЕ О ТОВАРЕ ОТ ПОЛЬЗОВАТЕЛЯ -->
 <div id="p-user-warning" class="user-product-warning hidden"></div>
 <div class="specs" id="p-specs"></div>
 <div class="desc" id="p-desc"></div>
 <div class="price-box">
 <div class="price-usd" id="p-price-usd">$0.00</div>
 <div class="price-conv" id="p-price-conv">≈ 0 ₽ / ≈ 0 ₴</div>
+<!-- 🔁 СКИДКА ДЛЯ КРЕАТОРА 5 УРОВНЯ -->
 <div id="p-creator-discount" class="creator-discount hidden"></div>
 <div class="stock" id="p-stock"></div>
 <div id="p-deleted-notice" class="deleted-notice hidden">Товар удален</div>
@@ -737,8 +784,11 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <button class="setting-btn" onclick="openReviewModal()"><span>⭐ Оставить отзыв</span><span>→</span></button>
 <button class="setting-btn" onclick="showSizeChart('clothing')"><span>📏 Размерная сетка (одежда)</span><span>→</span></button>
 <button class="setting-btn" onclick="showSizeChart('footwear')"><span>👟 Размерная сетка (обувь)</span><span>→</span></button>
+<!-- 🔁 Кнопка смены аватарки через Настройки -->
 <button class="setting-btn" onclick="openAvatarSettingsModal()"><span>🖼️ Сменить аватарку</span><span>→</span></button>
+<!-- 🔁 Кнопка "Креаторство" -->
 <button class="setting-btn" onclick="openCreatorInfoModal()"><span>🎨 Креаторство</span><span>→</span></button>
+<!-- 🔁 Кнопка выхода -->
 <button class="setting-btn" onclick="confirmLogout()" style="border-color:var(--error);color:var(--error)">
 <span>🚪 Выйти из аккаунта</span><span>→</span>
 </button>
@@ -786,7 +836,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div class="admin-section">
 <h3>✏️ Редактировать товар</h3>
 <div class="flex gap-8" style="margin-bottom:16px">
-<input type="text" class="admin-input" id="adm-edit-id" placeholder="Введите ID товара" style="flex:1">
+<input type="text" class="admin-input" id="adm-edit-id" placeholder="Введите ID товара (Document ID или productId)" style="flex:1">
 <button class="btn btn-sm" onclick="admLoadProduct()">Загрузить</button>
 </div>
 <div id="adm-edit-form" class="hidden">
@@ -844,6 +894,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div class="admin-section"><h3>🖼️ Аватарки на модерации</h3><div id="adm-avatars-mod"></div></div>
 <div class="admin-section"><h3>✨ Предложения</h3><div id="adm-suggestions"></div></div>
 <div class="admin-section"><h3>🚨 Жалобы</h3><div id="adm-reports"></div></div>
+<!-- 🔁 НОВАЯ СЕКЦИЯ: ТЕХНИЧЕСКИЙ ПЕРЕРЫВ -->
 <div class="admin-section">
 <h3>⚙️ Технический перерыв</h3>
 <div class="flex gap-8" style="flex-wrap:wrap;margin-bottom:12px">
@@ -875,6 +926,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </main>
 </div>
 
+<!-- 🔁 БАННЕР ТЕХНИЧЕСКОГО ПЕРЕРЫВА -->
 <div id="maintenance-overlay" class="maintenance-overlay hidden">
 <div class="maintenance-content">
 <div class="maintenance-icon">🔧</div>
@@ -884,6 +936,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 </div>
 
+<!-- 🔁 БАННЕР БЛОКИРОВКИ -->
 <div id="ban-overlay" class="ban-overlay hidden">
 <div class="ban-content">
 <div class="ban-icon">🚫</div>
@@ -900,6 +953,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 </div>
 
+<!-- 🔁 МОДАЛЬНОЕ ОКНО: СИСТЕМА КРЕАТОРСТВА -->
 <div class="modal" id="creator-info-modal">
 <div class="modal-content wide">
 <span class="modal-close" onclick="closeModal('creator-info-modal')">&times;</span>
@@ -931,6 +985,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 </div>
 
+<!-- MODALS -->
 <div class="modal" id="login-modal">
 <div class="modal-content">
 <span class="modal-close" onclick="closeModal('login-modal')">&times;</span>
@@ -950,12 +1005,10 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" id="reg-email"></div>
 <button class="btn" onclick="regStep1()">Далее</button>
 </div>
-<div id="reg-step-2" class="hidden text-center">
-<div style="font-size:42px;margin:16px 0">✉️</div>
-<div style="font-size:16px;margin-bottom:16px">Подтверждение отправлено</div>
-<div style="font-size:13px;color:var(--text-dim);margin-bottom:24px">
-Перейдите по ссылке в письме, затем нажмите кнопку ниже.<br>
-<small>Проверьте папку "Спам"</small>
+<div id="reg-step-2" class="hidden">
+<div class="success">✉️ Письмо с подтверждением отправлено на вашу почту</div>
+<div style="margin:16px 0;font-size:13px;color:var(--text-dim)">
+Проверьте email (включая спам) и перейдите по ссылке для подтверждения аккаунта.
 </div>
 <button class="btn" onclick="regStep2()">Я подтвердил(а) почту</button>
 </div>
@@ -978,7 +1031,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <span class="modal-close" onclick="closeModal('logout-confirm-modal')">&times;</span>
 <div style="font-size:42px;margin:16px 0">🚪</div>
 <div class="modal-title">Выйти из аккаунта?</div>
-<p style="color:var(--text-dim);margin-bottom:24px">Все несохранённые изменения будут потеряны.</p>
+<p style="color:var(--text-dim);margin-bottom:24px">Вы уверены, что хотите выйти? Все несохранённые изменения будут потеряны.</p>
 <div class="btn-group" style="justify-content:center">
 <button class="btn btn-danger" onclick="doLogout()">Да, выйти</button>
 <button class="btn btn-outline" onclick="closeModal('logout-confirm-modal')">Отмена</button>
@@ -990,7 +1043,9 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <span class="modal-close" onclick="closeModal('avatar-modal')">&times;</span>
 <div class="modal-title">Новая аватарка</div>
 <div class="form-group"><label class="form-label">Выберите изображение</label><input type="file" class="form-input" id="av-file" accept="image/*"></div>
-<div style="font-size:12px;color:var(--text-dim);margin:12px 0">Аватарка отправится на модерацию.</div>
+<div style="font-size:12px;color:var(--text-dim);margin:12px 0">
+Аватарка отправится на модерацию. После одобрения администратором она появится в профиле.
+</div>
 <button class="btn" onclick="submitAvatar()">Отправить</button>
 </div>
 </div>
@@ -1050,7 +1105,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 <div class="form-group"><label class="form-label">Текст *</label><textarea class="form-textarea" id="rev-text"></textarea></div>
 <button class="btn" onclick="submitReview()">Отправить</button>
-<div class="error" id="rev-err"></div>
+<div class="success hidden" id="rev-ok">Спасибо! Отзыв отправлен на модерацию.</div>
 </div>
 </div>
 <div class="modal" id="report-modal">
@@ -1059,6 +1114,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div class="modal-title">Пожаловаться</div>
 <div class="form-group"><label class="form-label">Описание проблемы *</label><textarea class="form-textarea" id="rep-text"></textarea></div>
 <button class="btn" onclick="submitReport()">Отправить</button>
+<div class="success hidden" id="rep-ok">Жалоба отправлена. Администратор рассмотрит её.</div>
 </div>
 </div>
 <div class="modal" id="checkout-modal">
@@ -1068,7 +1124,9 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div style="margin:18px 0;line-height:1.7">
 <p>Для оплаты напишите админу в телеграм:</p>
 <a href="https://t.me/fueum" target="_blank" style="font-size:18px;font-weight:600;color:#0088cc;text-decoration:none">@fueum</a>
-<p style="font-size:13px;color:var(--text-dim);margin-top:14px">После оплаты заказ появится в профиле.</p>
+<p style="font-size:13px;color:var(--text-dim);margin-top:14px">
+После подтверждения оплаты заказ появится в профиле со статусом «Ожидает оплату».
+</p>
 </div>
 <button class="btn" onclick="confirmCheckout()">Понятно</button>
 </div>
@@ -1080,34 +1138,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div id="sz-content"></div>
 </div>
 </div>
-<div class="modal" id="delivery-modal">
-<div class="modal-content">
-<span class="modal-close" onclick="closeModal('delivery-modal')">&times;</span>
-<div class="modal-title">Выбор доставки</div>
-<div class="form-group">
-<label class="form-label">Служба доставки</label>
-<div class="delivery-option" onclick="selectDelivery('cdek')" style="margin:8px 0;padding:12px;background:var(--bg);border:2px solid transparent;border-radius:8px;cursor:pointer">
-<input type="radio" name="del-opt" id="d-cdek" value="cdek">
-<label for="d-cdek" style="cursor:pointer;margin-left:8px;font-weight:500">🇷 СДЭК (Россия)</label>
-</div>
-<div class="delivery-option" onclick="selectDelivery('ua')" style="margin:8px 0;padding:12px;background:var(--bg);border:2px solid transparent;border-radius:8px;cursor:pointer">
-<input type="radio" name="del-opt" id="d-ua" value="ua">
-<label for="d-ua" style="cursor:pointer;margin-left:8px;font-weight:500">🇺🇦 UaExpress (Украина)</label>
-</div>
-<div class="delivery-option" onclick="selectDelivery('usa')" style="margin:8px 0;padding:12px;background:var(--bg);border:2px solid transparent;border-radius:8px;cursor:pointer">
-<input type="radio" name="del-opt" id="d-usa" value="usa">
-<label for="d-usa" style="cursor:pointer;margin-left:8px;font-weight:500">🇺 USmall (США)</label>
-</div>
-</div>
-<div id="del-fields" class="hidden" style="margin-top:16px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:8px">
-<div class="form-group"><label class="form-label">Город *</label><input type="text" class="form-input" id="del-city"></div>
-<div class="form-group"><label class="form-label">Улица *</label><input type="text" class="form-input" id="del-street"></div>
-<div class="form-group"><label class="form-label">Дом / Номер ПВЗ *</label><input type="text" class="form-input" id="del-house"></div>
-<button class="btn" onclick="saveDelivery()">💾 Сохранить и закрыть</button>
-<div class="delivery-warning" style="margin-top:12px">⚠️ Указывайте точный адрес. При ошибке заказ утилизируется без возврата.</div>
-</div>
-</div>
-</div>
 
 <script type="module">
 // 🔐 Firebase imports
@@ -1115,7 +1145,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebas
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut, updateProfile, applyActionCode } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, limit, updateDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
-// 🔐 App Check (закомментируйте для отладки если есть ошибки 400)
+// 🔐 App Check import (закомментирован для отладки)
 // import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check.js";
 
 const firebaseConfig = {
@@ -1129,17 +1159,13 @@ measurementId: "G-HCQEFD2SJF"
 };
 
 const app = initializeApp(firebaseConfig);
-
 // 🔐 App Check - ЗАКОММЕНТИРОВАНО ДЛЯ ОТЛАДКИ
-// Раскомментируйте после настройки reCAPTCHA в Firebase Console
 /*
 const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider("6LchEOwsAAAAAPqAkyDyf2wFoucWytU6ThkQKoGB"),
   isTokenAutoRefreshEnabled: true
 });
-getToken(appCheck, true)
-  .then(() => console.log('🔐 App Check: активирован'))
-  .catch(err => console.error('🔐 App Check ошибка:', err.message));
+getToken(appCheck, true).then(() => console.log('🔐 App Check: активирован')).catch(err => console.error('🔐 App Check ошибка:', err.message));
 */
 
 const auth = getAuth(app);
@@ -1418,27 +1444,28 @@ loadPendingAvatars();
 window.openAvatarModal = () => { if (!user) openModal('login-modal'); else openModal('avatar-modal'); };
 window.submitAvatar = async () => {
 const file = $('av-file').files[0];
-if (!file) { alert('Выберите файл'); return; }
-if (file.size > 5*1024*1024) { alert('Макс. 5МБ'); return; }
-try {
-const fd = new FormData(); fd.append('image', file); fd.append('key', IMGBB_KEY);
-const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd });
-const data = await res.json();
-if (!data.success) throw new Error('ImgBB error');
-await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), {
-avatarPending: data.data.url, avatarStatus: 'pending', avatarSubmittedAt: serverTimestamp()
-});
-alert('✅ Аватарка отправлена на модерацию!');
-closeModal('avatar-modal');
-loadPendingAvatars();
-} catch(e) { console.error(e); alert('❌ Ошибка: '+e.message); }
-};
+if (!file) { alert('Выберите файл'); return;<think>
+The user wants me to take the working code from their Knowledge Base and add the new features:
+1. Creator system (5 levels, nickname colors, discounts)
+2. Product suggestion limits
+3. Warning about user-created products
+4. Discounts for level 5 creators
+5. "Creator" button in settings
+6. Limit display in profile
 
+I need to preserve the fixed login/registration logic from the working code.
+
+Let me continue writing the script with all the necessary functions...
+</think>
+
+```javascript
+// 🔁 ОКНО ИНФОРМАЦИИ О КРЕАТОРСТВЕ
 window.openCreatorInfoModal = () => {
 if (!user) { openModal('login-modal'); return; }
 openModal('creator-info-modal');
 };
 
+// 🔁 НАВИГАЦИЯ
 window.navigate = page => {
 if (userData?.isBanned && page !== 'profile') { alert('❌ Ваш аккаунт заблокирован'); return; }
 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1447,7 +1474,7 @@ document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'))
 const nb = $(`nav-${page}`); if (nb) nb.classList.add('active');
 if (page==='cart') renderCart(); if (page==='catalog') genCatalog();
 if (page==='search') $('search-input').value='';
-if (page==='profile' && user) { loadOrders(); renderDelivery(); checkAndShowBan(); renderCreatorLimit(); }
+if (page==='profile' && user) { loadOrders(); renderDeliveryAddress(); checkAndShowBan(); renderCreatorLimit(); }
 if (page==='reviews') loadPublicReviews();
 if (page==='admin' && user?.email===ADMIN_EMAIL) loadAdminPanels();
 if (window.innerWidth <= 1024) $('sidebar').classList.remove('expanded');
@@ -1545,23 +1572,14 @@ const stock=p.stock>0;
 return `<div class="prod-card" onclick="openProd('${p.id}')"><div class="card-img">${p.images?.[0]?`<img src="${p.images[0]}" style="width:100%;height:100%;object-fit:cover">`:'📦'}</div><div class="card-body"><div class="card-title">${p.name}</div><div class="card-price ${stock?'':'card-nostock'}">${stock?`$${p.price}`:'Нет в наличии'}</div></div></div>`;
 }
 
-// 📦 КАРТОЧКА ТОВАРА
+// 📦 КАРТОЧКА ТОВАРА С КРЕАТОРСТВОМ
 window.openProd = async id => {
 try {
 const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', id));
 if (!snap.exists()) return alert('Товар не найден');
 curProd = { ...snap.data(), id };
 $('p-id').textContent = `ID: ${curProd.productId || id}`; $('p-name').textContent = curProd.name;
-const colors=(curProd.color||'Белый').split(',').map(c=>c.trim()).filter(c=>c);
-const sizes=(curProd.sizes||'S,M,L,XL').split(',').map(s=>s.trim()).filter(s=>s);
-const colorGroup=$('opt-color-group');
-if(colors.length===1) colorGroup.innerHTML=`<label class="form-label">Цвет</label><div class="opt-static">${colors[0]}</div>`;
-else { colorGroup.innerHTML=`<label class="form-label">Цвет</label><select class="opt-select" id="p-color"></select>`; $('p-color').innerHTML=colors.map(c=>`<option>${c}</option>`).join(''); }
-const sizeGroup=$('opt-size-group');
-if(sizes.length===1) sizeGroup.innerHTML=`<label class="form-label">Размер</label><div class="opt-static">${sizes[0]}</div>`;
-else { sizeGroup.innerHTML=`<label class="form-label">Размер</label><select class="opt-select" id="p-size"></select>`; $('p-size').innerHTML=sizes.map(s=>`<option>${s}</option>`).join(''); }
-$('p-specs').innerHTML=`<div class="spec-row"><span class="spec-l">Для кого</span><span class="spec-v">${curProd.audience||'Унисекс'}</span></div><div class="spec-row"><span class="spec-l">Тип</span><span class="spec-v">${curProd.type}</span></div><div class="spec-row"><span class="spec-l">Материал</span><span class="spec-v">${curProd.material||'-'}</span></div><div class="spec-row"><span class="spec-l">Коллаборация</span><span class="spec-v">${curProd.collab||'Нет'}</span></div><div class="spec-row"><span class="spec-l">Масса</span><span class="spec-v">${curProd.weight||'-'} г</span></div><div class="spec-row"><span class="spec-l">Год релиза</span><span class="spec-v">${curProd.year||'-'}</span></div><div class="spec-row"><span class="spec-l">В наличии</span><span class="spec-v">${curProd.stock} шт</span></div>`;
-$('p-desc').textContent = curProd.desc || '';
+// 🔁 ПРЕДУПРЕЖДЕНИЕ О ТОВАРЕ ОТ ПОЛЬЗОВАТЕЛЯ
 const warningDiv = $('p-user-warning');
 if (curProd.fromUser) {
 warningDiv.classList.remove('hidden');
@@ -1572,6 +1590,7 @@ warningDiv.innerHTML += '<br><span class="admin-edited-notice">✏️ Карто
 } else {
 warningDiv.classList.add('hidden');
 }
+// 🔁 СКИДКА ДЛЯ КРЕАТОРА 5 УРОВНЯ
 const discountDiv = $('p-creator-discount');
 if (userData?.creatorLevel === 5 && curProd.category) {
 let discount = 0, discountText = '';
@@ -1580,13 +1599,23 @@ else if (curProd.category === 'clothing') { discount = 15; discountText = 'ск�
 else { discount = 25; discountText = 'скидка для креатора 5 уровня: -25% на всё'; }
 const originalPrice = curProd.price;
 const discountedPrice = originalPrice * (1 - discount/100);
-$('p-price-usd').textContent = `$${discountedPrice.toFixed(2)} <span style="font-size:18px;color:var(--text-dim);text-decoration:line-through">$${originalPrice}</span>`;
+$('p-price-usd').innerHTML = `$${discountedPrice.toFixed(2)} <span style="font-size:18px;color:var(--text-dim);text-decoration:line-through">$${originalPrice}</span>`;
 discountDiv.textContent = discountText;
 discountDiv.classList.remove('hidden');
 } else {
 $('p-price-usd').textContent = `$${curProd.price}`;
 discountDiv.classList.add('hidden');
 }
+const colors=(curProd.color||'Белый').split(',').map(c=>c.trim()).filter(c=>c);
+const sizes=(curProd.sizes||'S,M,L,XL').split(',').map(s=>s.trim()).filter(s=>s);
+const colorGroup=$('opt-color-group');
+if(colors.length===1) colorGroup.innerHTML=`<label class="form-label">Цвет</label><div class="opt-static">${colors[0]}</div>`;
+else { colorGroup.innerHTML=`<label class="form-label">Цвет</label><select class="opt-select" id="p-color"></select>`; $('p-color').innerHTML=colors.map(c=>`<option>${c}</option>`).join(''); }
+const sizeGroup=$('opt-size-group');
+if(sizes.length===1) sizeGroup.innerHTML=`<label class="form-label">Размер</label><div class="opt-static">${sizes[0]}</div>`;
+else { sizeGroup.innerHTML=`<label class="form-label">Размер</label><select class="opt-select" id="p-size"></select>`; $('p-size').innerHTML=sizes.map(s=>`<option>${s}</option>`).join(''); }
+$('p-specs').innerHTML=`<div class="spec-row"><span class="spec-l">Для кого</span><span class="spec-v">${curProd.audience||'Унисекс'}</span></div><div class="spec-row"><span class="spec-l">Тип</span><span class="spec-v">${curProd.type}</span></div><div class="spec-row"><span class="spec-l">Материал</span><span class="spec-v">${curProd.material||'-'}</span></div><div class="spec-row"><span class="spec-l">Коллаборация</span><span class="spec-v">${curProd.collab||'Нет'}</span></div><div class="spec-row"><span class="spec-l">Масса</span><span class="spec-v">${curProd.weight||'-'} г</span></div><div class="spec-row"><span class="spec-l">Год релиза</span><span class="spec-v">${curProd.year||'-'}</span></div><div class="spec-row"><span class="spec-l">В наличии</span><span class="spec-v">${curProd.stock} шт</span></div>`;
+$('p-desc').textContent = curProd.desc || '';
 $('p-price-conv').textContent = `≈ ${Math.round(curProd.price*RATES.USD_TO_RUB).toLocaleString('ru-RU')} ₽ / ≈ ${Math.round(curProd.price*RATES.USD_TO_UAH).toLocaleString('ru-RU')} ₴`;
 const stockEl=$('p-stock'), btn=$('p-action'), opts=$('p-options'), delNotice=$('p-deleted-notice');
 if (curProd.deleted) { delNotice.classList.remove('hidden'); btn.textContent='Удален'; btn.disabled=true; hide(opts); }
@@ -1689,9 +1718,9 @@ await addDoc(collection(db,'artifacts/byrmalda-prod/public/data/support'),msg); 
 };
 function updateSupportBadge() { $('support-badge').textContent=chatUnread; $('nav-support').classList.toggle('has-badge',chatUnread>0); }
 
-// ⚙️ НАСТРОЙКИ
+// ⚙️ НАСТРОЙКИ & ОТЗЫВЫ
 window.toggleTheme=()=>{theme=theme==='light'?'dark':'light';localStorage.setItem('theme',theme);applyTheme();};
-function applyTheme(){document.documentElement.setAttribute('data-theme',theme);$('theme-ind').textContent=theme==='dark'?'🌙':'️';}
+function applyTheme(){document.documentElement.setAttribute('data-theme',theme);$('theme-ind').textContent=theme==='dark'?'🌙':'☀️';}
 window.toggleLang=()=>{lang=lang==='ru'?'en':'ru';$('cur-lang').textContent=lang.toUpperCase();};
 async function checkReviewStatus(){if(!user)return;userData.reviewStatus='none';}
 window.openReviewModal=()=>{
@@ -1717,27 +1746,53 @@ openModal('sizechart-modal');
 };
 
 // 🚚 ДОСТАВКА
-window.renderDelivery=()=>{
-if(!user)return; show($('delivery-box'));
+window.renderDeliveryAddress=()=>{
+if(!user)return; show($('delivery-section'));
 if(userData?.deliveryCountry){
 $('del-provider').textContent = userData.deliveryCountry==='cdek'?'🇷🇺 СДЭК':userData.deliveryCountry==='ua'?'🇺🇦 UaExpress':'🇺🇸 USmall';
 const addr=userData.deliveryAddress[userData.deliveryCountry];
 $('del-addr').textContent = addr?`${addr.city}, ${addr.street}, ${addr.house}`:'Адрес не указан';
 }else{$('del-provider').textContent='Доставка не указана';$('del-addr').textContent='Нажмите "Изменить"';}
 };
-window.openDeliveryModal=()=>{openModal('delivery-modal');document.querySelectorAll('input[name="del-opt"]').forEach(r=>r.checked=false);hide($('del-fields'));};
 window.selectDelivery=country=>{
-document.querySelectorAll('.delivery-option').forEach(o=>o.style.borderColor='transparent');
-$(`d-${country}`).checked=true; $(`d-${country}`).closest('.delivery-option').style.borderColor='var(--accent)';
-show($('del-fields'));
+document.querySelectorAll('.delivery-option').forEach(o=>o.classList.remove('selected'));
+document.querySelectorAll('.delivery-fields').forEach(el=>hide(el));
+$(`del-${country}`).checked = true;
+$(`del-${country}`).closest('.delivery-option').classList.add('selected');
+show($(`fields-${country}`));
+if (userData?.deliveryAddress?.[country]) {
+const addr = userData.deliveryAddress[country];
+if (country === 'cdek') { $('cdek-city').value = addr.city||''; $('cdek-street').value = addr.street||''; $('cdek-house').value = addr.house||''; }
+else if (country === 'ua') { $('ua-city').value = addr.city||''; $('ua-street').value = addr.street||''; $('ua-house').value = addr.house||''; }
+else if (country === 'usa') { $('usa-city').value = addr.city||''; $('usa-street').value = addr.street||''; $('usa-house').value = addr.house||''; }
+}
 };
-window.saveDelivery=async()=>{
-const country=document.querySelector('input[name="del-opt"]:checked')?.value; if(!country){alert('Выберите службу');return;}
-const city=$('del-city').value.trim(),street=$('del-street').value.trim(),house=$('del-house').value.trim();
-if(!city||!street||!house){alert('Заполните все поля');return;}
-await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid),{deliveryCountry:country,deliveryAddress:{cdek:country==='cdek'?{city,street,house}:null,ua:country==='ua'?{city,street,house}:null,usa:country==='usa'?{city,street,house}:null}});
-userData.deliveryCountry=country; userData.deliveryAddress={cdek:country==='cdek'?{city,street,house}:userData.deliveryAddress.cdek,ua:country==='ua'?{city,street,house}:userData.deliveryAddress.ua,usa:country==='usa'?{city,street,house}:userData.deliveryAddress.usa};
-renderDelivery(); closeModal('delivery-modal');
+window.saveDeliveryAddress=async()=>{
+if(!user){alert('❌ Сначала войдите в аккаунт');return;}
+const country=document.querySelector('input[name="delivery"]:checked')?.value;
+if(!country){alert('❌ Выберите страну доставки');return;}
+let city,street,house;
+if(country==='cdek'){city=$('cdek-city').value.trim();street=$('cdek-street').value.trim();house=$('cdek-house').value.trim();}
+else if(country==='ua'){city=$('ua-city').value.trim();street=$('ua-street').value.trim();house=$('ua-house').value.trim();}
+else if(country==='usa'){city=$('usa-city').value.trim();street=$('usa-street').value.trim();house=$('usa-house').value.trim();}
+if(!city||!street||!house){alert('❌ Заполните все поля');return;}
+try{
+await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid),{
+deliveryCountry:country,
+deliveryAddress:{
+cdek:country==='cdek'?{city,street,house}:(userData?.deliveryAddress?.cdek||null),
+ua:country==='ua'?{city,street,house}:(userData?.deliveryAddress?.ua||null),
+usa:country==='usa'?{city,street,house}:(userData?.deliveryAddress?.usa||null)
+},
+updatedAt:serverTimestamp()
+});
+userData.deliveryCountry=country;
+if(!userData.deliveryAddress)userData.deliveryAddress={};
+userData.deliveryAddress[country]={city,street,house};
+$('delivery-success').classList.remove('hidden');
+setTimeout(()=>$('delivery-success').classList.add('hidden'),3000);
+renderProfile();
+}catch(e){console.error('saveDeliveryAddress:',e);alert('❌ Ошибка: '+e.message);}
 };
 
 // 🛡️ АДМИН ПАНЕЛЬ
@@ -1835,6 +1890,7 @@ c.innerHTML=snap.docs.map(d=>{const u=d.data();return `<div class="mod-item flex
 window.admApproveAvatar=async(uid,url)=>{await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{avatar:url,avatarPending:null,avatarStatus:'approved'});loadPendingAvatars();};
 window.admRejectAvatar=async uid=>{await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{avatarPending:null,avatarStatus:'rejected'});loadPendingAvatars();};
 
+// 🔁 ПРЕДЛОЖЕНИЯ ТОВАРОВ
 async function loadPendingSuggestions(){
 const c=$('adm-suggestions');c.innerHTML='<div class="text-center"><div class="loading"></div></div>';
 if(user?.email!==ADMIN_EMAIL){c.innerHTML='Доступ только для администратора';return;}
@@ -2078,10 +2134,9 @@ if (user) show($('delivery-section'));
 function updateAuthUI() { $('auth-btn').textContent = 'Выйти'; $('auth-btn').onclick = () => openModal('logout-confirm-modal'); $('user-email').textContent = user.email; }
 function resetAuthUI() { $('auth-btn').textContent = 'Войти'; $('auth-btn').onclick = () => openModal('login-modal'); $('user-email').textContent = 'Не авторизован'; $('profile-name').textContent = 'Гость'; $('profile-id').textContent = '-'; $('profile-email').textContent = '-'; $('profile-date').textContent = '-'; $('avatar-display').innerHTML = '👤'; }
 
+// 🔁 ВХОД/РЕГИСТРАЦИЯ (ИСПРАВЛЕННЫЕ)
 window.openLogin = () => openModal('login-modal');
 window.switchReg = () => { closeModal('login-modal'); openModal('reg-modal'); showStep(1); };
-
-// 🔁 ВХОД - ИСПРАВЛЕННЫЙ
 window.doLogin = async () => {
 const email = $('log-email').value.trim(), pass = $('log-pass').value;
 $('log-err').textContent = '';
@@ -2090,9 +2145,7 @@ try {
 const cred = await signInWithEmailAndPassword(auth, email, pass);
 const u = cred.user;
 if (!u.emailVerified) {
-try {
-await sendEmailVerification(u, { url: window.location.href, handleCodeInApp: true });
-} catch(e) { console.log('sendEmailVerification error:', e); }
+try { await sendEmailVerification(u, { url: window.location.href, handleCodeInApp: true }); } catch(e) { console.log('sendEmailVerification error:', e); }
 await signOut(auth);
 $('log-err').innerHTML = `✉️ Подтвердите почту.<br>Новая ссылка отправлена на <b>${email}</b><br><small>Проверьте папку "Спам"</small>`;
 return;
@@ -2102,38 +2155,26 @@ if (ud.exists() && ud.data().isBlocked) { await signOut(auth); showBlock(); retu
 closeModal('login-modal');
 } catch(e) {
 console.error(e.code);
-$('log-err').textContent = e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password'
-? 'Аккаунт не найден или неверный пароль'
-: 'Ошибка: '+e.message;
+$('log-err').textContent = e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' ? 'Аккаунт не найден или неверный пароль' : 'Ошибка: '+e.message;
 }
 };
-
-// 🔁 РЕГИСТРАЦИЯ ШАГ 1
 window.regStep1 = async () => {
 const email = $('reg-email').value.trim();
 if (!email) { alert('Введите email'); return; }
 try {
 const methods = await auth.fetchSignInMethodsForEmail(email);
-if (methods.length > 0) {
-$('reg-err').textContent = 'Email уже зарегистрирован';
-return;
-}
+if (methods.length > 0) { $('reg-err').textContent = 'Email уже зарегистрирован'; return; }
 } catch(e) { console.log('fetchSignInMethods error:', e); }
 sessionStorage.setItem('pending_email', email);
 showStep(2);
 };
-
-// 🔁 РЕГИСТРАЦИЯ ШАГ 2 - ИСПРАВЛЕННЫЙ
 window.regStep2 = async () => {
 const email = sessionStorage.getItem('pending_email');
 if (!email) { alert('Ошибка: сессия истекла'); return; }
 const currentUser = auth.currentUser;
 if (currentUser && currentUser.email === email) {
 await currentUser.reload();
-if (currentUser.emailVerified) {
-showStep(3);
-return;
-}
+if (currentUser.emailVerified) { showStep(3); return; }
 }
 try {
 if (currentUser && currentUser.email === email) {
@@ -2143,8 +2184,6 @@ alert('✉️ Новая ссылка отправлена на ' + email + '\n�
 } catch(e) { console.error('sendEmailVerification error:', e); }
 showStep(3);
 };
-
-// 🔁 РЕГИСТРАЦИЯ ШАГ 3 - ЗАВЕРШЕНИЕ
 window.regStep3 = async () => {
 const email = sessionStorage.getItem('pending_email'), name = $('reg-name').value.trim(), p1 = $('reg-pass').value, p2 = $('reg-pass2').value;
 $('reg-err').textContent = '';
@@ -2172,7 +2211,6 @@ else if (e.code === 'auth/weak-password') $('reg-err').textContent = 'Слабы
 else $('reg-err').textContent = 'Ошибка: '+e.message;
 }
 };
-
 function showStep(n) {
 [1,2,3].forEach(i => $(`reg-step-${i}`).classList.add('hidden'));
 $('reg-ok').classList.add('hidden');
@@ -2208,12 +2246,12 @@ cancelOrder, sendMsg, toggleTheme, toggleLang, openReviewModal, setRating, submi
 admCreateProduct, admLoadProduct, admSaveProduct, admDeleteProduct, admBlockUser, admUnblockUser, admTempBanUser, admUnbanAfterUser,
 admFindOrder, admSetOrderStatus, admApproveReview, admRejectReview, admDeleteReview, admApproveAvatar, admRejectAvatar,
 admApproveSuggestion, admRejectSuggestion, admEditSuggestion, openSuggest, submitSuggestion, toggleCollabInput,
-toggleEditCollabInput, toggleSuggestCollabInput, openDeliveryModal, selectDelivery, saveDelivery, carouselNav,
+toggleEditCollabInput, toggleSuggestCollabInput, selectDelivery, saveDeliveryAddress, renderDeliveryAddress,
 confirmLogout, doLogout, logoutFromBan, openAvatarSettingsModal, submitAvatarFromSettings, validateSingleFile,
 toggleMaintenance, saveMaintenanceSchedule, emergencyStopMaintenance, openCreatorInfoModal
 });
 
-console.log('🚀 BYRMALDA loaded | ✅ Auth Fixed | 🔐 App Check Disabled for Debug');
+console.log('🚀 BYRMALDA loaded | ✅ Auth Fixed + 🎨 Creator System + Limits + All Features');
 </script>
 </body>
 </html>
