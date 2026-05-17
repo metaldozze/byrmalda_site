@@ -1532,7 +1532,6 @@ if (!user) return;
 try {
 const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid));
 userData = snap.exists() ? snap.data() : await createUserDoc();
-// Инициализация лимитов, если их нет
 if (!userData.suggestionCount) userData.suggestionCount = 0;
 if (!userData.suggestionLimitReset) userData.suggestionLimitReset = getMoscowMidnight();
 renderProfile(); syncCartFromDB();
@@ -2047,14 +2046,17 @@ const files=$('edit-photos').files;
 if(files.length>0){const cur=JSON.parse($('adm-edit-form').dataset.curImgs||'[]');for(let f of files){const fd=new FormData();fd.append('image',f);fd.append('key',IMGBB_KEY);const res=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd});const d=await res.json();if(d.success)cur.push(d.data.url);} u.images=cur;}
 await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/products',docId),u); alert('✅ Сохранено'); hide($('adm-edit-form'));
 };
+// 🔁 ИСПРАВЛЕННЫЕ ФУНКЦИИ УДАЛЕНИЯ/ВОССТАНОВЛЕНИЯ ТОВАРА
 window.admDeleteProduct = async () => {
 const productId = $('adm-delete-id').value.trim();
 if (!productId) { alert('Введите ID товара'); return; }
 if (!confirm('Точно удалить товар? Он переместится в архив.')) return;
 try {
+// 🔍 Ищем документ по полю productId
 const q = query(collection(db, 'artifacts/byrmalda-prod/public/data/products'), where('productId', '==', productId), limit(1));
 const snap = await getDocs(q);
 if (snap.empty) {
+// Пробуем найти по ID документа (на случай если ввели doc ID)
 const directSnap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', productId));
 if (!directSnap.exists()) {
 alert('❌ Товар не найден');
@@ -2077,9 +2079,11 @@ const productId = $('adm-delete-id').value.trim();
 if (!productId) { alert('Введите ID товара'); return; }
 if (!confirm('Восстановить товар? Он вернётся в каталог.')) return;
 try {
+// 🔍 Ищем документ по полю productId
 const q = query(collection(db, 'artifacts/byrmalda-prod/public/data/products'), where('productId', '==', productId), limit(1));
 const snap = await getDocs(q);
 if (snap.empty) {
+// Пробуем найти по ID документа
 const directSnap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', productId));
 if (!directSnap.exists()) {
 alert('❌ Товар не найден');
@@ -2097,6 +2101,7 @@ console.error('admRestoreProduct:', e);
 alert('❌ Ошибка: ' + e.message);
 }
 };
+// 🔁 СИСТЕМА БАНОВ
 window.admBlockUser=async()=>{const uid=$('adm-uid').value.trim();if(!uid)return;await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{isBanned:true,banType:'permanent',banUntil:null,banDuration:null});alert('✅ Пользователь заблокирован навсегда');};
 window.admUnblockUser=async()=>{const uid=$('adm-uid').value.trim();if(!uid)return;await updateDoc(doc(db,'artifacts/byrmalda-prod/users',uid),{isBanned:false,banType:null,banUntil:null,banDuration:null});alert('✅ Пользователь разблокирован');};
 window.admTempBanUser=async()=>{
@@ -2249,26 +2254,27 @@ await deleteDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
 await incrementSuggestionCount();
 loadPendingSuggestions();
 };
+// 🔁 ИСПРАВЛЕННАЯ ЛОГИКА ЛИМИТОВ ДЛЯ КНОПКИ "ПРЕДЛОЖИТЬ"
 window.openSuggest = async () => {
 if (!user) { openModal('login-modal'); return; }
+// Сначала проверяем лимит
 const limitCheck = await checkSuggestionLimit();
 if (!limitCheck.allowed) {
-if (limitCheck.reason === 'limit_exceeded') {
+// Если лимит исчерпан — показываем ошибку
 $('limit-reset-time').textContent = `Обновление: через ${formatTimeUntilReset(limitCheck.resetTime)}`;
 show($('limit-exceeded-modal'));
-}
 return;
 }
+// Если лимит есть — открываем окно
 openModal('suggest-modal');
 };
 window.submitSuggestion = async () => {
 if (!user) { openModal('login-modal'); return; }
+// Финальная проверка лимита перед отправкой
 const limitCheck = await checkSuggestionLimit();
 if (!limitCheck.allowed) {
-if (limitCheck.reason === 'limit_exceeded') {
 $('limit-reset-time').textContent = `Обновление: через ${formatTimeUntilReset(limitCheck.resetTime)}`;
 show($('limit-exceeded-modal'));
-}
 closeModal('suggest-modal');
 return;
 }
@@ -2298,6 +2304,7 @@ desc: $('sug-desc').value,
 status: 'pending',
 ts: serverTimestamp()
 });
+// Списываем попытку ТОЛЬКО после успешной отправки
 await incrementSuggestionCount();
 alert('✅ Отправлено на модерацию');
 closeModal('suggest-modal');
