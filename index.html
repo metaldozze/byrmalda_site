@@ -1478,15 +1478,46 @@ $('catalog-grid').innerHTML = cats.map(c => `<div class="cat-card" onclick="filt
 window.filterType = async type => { navigate('search'); $('search-input').value=type; await searchProds(type); };
 window.handleSearch = async e => { const q=e.target.value.trim().toLowerCase(); if(q.length>=2) await searchProds(q); else $('search-results').innerHTML=''; };
 async function searchProds(q) {
-const c=$('search-results'); c.innerHTML='<div class="text-center" style="padding:32px"><div class="loading"></div></div>';
+const c = $('search-results'); 
+c.innerHTML = '<div class="text-center" style="padding:32px"><div class="loading"></div></div>';
 try {
-let snap;
-if(q==='archive') snap = await getDocs(query(collection(db,'artifacts/byrmalda-prod/public/data/products'), where('deleted','==',true)));
-else snap = await getDocs(query(collection(db,'artifacts/byrmalda-prod/public/data/products'), where('published','==',true), where('deleted','==',false)));
-const res=[]; snap.forEach(d=>{ const p=d.data(); if(`${p.name} ${p.type} ${p.category} ${p.desc}`.toLowerCase().includes(q)) res.push({...p,id:d.id}); });
-if(!res.length) { c.innerHTML='<div class="text-center" style="padding:32px;color:var(--text-dim)">Ничего не найдено</div>'; return; }
+let coll = collection(db, 'artifacts/byrmalda-prod/public/data/products');
+
+// 🔁 Архив — отдельная логика
+if (q === 'archive') {
+const snap = await getDocs(query(coll, where('deleted','==',true)));
+const res = []; snap.forEach(d => res.push({...d.data(),id:d.id}));
+if (!res.length) { c.innerHTML = '<div class="text-center" style="padding:32px;color:var(--text-dim)">Архив пуст</div>'; return; }
 c.innerHTML = res.map(p => prodCard(p)).join('');
-} catch(e) { c.innerHTML='<div class="text-center" style="padding:32px;color:var(--error)">Ошибка</div>'; }
+return;
+}
+
+// 🔁 Список точных типов для фильтрации (должны совпадать с полем "Тип" при создании товара!)
+const filterTypes = ['футболка','толстовка','кроссовки','аксессуар','штаны','шорты','куртка','лонгслив'];
+const isExactFilter = filterTypes.includes(q.toLowerCase());
+
+let snap;
+if (isExactFilter) {
+// 🔁 ТОЧНЫЙ поиск по полю type (только товары с этим типом)
+snap = await getDocs(query(coll, where('published','==',true), where('deleted','==',false), where('type','==',q)));
+} else {
+// 🔁 Обычный поиск по всем полям (для произвольных запросов)
+snap = await getDocs(query(coll, where('published','==',true), where('deleted','==',false)));
+}
+
+const res = [];
+if (isExactFilter) {
+// При точном поиске все результаты уже отфильтрованы по type
+snap.forEach(d => res.push({...d.data(),id:d.id}));
+} else {
+// При обычном поиске фильтруем по всем полям на клиенте
+snap.forEach(d => { const p = d.data(); if (`${p.name} ${p.type} ${p.category} ${p.desc}`.toLowerCase().includes(q)) res.push({...p,id:d.id}); });
+}
+
+if (!res.length) { c.innerHTML = `<div class="text-center" style="padding:32px;color:var(--text-dim)">Ничего не найдено</div>`; return; }
+c.innerHTML = res.map(p => prodCard(p)).join('');
+
+} catch(e) { console.error(e); c.innerHTML = '<div class="text-center" style="padding:32px;color:var(--error)">Ошибка</div>'; }
 }
 function prodCard(p) {
 const stock=p.stock>0;
