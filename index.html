@@ -558,16 +558,8 @@ margin: 12px 0; font-size: 12px;
 .grant-creator-grid {
 display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;
 }
-/* 🔁 СТИЛИ ДЛЯ МОДАЛЬНОГО ОКНА ПРЕДУПРЕЖДЕНИЯ */
-.warning-list {
-margin: 16px 0;
-padding-left: 20px;
-}
-.warning-list li {
-margin: 8px 0;
-line-height: 1.5;
-color: var(--text-dim);
-}
+.warning-list { margin: 16px 0; padding-left: 20px; }
+.warning-list li { margin: 8px 0; line-height: 1.5; color: var(--text-dim); }
 @media (max-width: 1024px) {
 .sidebar { width: 64px; }
 .sidebar.expanded, .sidebar:hover { width: 220px; }
@@ -709,7 +701,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div class="p-info">
 <div class="product-id" id="p-id">ID: -</div>
 <h1 id="p-name">Название</h1>
-<!-- 🔁 ПРЕДУПРЕЖДЕНИЕ О ТОВАРЕ ОТ ПОЛЬЗОВАТЕЛЯ -->
 <div id="user-created-badge" class="user-created-badge hidden" onclick="showUserProductWarning()">⚠️ <span data-i18n="user_product_warning">Этот товар создал пользователь, будьте осторожны</span></div>
 <div id="admin-edited-badge" class="admin-edited-badge hidden"><span data-i18n="admin_edited">Товар и карточка товара были отредактированы и исправлены админом</span>✔️</div>
 <div class="specs" id="p-specs"></div>
@@ -776,7 +767,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <button class="setting-btn" onclick="showSizeChart('footwear')"><span>👟 <span data-i18n="size_chart_footwear">Размерная сетка (обувь)</span></span><span>→</span></button>
 <button class="setting-btn" onclick="openAvatarSettingsModal()"><span>🖼️ <span data-i18n="btn_change_avatar">Сменить аватарку</span></span><span>→</span></button>
 <button class="setting-btn" onclick="openCreatorInfo()"><span>✨ <span data-i18n="creator">Креаторство</span></span><span>→</span></button>
-<!-- 🔁 ЛИМИТ ПЕРЕНОСИТСЯ СЮДА -->
 <div class="creator-limit hidden" id="creator-limit-settings" style="margin:8px 0;padding:12px;background:var(--bg-soft);border-radius:6px;font-size:12px"></div>
 <button class="setting-btn" onclick="confirmLogout()" style="border-color:var(--error);color:var(--error)">
 <span>🚪 <span data-i18n="btn_logout">Выйти из аккаунта</span></span><span>→</span>
@@ -852,7 +842,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div class="btn-group"><button class="btn" onclick="admSaveProduct()" data-i18n="btn_save">Сохранить</button><button class="btn btn-outline" onclick="hide($('adm-edit-form'))" data-i18n="btn_cancel">Отмена</button></div>
 </div>
 </div>
-<!-- 🔁 УДАЛЕНИЕ/ВОССТАНОВЛЕНИЕ ТОВАРА -->
 <div class="admin-section">
 <h3 data-i18n="adm_manage_product">🗑️ Управление товаром</h3>
 <div class="flex gap-8" style="margin-bottom:12px;flex-wrap:wrap">
@@ -862,7 +851,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 <div style="font-size:12px;color:var(--text-dim)" data-i18n="archive_hint">Удалённые товары перемещаются в архив и помечаются как "Удалён". Восстановление возвращает товар в каталог.</div>
 </div>
-<!-- 🔁 ВЫДАЧА КРЕАТОРА НА ПЕРИОД -->
 <div class="admin-section">
 <h3 data-i18n="grant_creator">🎁 Выдать креаторство на период</h3>
 <div class="grant-creator-grid">
@@ -941,7 +929,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </section>
 </main>
 </div>
-<!-- 🔁 МОДАЛЬНОЕ ОКНО: ПРЕДУПРЕЖДЕНИЕ О ТОВАРЕ ОТ ПОЛЬЗОВАТЕЛЯ -->
 <div class="modal" id="user-product-warning-modal">
 <div class="modal-content wide">
 <span class="modal-close" onclick="closeModal('user-product-warning-modal')">&times;</span>
@@ -957,7 +944,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <button class="btn mt-16" onclick="closeModal('user-product-warning-modal')" data-i18n="btn_understood">Понятно</button>
 </div>
 </div>
-<!-- 🔁 БАННЕР ТЕХНИЧЕСКОГО ПЕРЕРЫВА -->
 <div id="maintenance-overlay" class="maintenance-overlay hidden">
 <div class="maintenance-content">
 <div class="maintenance-icon">🔧</div>
@@ -966,7 +952,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div id="maint-timer-display" class="maintenance-timer hidden">00:00:00</div>
 </div>
 </div>
-<!-- 🔁 БАННЕР БЛОКИРОВКИ -->
 <div id="ban-overlay" class="ban-overlay hidden">
 <div class="ban-content">
 <div class="ban-icon">🚫</div>
@@ -982,7 +967,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <button class="btn btn-danger mt-16" onclick="logoutFromBan()" data-i18n="btn_logout">Выйти из аккаунта</button>
 </div>
 </div>
-<!-- 🔁 МОДАЛЬНОЕ ОКНО: СИСТЕМА КРЕАТОРСТВА -->
 <div class="modal" id="creator-info-modal">
 <div class="modal-content wide">
 <span class="modal-close" onclick="closeModal('creator-info-modal')">&times;</span>
@@ -1032,7 +1016,6 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 </div>
 </div>
-<!-- MODALS -->
 <div class="modal" id="login-modal">
 <div class="modal-content">
 <span class="modal-close" onclick="closeModal('login-modal')">&times;</span>
@@ -1201,246 +1184,208 @@ import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, o
 import { getStorage } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check.js";
 
-// 🔁 СИСТЕМА ПЕРЕВОДОВ (i18n)
 const translations = {
-  ru: {
-    // Навигация
-    nav_profile: "Профиль", nav_search: "Поиск", nav_catalog: "Каталог", nav_cart: "Корзина",
-    nav_support: "Поддержка", nav_settings: "Настройки", nav_reviews: "Отзывы",
-    nav_admin: "Панель", nav_suggest: "Предложить",
-    // Общие
-    guest: "Гость", not_authorized: "Не авторизован", btn_login: "Войти", btn_logout: "Выйти из аккаунта",
-    label_id: "ID:", label_date: "Дата:", label_email: "Email", label_name: "Название", label_password: "Пароль",
-    label_password_confirm: "Повтор пароля", btn_next: "Далее", btn_submit: "Отправить", btn_save: "Сохранить",
-    btn_cancel: "Отмена", btn_confirm: "Подтвердить", btn_understood: "Понятно", btn_change: "Изменить",
-    btn_back: "← Назад", btn_buy: "Купить", btn_checkout: "Оформить заказ", btn_report: "Пожаловаться",
-    btn_theme: "Тема", btn_lang: "Язык", btn_review: "Оставить отзыв", btn_change_avatar: "Сменить аватарку",
-    creator: "Креаторство", settings: "Настройки", reviews: "Отзывы", catalog: "Каталог", cart: "Корзина",
-    support: "Поддержка", admin_panel: "Панель администратора",
-    // Профиль
-    my_orders: "Мои заказы", loading_orders: "Загрузка заказов...", delivery_not_set: "Доставка не указана",
-    edit_avatar: "Изменить аватарку",
-    // Поиск
-    search_placeholder: "Поиск: футболка, free drun, кроссовки...",
-    // Товар
-    label_size: "Размер", label_color: "Цвет", label_quantity: "Количество", label_price: "Цена ($)",
-    label_stock: "В наличии", label_weight: "Масса (г)", label_audience: "Для кого", label_material: "Материал",
-    label_sizes: "Размеры", label_year: "Год релиза", label_collab: "Коллаборация", label_desc: "Описание",
-    label_photos: "Фотографии", btn_publish: "Опубликовать", user_product_warning: "Этот товар создал пользователь, будьте осторожны",
-    admin_edited: "Товар и карточка товара были отредактированы и исправлены админом", product_deleted: "Товар удален",
-    in_stock: "✓ В наличии", out_stock: "✗ Предзаказ", deleted: "✗ Удалён", preorder: "Предзаказ",
-    // Корзина
-    cart_empty: "Корзина пуста", cart_qty: "Кол-во", cart_product: "Товар", cart_price: "Цена",
-    cart_total: "Итого:", delivery_note: "Доставка: ~900 ₽/кг • Рассчитывается при оформлении",
-    // Чат
-    chat_placeholder: "Напишите сообщение...",
-    // Модальные окна
-    modal_login: "Вход", modal_register: "Регистрация", confirm_sent: "Подтверждение отправлено",
-    confirm_hint: "Перейдите по ссылке в письме, затем нажмите кнопку ниже.<br><small>Проверьте папку \"Спам\"</small>",
-    btn_confirmed: "Я подтвердил(а) почту", welcome: "Добро пожаловать в BYRMALDA!", btn_to_profile: "В профиль",
-    confirm_logout: "Выйти из аккаунта?", logout_warning: "Все несохранённые изменения будут потеряны.",
-    btn_yes_logout: "Да, выйти", no_account: "Нет аккаунта? Зарегистрироваться",
-    new_avatar: "Новая аватарка", select_image: "Выберите изображение", avatar_moderation: "Аватарка отправится на модерацию.",
-    change_avatar: "Сменить аватарку", select_image_single: "Выберите изображение (только 1 файл)",
-    avatar_moderation_hint: "Аватарка отправится на модерацию. После одобрения она появится в вашем профиле.",
-    btn_save_submit: "Сохранить и отправить", suggest_product: "Предложить товар",
-    btn_submit_mod: "Отправить на модерацию", leave_review: "Оставить отзыв", label_rating: "Оценка",
-    label_text: "Текст", report: "Пожаловаться", label_issue: "Описание проблемы",
-    checkout: "Оформление", payment_hint: "Для оплаты напишите админу в телеграм:",
-    payment_note: "После оплаты заказ появится в профиле.", size_chart: "Размерная сетка",
-    select_delivery: "Выбор доставки", label_delivery_service: "Служба доставки",
-    label_city: "Город", label_street: "Улица", label_house: "Дом / Номер ПВЗ",
-    btn_save_close: "💾 Сохранить и закрыть", delivery_warning: "⚠️ Указывайте точный адрес. При ошибке заказ утилизируется без возврата.",
-    // Предупреждение о товарах от пользователей
-    warning_title: "⚠️ Почему не стоит слишком сильно доверять товарам, созданные пользователями?",
-    warning_1: "Карточка товара может не соответствовать действительному товару",
-    warning_2: "Есть риск невозможности возврата товара",
-    warning_3: "Товар будет ехать значительно дольше, никаких доп. проверок на товары от пользователей нет",
-    warning_4: "Товар по пути может поехать не на ваш адрес, указывайте адрес правильно",
-    warning_5: "Вас могут обмануть уже на заказе товара",
-    warning_6: "Товар может быть несуществующим (мы стараемся следить за актуальностью товара)",
-    // Технический перерыв
-    maintenance_title: "Технический перерыв", maintenance_text: "Внимание: идет технический перерыв. Просьба не оформлять заказы пока не закончится технический перерыв.",
-    // Бан
-    ban_title: "Аккаунт заблокирован", ban_message: "Ваш аккаунт был заблокирован администрацией.",
-    ban_timer_label: "Разблокировка через:", ban_reload: "✅ Время истекло! Перезагрузите страницу для разблокировки.",
-    // Креаторство
-    creator_system: "✨ Система креаторства BYRMALDA", creator_intro: "Станьте креатором и получайте привилегии за ваши предложения товаров!",
-    creator_levels: "📊 Уровни креаторов:", level_1_badge: "Уровень 1", level_1_desc: "Синий ник", level_1_req: "1 одобренный товар (не редактированный админом)",
-    level_2_badge: "Уровень 2", level_2_desc: "Жёлтый ник", level_2_req: "5 одобренных товаров (счётчик обнуляется после перехода)",
-    level_3_badge: "Уровень 3", level_3_desc: "Зелёный ник", level_3_req: "10 одобренных товаров (счётчик обнуляется после перехода)",
-    level_4_badge: "Уровень 4", level_4_desc: "Красный ник", level_4_req: "25 одобренных товаров (счётчик обнуляется после перехода)",
-    level_5_badge: "Уровень 5", level_5_desc: "Переливающийся ник", level_5_req: "50 одобренных товаров (счётчик обнуляется после перехода)",
-    creator_perks: "🎁 Привилегии 5 уровня:", perk_discount: "Скидка 25% на все товары (обувь 10%, одежда 15%)",
-    perk_price: "Специальная цена отображается в карточке товара",
-    creator_limits: "⏱️ Лимиты на предложения:", limit_normal: "Обычные пользователи и креаторы 1-3 уровня:",
-    limit_1_3: "1 попытка отправить товар на модерацию каждые 3 дня", limit_reset: "Лимит обновляется в 00:00 по московскому времени",
-    limit_premium: "Креаторы 4-5 уровня:", limit_4_5: "3 попытки отправить товар на модерацию каждые 3 дня (1 в день)",
-    creator_buy: "💰 Купить уровень креатора:", prices_title: "Цены за месяц:",
-    price_1: "1 уровень — 500 ₽/мес", price_2: "2 уровень — 1300 ₽/мес", price_3: "3 уровень — 2000 ₽/мес", price_4_5: "4-5 уровни — 2500 ₽/мес",
-    btn_buy_creator: "🛒 Купить уровень креатора", creator_rules: "📋 Важные правила:",
-    rule_1: "Товары, отредактированные админом перед одобрением, НЕ считаются для повышения уровня",
-    rule_2: "После перехода на новый уровень счётчик одобренных товаров обнуляется",
-    rule_3: "Отклонённые товары не уменьшают ваш уровень",
-    rule_4: "Лимиты на предложения обновляются автоматически в 00:00 МСК",
-    rule_5: "Купленное креаторство действует до указанной даты, после чего уровень сбрасывается",
-    // Админ панель
-    adm_create_product: "➕ Создать товар", adm_edit_product: "✏️ Редактировать товар", adm_manage_product: "🗑️ Управление товаром",
-    grant_creator: "🎁 Выдать креаторство на период", adm_users: "👥 Пользователи", adm_orders: "📦 Заказы",
-    adm_reviews_mod: "⭐ Отзывы на модерации", adm_avatars_mod: "🖼️ Аватарки на модерации",
-    adm_suggestions: "✨ Предложения", adm_reports: "🚨 Жалобы", adm_maintenance: "⚙️ Технический перерыв",
-    cat_clothing: "Одежда", cat_footwear: "Обувь", type_placeholder: "футболка, кроссовки...",
-    aud_unisex: "Унисекс", aud_male: "Мужчина", aud_female: "Женщина", color_placeholder: "Черный,Белый",
-    collab_no: "Нет", collab_yes: "Да", label_brand: "Название бренда", weight_placeholder: "200",
-    enter_product_id: "Введите ID товара", btn_load: "Загрузить", btn_archive: "🗑️ Удалить (в архив)",
-    btn_restore: "♻️ Восстановить", archive_hint: "Удалённые товары перемещаются в архив и помечаются как \"Удалён\". Восстановление возвращает товар в каталог.",
-    label_uid: "UID пользователя", label_creator_level: "Уровень креатора", enter_uid: "Введите UID",
-    level_1: "1 уровень (Синий)", level_2: "2 уровень (Жёлтый)", level_3: "3 уровень (Зелёный)",
-    level_4: "4 уровень (Красный)", level_5: "5 уровень (Переливающийся)", label_start: "Начало", label_end: "Окончание",
-    btn_grant: "✨ Выдать креаторство", creator_granted: "✅ Креаторство выдано!",
-    enter_user_uid: "UID пользователя", btn_block_forever: "Заблокировать навсегда", btn_unblock: "Разблокировать",
-    enter_temp_ban_uid: "UID для временного бана", time_format: "ДД:ЧЧ:ММ:СС", btn_temp_ban: "Заблокировать на время",
-    enter_unban_uid: "UID для отложенной разблокировки", btn_unban_after: "Разблокировать через",
-    enter_order_id: "ID или трек", btn_find: "Найти", btn_enable_maintenance: "Включить тех. перерыв",
-    btn_disable_maintenance: "Выключить тех. перерыв", label_start_msk: "Начало (МСК)", label_end_msk: "Окончание (МСК)",
-    btn_save_schedule: "💾 Сохранить расписание", schedule_saved: "✅ Расписание сохранено!",
-    btn_emergency_stop: "🚨 Экстренно выключить по времени"
-  },
-  en: {
-    // Navigation
-    nav_profile: "Profile", nav_search: "Search", nav_catalog: "Catalog", nav_cart: "Cart",
-    nav_support: "Support", nav_settings: "Settings", nav_reviews: "Reviews",
-    nav_admin: "Admin", nav_suggest: "Suggest",
-    // General
-    guest: "Guest", not_authorized: "Not authorized", btn_login: "Sign In", btn_logout: "Sign Out",
-    label_id: "ID:", label_date: "Date:", label_email: "Email", label_name: "Name", label_password: "Password",
-    label_password_confirm: "Confirm Password", btn_next: "Next", btn_submit: "Submit", btn_save: "Save",
-    btn_cancel: "Cancel", btn_confirm: "Confirm", btn_understood: "Understood", btn_change: "Change",
-    btn_back: "← Back", btn_buy: "Buy", btn_checkout: "Checkout", btn_report: "Report",
-    btn_theme: "Theme", btn_lang: "Language", btn_review: "Leave Review", btn_change_avatar: "Change Avatar",
-    creator: "Creator", settings: "Settings", reviews: "Reviews", catalog: "Catalog", cart: "Cart",
-    support: "Support", admin_panel: "Admin Panel",
-    // Profile
-    my_orders: "My Orders", loading_orders: "Loading orders...", delivery_not_set: "Delivery not set",
-    edit_avatar: "Change avatar",
-    // Search
-    search_placeholder: "Search: t-shirt, free drun, sneakers...",
-    // Product
-    label_size: "Size", label_color: "Color", label_quantity: "Quantity", label_price: "Price ($)",
-    label_stock: "In Stock", label_weight: "Weight (g)", label_audience: "For", label_material: "Material",
-    label_sizes: "Sizes", label_year: "Release Year", label_collab: "Collaboration", label_desc: "Description",
-    label_photos: "Photos", btn_publish: "Publish", user_product_warning: "This product was created by a user, be careful",
-    admin_edited: "Product and card were edited by admin", product_deleted: "Product deleted",
-    in_stock: "✓ In Stock", out_stock: "✗ Pre-order", deleted: "✗ Deleted", preorder: "Pre-order",
-    // Cart
-    cart_empty: "Cart is empty", cart_qty: "Qty", cart_product: "Product", cart_price: "Price",
-    cart_total: "Total:", delivery_note: "Delivery: ~900 ₽/kg • Calculated at checkout",
-    // Chat
-    chat_placeholder: "Type a message...",
-    // Modals
-    modal_login: "Sign In", modal_register: "Sign Up", confirm_sent: "Confirmation sent",
-    confirm_hint: "Click the link in the email, then press the button below.<br><small>Check your \"Spam\" folder</small>",
-    btn_confirmed: "I confirmed my email", welcome: "Welcome to BYRMALDA!", btn_to_profile: "To Profile",
-    confirm_logout: "Sign out?", logout_warning: "All unsaved changes will be lost.",
-    btn_yes_logout: "Yes, sign out", no_account: "No account? Sign up",
-    new_avatar: "New Avatar", select_image: "Select image", avatar_moderation: "Avatar will be sent for moderation.",
-    change_avatar: "Change Avatar", select_image_single: "Select image (1 file only)",
-    avatar_moderation_hint: "Avatar will be sent for moderation. After approval, it will appear in your profile.",
-    btn_save_submit: "Save & Submit", suggest_product: "Suggest Product",
-    btn_submit_mod: "Submit for Moderation", leave_review: "Leave Review", label_rating: "Rating",
-    label_text: "Text", report: "Report", label_issue: "Problem Description",
-    checkout: "Checkout", payment_hint: "For payment, message the admin on Telegram:",
-    payment_note: "After payment, the order will appear in your profile.", size_chart: "Size Chart",
-    select_delivery: "Select Delivery", label_delivery_service: "Delivery Service",
-    label_city: "City", label_street: "Street", label_house: "House / Pickup Point #",
-    btn_save_close: "💾 Save & Close", delivery_warning: "⚠️ Enter exact address. Orders with wrong address are disposed without refund.",
-    // User product warning
-    warning_title: "⚠️ Why you shouldn't fully trust user-created products?",
-    warning_1: "Product card may not match the actual item",
-    warning_2: "There is a risk of being unable to return the product",
-    warning_3: "Delivery will take significantly longer, no additional checks for user products",
-    warning_4: "Product may be sent to wrong address during transit, enter address carefully",
-    warning_5: "You may be scammed during the ordering process",
-    warning_6: "Product may not exist (we try to monitor product availability)",
-    // Maintenance
-    maintenance_title: "Maintenance", maintenance_text: "Attention: technical maintenance in progress. Please do not place orders until maintenance ends.",
-    // Ban
-    ban_title: "Account Blocked", ban_message: "Your account has been blocked by administration.",
-    ban_timer_label: "Unblock in:", ban_reload: "✅ Time expired! Reload page to unblock.",
-    // Creator
-    creator_system: "✨ BYRMALDA Creator System", creator_intro: "Become a creator and get perks for your product suggestions!",
-    creator_levels: "📊 Creator Levels:", level_1_badge: "Level 1", level_1_desc: "Blue nickname", level_1_req: "1 approved product (not edited by admin)",
-    level_2_badge: "Level 2", level_2_desc: "Yellow nickname", level_2_req: "5 approved products (counter resets after upgrade)",
-    level_3_badge: "Level 3", level_3_desc: "Green nickname", level_3_req: "10 approved products (counter resets after upgrade)",
-    level_4_badge: "Level 4", level_4_desc: "Red nickname", level_4_req: "25 approved products (counter resets after upgrade)",
-    level_5_badge: "Level 5", level_5_desc: "Gradient nickname", level_5_req: "50 approved products (counter resets after upgrade)",
-    creator_perks: "🎁 Level 5 Perks:", perk_discount: "25% discount on all products (footwear 10%, clothing 15%)",
-    perk_price: "Special price shown on product card",
-    creator_limits: "⏱️ Suggestion Limits:", limit_normal: "Regular users & creators levels 1-3:",
-    limit_1_3: "1 attempt to submit product for moderation every 3 days", limit_reset: "Limit resets at 00:00 Moscow time",
-    limit_premium: "Creators levels 4-5:", limit_4_5: "3 attempts to submit product for moderation every 3 days (1 per day)",
-    creator_buy: "💰 Buy Creator Level:", prices_title: "Monthly Prices:",
-    price_1: "Level 1 — 500 ₽/month", price_2: "Level 2 — 1300 ₽/month", price_3: "Level 3 — 2000 ₽/month", price_4_5: "Levels 4-5 — 2500 ₽/month",
-    btn_buy_creator: "🛒 Buy Creator Level", creator_rules: "📋 Important Rules:",
-    rule_1: "Products edited by admin before approval do NOT count toward level progression",
-    rule_2: "After upgrading to a new level, the approved products counter resets",
-    rule_3: "Rejected products do not decrease your level",
-    rule_4: "Suggestion limits reset automatically at 00:00 MSK",
-    rule_5: "Purchased creator status expires on specified date, then level resets",
-    // Admin Panel
-    adm_create_product: "➕ Create Product", adm_edit_product: "✏️ Edit Product", adm_manage_product: "🗑️ Manage Product",
-    grant_creator: "🎁 Grant Creator for Period", adm_users: "👥 Users", adm_orders: "📦 Orders",
-    adm_reviews_mod: "⭐ Reviews for Moderation", adm_avatars_mod: "🖼️ Avatars for Moderation",
-    adm_suggestions: "✨ Suggestions", adm_reports: "🚨 Reports", adm_maintenance: "⚙️ Maintenance",
-    cat_clothing: "Clothing", cat_footwear: "Footwear", type_placeholder: "t-shirt, sneakers...",
-    aud_unisex: "Unisex", aud_male: "Male", aud_female: "Female", color_placeholder: "Black,White",
-    collab_no: "No", collab_yes: "Yes", label_brand: "Brand Name", weight_placeholder: "200",
-    enter_product_id: "Enter Product ID", btn_load: "Load", btn_archive: "🗑️ Delete (to Archive)",
-    btn_restore: "♻️ Restore", archive_hint: "Deleted products move to archive and are marked as \"Deleted\". Restore returns product to catalog.",
-    label_uid: "User UID", label_creator_level: "Creator Level", enter_uid: "Enter UID",
-    level_1: "Level 1 (Blue)", level_2: "Level 2 (Yellow)", level_3: "Level 3 (Green)",
-    level_4: "Level 4 (Red)", level_5: "Level 5 (Gradient)", label_start: "Start", label_end: "End",
-    btn_grant: "✨ Grant Creator", creator_granted: "✅ Creator granted!",
-    enter_user_uid: "User UID", btn_block_forever: "Block Forever", btn_unblock: "Unblock",
-    enter_temp_ban_uid: "UID for temp ban", time_format: "DD:HH:MM:SS", btn_temp_ban: "Temp Ban",
-    enter_unban_uid: "UID for scheduled unban", btn_unban_after: "Unblock After",
-    enter_order_id: "Order ID or Tracking", btn_find: "Find", btn_enable_maintenance: "Enable Maintenance",
-    btn_disable_maintenance: "Disable Maintenance", label_start_msk: "Start (MSK)", label_end_msk: "End (MSK)",
-    btn_save_schedule: "💾 Save Schedule", schedule_saved: "✅ Schedule saved!",
-    btn_emergency_stop: "🚨 Emergency Stop"
-  }
+ru: {
+nav_profile: "Профиль", nav_search: "Поиск", nav_catalog: "Каталог", nav_cart: "Корзина",
+nav_support: "Поддержка", nav_settings: "Настройки", nav_reviews: "Отзывы",
+nav_admin: "Панель", nav_suggest: "Предложить",
+guest: "Гость", not_authorized: "Не авторизован", btn_login: "Войти", btn_logout: "Выйти из аккаунта",
+label_id: "ID:", label_date: "Дата:", label_email: "Email", label_name: "Название", label_password: "Пароль",
+label_password_confirm: "Повтор пароля", btn_next: "Далее", btn_submit: "Отправить", btn_save: "Сохранить",
+btn_cancel: "Отмена", btn_confirm: "Подтвердить", btn_understood: "Понятно", btn_change: "Изменить",
+btn_back: "← Назад", btn_buy: "Купить", btn_checkout: "Оформить заказ", btn_report: "Пожаловаться",
+btn_theme: "Тема", btn_lang: "Язык", btn_review: "Оставить отзыв", btn_change_avatar: "Сменить аватарку",
+creator: "Креаторство", settings: "Настройки", reviews: "Отзывы", catalog: "Каталог", cart: "Корзина",
+support: "Поддержка", admin_panel: "Панель администратора",
+my_orders: "Мои заказы", loading_orders: "Загрузка заказов...", delivery_not_set: "Доставка не указана",
+edit_avatar: "Изменить аватарку",
+search_placeholder: "Поиск: футболка, free drun, кроссовки...",
+label_size: "Размер", label_color: "Цвет", label_quantity: "Количество", label_price: "Цена ($)",
+label_stock: "В наличии", label_weight: "Масса (г)", label_audience: "Для кого", label_material: "Материал",
+label_sizes: "Размеры", label_year: "Год релиза", label_collab: "Коллаборация", label_desc: "Описание",
+label_photos: "Фотографии", btn_publish: "Опубликовать", user_product_warning: "Этот товар создал пользователь, будьте осторожны",
+admin_edited: "Товар и карточка товара были отредактированы и исправлены админом", product_deleted: "Товар удален",
+in_stock: "✓ В наличии", out_stock: "✗ Предзаказ", deleted: "✗ Удалён", preorder: "Предзаказ",
+cart_empty: "Корзина пуста", cart_qty: "Кол-во", cart_product: "Товар", cart_price: "Цена",
+cart_total: "Итого:", delivery_note: "Доставка: ~900 ₽/кг • Рассчитывается при оформлении",
+chat_placeholder: "Напишите сообщение...",
+modal_login: "Вход", modal_register: "Регистрация", confirm_sent: "Подтверждение отправлено",
+confirm_hint: "Перейдите по ссылке в письме, затем нажмите кнопку ниже.<br><small>Проверьте папку \"Спам\"</small>",
+btn_confirmed: "Я подтвердил(а) почту", welcome: "Добро пожаловать в BYRMALDA!", btn_to_profile: "В профиль",
+confirm_logout: "Выйти из аккаунта?", logout_warning: "Все несохранённые изменения будут потеряны.",
+btn_yes_logout: "Да, выйти", no_account: "Нет аккаунта? Зарегистрироваться",
+new_avatar: "Новая аватарка", select_image: "Выберите изображение", avatar_moderation: "Аватарка отправится на модерацию.",
+change_avatar: "Сменить аватарку", select_image_single: "Выберите изображение (только 1 файл)",
+avatar_moderation_hint: "Аватарка отправится на модерацию. После одобрения она появится в вашем профиле.",
+btn_save_submit: "Сохранить и отправить", suggest_product: "Предложить товар",
+btn_submit_mod: "Отправить на модерацию", leave_review: "Оставить отзыв", label_rating: "Оценка",
+label_text: "Текст", report: "Пожаловаться", label_issue: "Описание проблемы",
+checkout: "Оформление", payment_hint: "Для оплаты напишите админу в телеграм:",
+payment_note: "После оплаты заказ появится в профиле.", size_chart: "Размерная сетка",
+select_delivery: "Выбор доставки", label_delivery_service: "Служба доставки",
+label_city: "Город", label_street: "Улица", label_house: "Дом / Номер ПВЗ",
+btn_save_close: "💾 Сохранить и закрыть", delivery_warning: "⚠️ Указывайте точный адрес. При ошибке заказ утилизируется без возврата.",
+warning_title: "⚠️ Почему не стоит слишком сильно доверять товарам, созданные пользователями?",
+warning_1: "Карточка товара может не соответствовать действительному товару",
+warning_2: "Есть риск невозможности возврата товара",
+warning_3: "Товар будет ехать значительно дольше, никаких доп. проверок на товары от пользователей нет",
+warning_4: "Товар по пути может поехать не на ваш адрес, указывайте адрес правильно",
+warning_5: "Вас могут обмануть уже на заказе товара",
+warning_6: "Товар может быть несуществующим (мы стараемся следить за актуальностью товара)",
+maintenance_title: "Технический перерыв", maintenance_text: "Внимание: идет технический перерыв. Просьба не оформлять заказы пока не закончится технический перерыв.",
+ban_title: "Аккаунт заблокирован", ban_message: "Ваш аккаунт был заблокирован администрацией.",
+ban_timer_label: "Разблокировка через:", ban_reload: "✅ Время истекло! Перезагрузите страницу для разблокировки.",
+creator_system: "✨ Система креаторства BYRMALDA", creator_intro: "Станьте креатором и получайте привилегии за ваши предложения товаров!",
+creator_levels: "📊 Уровни креаторов:", level_1_badge: "Уровень 1", level_1_desc: "Синий ник", level_1_req: "1 одобренный товар (не редактированный админом)",
+level_2_badge: "Уровень 2", level_2_desc: "Жёлтый ник", level_2_req: "5 одобренных товаров (счётчик обнуляется после перехода)",
+level_3_badge: "Уровень 3", level_3_desc: "Зелёный ник", level_3_req: "10 одобренных товаров (счётчик обнуляется после перехода)",
+level_4_badge: "Уровень 4", level_4_desc: "Красный ник", level_4_req: "25 одобренных товаров (счётчик обнуляется после перехода)",
+level_5_badge: "Уровень 5", level_5_desc: "Переливающийся ник", level_5_req: "50 одобренных товаров (счётчик обнуляется после перехода)",
+creator_perks: "🎁 Привилегии 5 уровня:", perk_discount: "Скидка 25% на все товары (обувь 10%, одежда 15%)",
+perk_price: "Специальная цена отображается в карточке товара",
+creator_limits: "⏱️ Лимиты на предложения:", limit_normal: "Обычные пользователи и креаторы 1-3 уровня:",
+limit_1_3: "1 попытка отправить товар на модерацию каждые 3 дня", limit_reset: "Лимит обновляется в 00:00 по московскому времени",
+limit_premium: "Креаторы 4-5 уровня:", limit_4_5: "3 попытки отправить товар на модерацию каждые 3 дня (1 в день)",
+creator_buy: "💰 Купить уровень креатора:", prices_title: "Цены за месяц:",
+price_1: "1 уровень — 500 ₽/мес", price_2: "2 уровень — 1300 ₽/мес", price_3: "3 уровень — 2000 ₽/мес", price_4_5: "4-5 уровни — 2500 ₽/мес",
+btn_buy_creator: "🛒 Купить уровень креатора", creator_rules: "📋 Важные правила:",
+rule_1: "Товары, отредактированные админом перед одобрением, НЕ считаются для повышения уровня",
+rule_2: "После перехода на новый уровень счётчик одобренных товаров обнуляется",
+rule_3: "Отклонённые товары не уменьшают ваш уровень",
+rule_4: "Лимиты на предложения обновляются автоматически в 00:00 МСК",
+rule_5: "Купленное креаторство действует до указанной даты, после чего уровень сбрасывается",
+adm_create_product: "➕ Создать товар", adm_edit_product: "✏️ Редактировать товар", adm_manage_product: "🗑️ Управление товаром",
+grant_creator: "🎁 Выдать креаторство на период", adm_users: "👥 Пользователи", adm_orders: "📦 Заказы",
+adm_reviews_mod: "⭐ Отзывы на модерации", adm_avatars_mod: "🖼️ Аватарки на модерации",
+adm_suggestions: "✨ Предложения", adm_reports: "🚨 Жалобы", adm_maintenance: "⚙️ Технический перерыв",
+cat_clothing: "Одежда", cat_footwear: "Обувь", type_placeholder: "футболка, кроссовки...",
+aud_unisex: "Унисекс", aud_male: "Мужчина", aud_female: "Женщина", color_placeholder: "Черный,Белый",
+collab_no: "Нет", collab_yes: "Да", label_brand: "Название бренда", weight_placeholder: "200",
+enter_product_id: "Введите ID товара", btn_load: "Загрузить", btn_archive: "🗑️ Удалить (в архив)",
+btn_restore: "♻️ Восстановить", archive_hint: "Удалённые товары перемещаются в архив и помечаются как \"Удалён\". Восстановление возвращает товар в каталог.",
+label_uid: "UID пользователя", label_creator_level: "Уровень креатора", enter_uid: "Введите UID",
+level_1: "1 уровень (Синий)", level_2: "2 уровень (Жёлтый)", level_3: "3 уровень (Зелёный)",
+level_4: "4 уровень (Красный)", level_5: "5 уровень (Переливающийся)", label_start: "Начало", label_end: "Окончание",
+btn_grant: "✨ Выдать креаторство", creator_granted: "✅ Креаторство выдано!",
+enter_user_uid: "UID пользователя", btn_block_forever: "Заблокировать навсегда", btn_unblock: "Разблокировать",
+enter_temp_ban_uid: "UID для временного бана", time_format: "ДД:ЧЧ:ММ:СС", btn_temp_ban: "Заблокировать на время",
+enter_unban_uid: "UID для отложенной разблокировки", btn_unban_after: "Разблокировать через",
+enter_order_id: "ID или трек", btn_find: "Найти", btn_enable_maintenance: "Включить тех. перерыв",
+btn_disable_maintenance: "Выключить тех. перерыв", label_start_msk: "Начало (МСК)", label_end_msk: "Окончание (МСК)",
+btn_save_schedule: "💾 Сохранить расписание", schedule_saved: "✅ Расписание сохранено!",
+btn_emergency_stop: "🚨 Экстренно выключить по времени"
+},
+en: {
+nav_profile: "Profile", nav_search: "Search", nav_catalog: "Catalog", nav_cart: "Cart",
+nav_support: "Support", nav_settings: "Settings", nav_reviews: "Reviews",
+nav_admin: "Admin", nav_suggest: "Suggest",
+guest: "Guest", not_authorized: "Not authorized", btn_login: "Sign In", btn_logout: "Sign Out",
+label_id: "ID:", label_date: "Date:", label_email: "Email", label_name: "Name", label_password: "Password",
+label_password_confirm: "Confirm Password", btn_next: "Next", btn_submit: "Submit", btn_save: "Save",
+btn_cancel: "Cancel", btn_confirm: "Confirm", btn_understood: "Understood", btn_change: "Change",
+btn_back: "← Back", btn_buy: "Buy", btn_checkout: "Checkout", btn_report: "Report",
+btn_theme: "Theme", btn_lang: "Language", btn_review: "Leave Review", btn_change_avatar: "Change Avatar",
+creator: "Creator", settings: "Settings", reviews: "Reviews", catalog: "Catalog", cart: "Cart",
+support: "Support", admin_panel: "Admin Panel",
+my_orders: "My Orders", loading_orders: "Loading orders...", delivery_not_set: "Delivery not set",
+edit_avatar: "Change avatar",
+search_placeholder: "Search: t-shirt, free drun, sneakers...",
+label_size: "Size", label_color: "Color", label_quantity: "Quantity", label_price: "Price ($)",
+label_stock: "In Stock", label_weight: "Weight (g)", label_audience: "For", label_material: "Material",
+label_sizes: "Sizes", label_year: "Release Year", label_collab: "Collaboration", label_desc: "Description",
+label_photos: "Photos", btn_publish: "Publish", user_product_warning: "This product was created by a user, be careful",
+admin_edited: "Product and card were edited by admin", product_deleted: "Product deleted",
+in_stock: "✓ In Stock", out_stock: "✗ Pre-order", deleted: "✗ Deleted", preorder: "Pre-order",
+cart_empty: "Cart is empty", cart_qty: "Qty", cart_product: "Product", cart_price: "Price",
+cart_total: "Total:", delivery_note: "Delivery: ~900 ₽/kg • Calculated at checkout",
+chat_placeholder: "Type a message...",
+modal_login: "Sign In", modal_register: "Sign Up", confirm_sent: "Confirmation sent",
+confirm_hint: "Click the link in the email, then press the button below.<br><small>Check your \"Spam\" folder</small>",
+btn_confirmed: "I confirmed my email", welcome: "Welcome to BYRMALDA!", btn_to_profile: "To Profile",
+confirm_logout: "Sign out?", logout_warning: "All unsaved changes will be lost.",
+btn_yes_logout: "Yes, sign out", no_account: "No account? Sign up",
+new_avatar: "New Avatar", select_image: "Select image", avatar_moderation: "Avatar will be sent for moderation.",
+change_avatar: "Change Avatar", select_image_single: "Select image (1 file only)",
+avatar_moderation_hint: "Avatar will be sent for moderation. After approval, it will appear in your profile.",
+btn_save_submit: "Save & Submit", suggest_product: "Suggest Product",
+btn_submit_mod: "Submit for Moderation", leave_review: "Leave Review", label_rating: "Rating",
+label_text: "Text", report: "Report", label_issue: "Problem Description",
+checkout: "Checkout", payment_hint: "For payment, message the admin on Telegram:",
+payment_note: "After payment, the order will appear in your profile.", size_chart: "Size Chart",
+select_delivery: "Select Delivery", label_delivery_service: "Delivery Service",
+label_city: "City", label_street: "Street", label_house: "House / Pickup Point #",
+btn_save_close: "💾 Save & Close", delivery_warning: "⚠️ Enter exact address. Orders with wrong address are disposed without refund.",
+warning_title: "⚠️ Why you shouldn't fully trust user-created products?",
+warning_1: "Product card may not match the actual item",
+warning_2: "There is a risk of being unable to return the product",
+warning_3: "Delivery will take significantly longer, no additional checks for user products",
+warning_4: "Product may be sent to wrong address during transit, enter address carefully",
+warning_5: "You may be scammed during the ordering process",
+warning_6: "Product may not exist (we try to monitor product availability)",
+maintenance_title: "Maintenance", maintenance_text: "Attention: technical maintenance in progress. Please do not place orders until maintenance ends.",
+ban_title: "Account Blocked", ban_message: "Your account has been blocked by administration.",
+ban_timer_label: "Unblock in:", ban_reload: "✅ Time expired! Reload page to unblock.",
+creator_system: "✨ BYRMALDA Creator System", creator_intro: "Become a creator and get perks for your product suggestions!",
+creator_levels: "📊 Creator Levels:", level_1_badge: "Level 1", level_1_desc: "Blue nickname", level_1_req: "1 approved product (not edited by admin)",
+level_2_badge: "Level 2", level_2_desc: "Yellow nickname", level_2_req: "5 approved products (counter resets after upgrade)",
+level_3_badge: "Level 3", level_3_desc: "Green nickname", level_3_req: "10 approved products (counter resets after upgrade)",
+level_4_badge: "Level 4", level_4_desc: "Red nickname", level_4_req: "25 approved products (counter resets after upgrade)",
+level_5_badge: "Level 5", level_5_desc: "Gradient nickname", level_5_req: "50 approved products (counter resets after upgrade)",
+creator_perks: "🎁 Level 5 Perks:", perk_discount: "25% discount on all products (footwear 10%, clothing 15%)",
+perk_price: "Special price shown on product card",
+creator_limits: "⏱️ Suggestion Limits:", limit_normal: "Regular users & creators levels 1-3:",
+limit_1_3: "1 attempt to submit product for moderation every 3 days", limit_reset: "Limit resets at 00:00 Moscow time",
+limit_premium: "Creators levels 4-5:", limit_4_5: "3 attempts to submit product for moderation every 3 days (1 per day)",
+creator_buy: "💰 Buy Creator Level:", prices_title: "Monthly Prices:",
+price_1: "Level 1 — 500 ₽/month", price_2: "Level 2 — 1300 ₽/month", price_3: "Level 3 — 2000 ₽/month", price_4_5: "Levels 4-5 — 2500 ₽/month",
+btn_buy_creator: "🛒 Buy Creator Level", creator_rules: "📋 Important Rules:",
+rule_1: "Products edited by admin before approval do NOT count toward level progression",
+rule_2: "After upgrading to a new level, the approved products counter resets",
+rule_3: "Rejected products do not decrease your level",
+rule_4: "Suggestion limits reset automatically at 00:00 MSK",
+rule_5: "Purchased creator status expires on specified date, then level resets",
+adm_create_product: "➕ Create Product", adm_edit_product: "✏️ Edit Product", adm_manage_product: "🗑️ Manage Product",
+grant_creator: "🎁 Grant Creator for Period", adm_users: "👥 Users", adm_orders: "📦 Orders",
+adm_reviews_mod: "⭐ Reviews for Moderation", adm_avatars_mod: "🖼️ Avatars for Moderation",
+adm_suggestions: "✨ Suggestions", adm_reports: "🚨 Reports", adm_maintenance: "⚙️ Maintenance",
+cat_clothing: "Clothing", cat_footwear: "Footwear", type_placeholder: "t-shirt, sneakers...",
+aud_unisex: "Unisex", aud_male: "Male", aud_female: "Female", color_placeholder: "Black,White",
+collab_no: "No", collab_yes: "Yes", label_brand: "Brand Name", weight_placeholder: "200",
+enter_product_id: "Enter Product ID", btn_load: "Load", btn_archive: "🗑️ Delete (to Archive)",
+btn_restore: "♻️ Restore", archive_hint: "Deleted products move to archive and are marked as \"Deleted\". Restore returns product to catalog.",
+label_uid: "User UID", label_creator_level: "Creator Level", enter_uid: "Enter UID",
+level_1: "Level 1 (Blue)", level_2: "Level 2 (Yellow)", level_3: "Level 3 (Green)",
+level_4: "Level 4 (Red)", level_5: "Level 5 (Gradient)", label_start: "Start", label_end: "End",
+btn_grant: "✨ Grant Creator", creator_granted: "✅ Creator granted!",
+enter_user_uid: "User UID", btn_block_forever: "Block Forever", btn_unblock: "Unblock",
+enter_temp_ban_uid: "UID for temp ban", time_format: "DD:HH:MM:SS", btn_temp_ban: "Temp Ban",
+enter_unban_uid: "UID for scheduled unban", btn_unban_after: "Unblock After",
+enter_order_id: "Order ID or Tracking", btn_find: "Find", btn_enable_maintenance: "Enable Maintenance",
+btn_disable_maintenance: "Disable Maintenance", label_start_msk: "Start (MSK)", label_end_msk: "End (MSK)",
+btn_save_schedule: "💾 Save Schedule", schedule_saved: "✅ Schedule saved!",
+btn_emergency_stop: "🚨 Emergency Stop"
+}
 };
 
-// 🔁 ФУНКЦИЯ ПРИМЕНЕНИЯ ПЕРЕВОДА
 function applyTranslations() {
-  const t = translations[lang];
-  if (!t) return;
-  
-  // Перевод элементов с data-i18n
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (t[key]) el.textContent = t[key];
-  });
-  
-  // Перевод placeholder'ов
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    if (t[key]) el.placeholder = t[key];
-  });
-  
-  // Перевод title/tooltip
-  document.querySelectorAll('[data-i18n-title]').forEach(el => {
-    const key = el.getAttribute('data-i18n-title');
-    if (t[key]) el.title = t[key];
-  });
-  
-  // Обновление кнопки языка
-  if($('cur-lang')) $('cur-lang').textContent = lang.toUpperCase();
-  
-  // Перерисовка динамических элементов
-  if (curProd) openProd(curProd.id);
-  if (userData?.cart?.length) renderCart();
-  genCatalog();
+const t = translations[lang];
+if (!t) return;
+document.querySelectorAll('[data-i18n]').forEach(el => {
+const key = el.getAttribute('data-i18n');
+if (t[key]) el.textContent = t[key];
+});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+const key = el.getAttribute('data-i18n-placeholder');
+if (t[key]) el.placeholder = t[key];
+});
+document.querySelectorAll('[data-i18n-title]').forEach(el => {
+const key = el.getAttribute('data-i18n-title');
+if (t[key]) el.title = t[key];
+});
+if($('cur-lang')) $('cur-lang').textContent = lang.toUpperCase();
+if (curProd) openProd(curProd.id);
+if (userData?.cart?.length) renderCart();
+genCatalog();
 }
 
 const firebaseConfig = {
@@ -1458,24 +1403,26 @@ provider: new ReCaptchaV3Provider("6LchEOwsAAAAAPqAkyDyf2wFoucWytU6ThkQKoGB"),
 isTokenAutoRefreshEnabled: true
 });
 getToken(appCheck, true).then(() => console.log('🔐 App Check активирован')).catch(err => console.error('🔐 App Check ошибка:', err.message));
+
 const auth = getAuth(app), db = getFirestore(app), storage = getStorage(app);
 const IMGBB_KEY = "eeef3479094c5cf6bf42607927565065";
 const ADMIN_EMAIL = "sobakastalina123@gmail.com";
 const RATES = { USD_TO_RUB: 90, USD_TO_UAH: 37 };
 let user = null, userData = null, curProd = null, galIdx = 0, chatUnread = 0, lang = localStorage.getItem('lang') || 'ru', theme = localStorage.getItem('theme') || 'light', revStars = 0, carouselIdx = 0, carouselTimer = null, banTimerInterval = null, maintenanceTimerInterval = null;
-// 🔁 НОВЫЕ ССЫЛКИ ДЛЯ ГЕРОЯ
+
 const heroImages = [
 "https://i.ibb.co/C5Pt8Rmh/IMG-20260517-222612.png",
-"https://i.ibb.co/TM8vNXDx/IMG-20260517-222236.png",
+"https://i.ibb.co/TM8vNXDx/IMG_20260517-222236.png",
 "https://i.ibb.co/N2t8MfX6/photo-2026-05-17-22-27-07.jpg",
 "https://i.ibb.co/mVYThhdY/photo-2026-05-17-22-27-01.jpg"
 ];
+
 const $ = id => document.getElementById(id);
 const show = el => el?.classList?.remove('hidden');
 const hide = el => el?.classList?.add('hidden');
 const fmtDate = ts => ts?.toDate?.()?.toLocaleDateString('ru-RU') || '...';
 const genId = () => Math.random().toString(36).substring(2, 10).toUpperCase();
-// 🔁 ФУНКЦИИ ДЛЯ ТАЙМЕРА БАНА
+
 function parseTimeStr(timeStr) {
 const parts = timeStr.split(':').map(p => parseInt(p) || 0);
 while (parts.length < 4) parts.unshift(0);
@@ -1508,7 +1455,6 @@ if($('ban-timer')) $('ban-timer').textContent = secondsToTimeStr(totalSeconds);
 updateTimer();
 banTimerInterval = setInterval(updateTimer, 1000);
 }
-// 🔁 ПРОВЕРКА БАНА ПРИ ВХОДЕ
 async function checkAndShowBan() {
 if (!user || !userData) return;
 const isBanned = userData.isBanned || false;
@@ -1541,7 +1487,6 @@ $('profile').style.opacity = '1';
 if (banTimerInterval) clearInterval(banTimerInterval);
 }
 }
-// 🔁 ФУНКЦИИ ДЛЯ ТЕХНИЧЕСКОГО ПЕРЕРЫВА
 function parseDateTimeMSK(dateStr, timeStr) {
 const [year, month, day] = dateStr.split('-').map(Number);
 const [hours, minutes] = timeStr.split(':').map(Number);
@@ -1623,7 +1568,6 @@ console.error('checkMaintenance:', e);
 hide($('maintenance-overlay'));
 }
 }
-// 🔁 ФУНКЦИИ ДЛЯ ЛИМИТОВ КРЕАТОРОВ
 function getMoscowMidnight() {
 const now = new Date();
 const mskOffset = 3 * 60 * 60 * 1000;
@@ -1653,7 +1597,6 @@ return `${hours} ${lang === 'ru' ? 'ч' : 'h'}`;
 }
 function getUserLimit(userData, isAdmin = false) {
 if (!userData) return { max: 1, used: 0 };
-// 🔁 АДМИН НЕ ИМЕЕТ ЛИМИТОВ
 if (isAdmin) return { max: 999, used: 0 };
 const level = userData.creatorLevel || 0;
 const max = level >= 4 ? 3 : 1;
@@ -1681,7 +1624,6 @@ userData.suggestionUsed = (userData.suggestionUsed || 0) + 1;
 }
 userData.suggestionLastReset = midnight;
 }
-// 🔁 ФУНКЦИИ ДЛЯ УРОВНЕЙ КРЕАТОРОВ
 function getCreatorLevel(userData) {
 if (!userData) return 0;
 return userData.creatorLevel || 0;
@@ -1704,12 +1646,10 @@ price: basePrice * (1 - discount),
 discount: Math.round(discount * 100)
 };
 }
-// 🔁 ПРОВЕРКА ИСТОЧЕНИЯ КРЕАТОРСТВА ПО ДАТЕ
 async function checkCreatorExpiry() {
 if (!user || !userData) return;
 const expiry = userData.creatorExpiryDate;
 if (expiry && Date.now() >= expiry) {
-// 🔁 СБРОС КРЕАТОРСТВА
 await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), {
 creatorLevel: 0,
 creatorExpiryDate: null,
@@ -1743,7 +1683,6 @@ document.querySelectorAll('.hero-slide').forEach((s,i) => {
 if(s) s.classList.toggle('active', i===carouselIdx);
 });
 }
-// 🔁 ФУНКЦИЯ ДЛЯ ПОКАЗА ПРЕДУПРЕЖДЕНИЯ
 window.showUserProductWarning = () => {
 openModal('user-product-warning-modal');
 };
@@ -1757,7 +1696,7 @@ window.history.replaceState({}, '', url);
 alert(lang === 'ru' ? '✅ Email подтверждён!' : '✅ Email confirmed!');
 }).catch(e => alert(lang === 'ru' ? '❌ Ошибка подтверждения: ' : '❌ Confirmation error: ' + e.message));
 }
-applyTheme(); initCarousel(); applyTranslations(); // 🔁 ПРИМЕНЯЕМ ПЕРЕВОДЫ ПРИ ЗАГРУЗКЕ
+applyTheme(); initCarousel(); applyTranslations();
 onAuthStateChanged(auth, async u => {
 if (u) {
 user = u; await loadUser(); updateAuthUI();
@@ -1768,10 +1707,10 @@ loadAdminPanels(); loadMaintenanceStatus();
 hide($('nav-admin')); show($('nav-suggest'));
 }
 loadOrders(); loadChat(); checkReviewStatus(); renderDelivery();
-renderCreatorLimit(); // 🔁 В НАСТРОЙКАХ
+renderCreatorLimit();
 await checkAndShowBan();
 await checkAndShowMaintenance();
-await checkCreatorExpiry(); // 🔁 ПРОВЕРКА ИСТОЧЕНИЯ
+await checkCreatorExpiry();
 } else {
 user = userData = null; resetAuthUI(); hide($('delivery-box')); hide($('ban-overlay')); hide($('maintenance-overlay'));
 if (banTimerInterval) clearInterval(banTimerInterval);
@@ -1800,7 +1739,7 @@ reviewStatus: 'none', deliveryCountry: null, deliveryAddress: { cdek: null, ua: 
 cart: [],
 isBanned: false, banType: null, banUntil: null, banDuration: null,
 creatorLevel: 0, creatorApprovedCount: 0, suggestionUsed: 0, suggestionLastReset: 0,
-creatorExpiryDate: null // 🔁 ДЛЯ ВРЕМЕННОГО КРЕАТОРСТВА
+creatorExpiryDate: null
 };
 await setDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), d, { merge: true });
 return d;
@@ -1822,7 +1761,6 @@ $('profile-name').innerHTML = `<span class="verified ${colorClass}">✓</span> $
 $('profile-name').innerHTML = `<span class="verified">✓</span> ${userData.name}`;
 }
 }
-// 🔁 ЛИМИТ ТЕПЕРЬ В НАСТРОЙКАХ
 function renderCreatorLimit() {
 const isAdmin = user?.email === ADMIN_EMAIL;
 const limitEl = $('creator-limit-settings');
@@ -1917,7 +1855,7 @@ const nb = $(`nav-${page}`); if (nb) nb.classList.add('active');
 if (page==='cart') renderCart(); if (page==='catalog') genCatalog();
 if (page==='search' && $('search-input')) $('search-input').value='';
 if (page==='profile' && user) { loadOrders(); renderDelivery(); checkAndShowBan(); }
-if (page==='settings' && user) renderCreatorLimit(); // 🔁 ОБНОВЛЕНИЕ ЛИМИТА
+if (page==='settings' && user) renderCreatorLimit();
 if (page==='reviews') loadPublicReviews();
 if (page==='admin' && user?.email===ADMIN_EMAIL) loadAdminPanels();
 if (window.innerWidth <= 1024 && $('sidebar')) $('sidebar').classList.remove('expanded');
@@ -1972,7 +1910,6 @@ closeModal('avatar-modal');
 loadPendingAvatars();
 } catch(e) { console.error(e); alert((lang === 'ru' ? '❌ Ошибка: ' : '❌ Error: ') + e.message); }
 };
-// 🛒 КОРЗИНА — С ПРОВЕРКОЙ НАЛИЧИЯ
 window.addToCart = async () => {
 if (!user) { openModal('login-modal'); return; }
 if (!userData || !curProd) return;
@@ -1981,7 +1918,6 @@ const sizeEl = $('p-size'), colorEl = $('p-color');
 if (sizeEl && sizeEl.tagName==='SELECT') size = sizeEl.value; else if (sizeEl?.closest?.('.opt-group')?.querySelector?.('.opt-static')) size = sizeEl.closest('.opt-group').querySelector('.opt-static').textContent;
 if (colorEl && colorEl.tagName==='SELECT') color = colorEl.value; else if (colorEl?.closest?.('.opt-group')?.querySelector?.('.opt-static')) color = colorEl.closest('.opt-group').querySelector('.opt-static').textContent;
 const qty = parseInt($('p-qty')?.value) || 1;
-// 🔁 ПРОВЕРКА: количество не превышает наличие
 if (qty > (curProd?.stock || 0)) {
 alert(`❌ ${lang === 'ru' ? 'количество выбранных товаров превышает количества наличия товара, максимальное количество:' : 'selected quantity exceeds available stock, maximum:'} ${curProd.stock}`);
 return;
@@ -2008,7 +1944,6 @@ let sub=0, kg=0;
 if(body) {
 body.innerHTML = '';
 for (const it of items) {
-// 🔁 ПРОВЕРКА: актуальное наличие из базы
 let currentStock = it?.stock || 0;
 try {
 const pSnap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', it?.pid));
@@ -2034,10 +1969,9 @@ window.updCart = async (id, f, v, maxStock) => {
 const it = userData?.cart?.find(i => i?.id === id);
 if(!it) return;
 const newQty = Math.max(1, parseInt(v) || 1);
-// 🔁 ПРОВЕРКА: не больше наличия
 if (newQty > maxStock) {
 alert(`❌ ${lang === 'ru' ? 'количество выбранных товаров превышает количества наличия товара, максимальное количество:' : 'selected quantity exceeds available stock, maximum:'} ${maxStock}`);
-if($('cart-items')) renderCart(); // Перерисовать с правильным значением
+if($('cart-items')) renderCart();
 return;
 }
 if(f==='qty') it.qty = newQty;
@@ -2051,18 +1985,18 @@ await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid), {cart: userDat
 renderCart(); loadCartCount();
 }
 };
-// 🔍 КАТАЛОГ & ПОИСК
+// 🔁 ИСПРАВЛЕНИЕ: Поиск теперь работает на обоих языках, переводя запрос к значениям в базе данных (Russian)
 function genCatalog() {
 const cats = [
-{id:'tshirts',n: lang === 'ru' ? 'Футболки' : 'T-Shirts',ic:'T-shirts',t: lang === 'ru' ? 'футболка' : 't-shirt'},
-{id:'hoodies',n: lang === 'ru' ? 'Толстовки' : 'Hoodies',ic:'hoodie',t: lang === 'ru' ? 'толстовка' : 'hoodie'},
-{id:'longsleeve',n: lang === 'ru' ? 'Лонгсливы' : 'Longsleeves',ic:'longsleeves',t: lang === 'ru' ? 'лонгслив' : 'longsleeve'},
-{id:'sneakers',n: lang === 'ru' ? 'Кроссовки' : 'Sneakers',ic:'sneakers',t: lang === 'ru' ? 'кроссовки' : 'sneakers'},
-{id:'acc',n: lang === 'ru' ? 'Аксессуары' : 'Accessories',ic:'accessories',t: lang === 'ru' ? 'аксессуар' : 'accessory'},
-{id:'pants',n: lang === 'ru' ? 'Штаны' : 'Pants',ic:'Pants',t: lang === 'ru' ? 'штаны' : 'pants'},
-{id:'shorts',n: lang === 'ru' ? 'Шорты' : 'Shorts',ic:'Shorts',t: lang === 'ru' ? 'шорты' : 'shorts'},
-{id:'jackets',n: lang === 'ru' ? 'Куртки' : 'Jackets',ic:'Jackets',t: lang === 'ru' ? 'куртка' : 'jacket'},
-{id:'archive',n: lang === 'ru' ? 'Архив' : 'Archive',ic:'📁',t: lang === 'ru' ? 'archive' : 'archive'}
+{id:'tshirts', n: lang === 'ru' ? 'Футболки' : 'T-Shirts', ic:'T-shirts', t:'футболка'},
+{id:'hoodies', n: lang === 'ru' ? 'Толстовки' : 'Hoodies', ic:'hoodie', t:'толстовка'},
+{id:'longsleeve', n: lang === 'ru' ? 'Лонгсливы' : 'Longsleeves', ic:'longsleeves', t:'лонгслив'},
+{id:'sneakers', n: lang === 'ru' ? 'Кроссовки' : 'Sneakers', ic:'sneakers', t:'кроссовки'},
+{id:'acc', n: lang === 'ru' ? 'Аксессуары' : 'Accessories', ic:'accessories', t:'аксессуар'},
+{id:'pants', n: lang === 'ru' ? 'Штаны' : 'Pants', ic:'Pants', t:'штаны'},
+{id:'shorts', n: lang === 'ru' ? 'Шорты' : 'Shorts', ic:'Shorts', t:'шорты'},
+{id:'jackets', n: lang === 'ru' ? 'Куртки' : 'Jackets', ic:'Jackets', t:'куртка'},
+{id:'archive', n: lang === 'ru' ? 'Архив' : 'Archive', ic:'📁', t:'archive'}
 ];
 if($('catalog-grid')) {
 $('catalog-grid').innerHTML = cats.map(c => `<div class="cat-card" onclick="filterType('${c.t}')"><div class="card-img">${c.ic}</div><div class="card-body"><div class="card-title">${c.n}</div></div></div>`).join('');
@@ -2079,14 +2013,21 @@ if (q === 'archive') {
 const snap = await getDocs(query(coll, where('deleted','==',true)));
 const res = []; snap.forEach(d => res.push({...d.data(),id:d.id}));
 if (!res.length && c) { c.innerHTML = `<div class="text-center" style="padding:32px;color:var(--text-dim)">${lang === 'ru' ? 'Архив пуст' : 'Archive is empty'}</div>`; return; }
-if(c) c.innerHTML = res.map(p => prodCard(p, true)).join(''); // 🔁 archive=true
+if(c) c.innerHTML = res.map(p => prodCard(p, true)).join('');
 return;
 }
-const filterTypes = lang === 'ru' ? ['футболка','толстовка','кроссовки','аксессуар','штаны','шорты','куртка','лонгслив'] : ['t-shirt','hoodie','sneakers','accessory','pants','shorts','jacket','longsleeve'];
-const isExactFilter = filterTypes.includes(q.toLowerCase());
+// 🔁 DATABASE MAPPING: English UI terms -> Russian DB terms
+const enToRu = {
+'t-shirt': 'футболка', 'hoodie': 'толстовка', 'longsleeve': 'лонгслив', 'sneakers': 'кроссовки',
+'accessory': 'аксессуар', 'pants': 'штаны', 'shorts': 'шорты', 'jacket': 'куртка'
+};
+const searchQuery = enToRu[q] || q;
+
+const filterTypes = ['футболка','толстовка','кроссовки','аксессуар','штаны','шорты','куртка','лонгслив'];
+const isExactFilter = filterTypes.includes(searchQuery.toLowerCase());
 let snap;
 if (isExactFilter) {
-snap = await getDocs(query(coll, where('published','==',true), where('deleted','==',false), where('type','==',q)));
+snap = await getDocs(query(coll, where('published','==',true), where('deleted','==',false), where('type','==',searchQuery)));
 } else {
 snap = await getDocs(query(coll, where('published','==',true), where('deleted','==',false)));
 }
@@ -2107,7 +2048,6 @@ let priceHtml = stock ? `$${p?.price||0}` : (lang === 'ru' ? 'Нет в нали
 if (isDeleted) priceHtml = lang === 'ru' ? 'Удалён' : 'Deleted';
 return `<div class="prod-card" onclick="openProd('${p?.id}')"><div class="card-img">${p?.images?.[0]?`<img src="${p.images[0]}" style="width:100%;height:100%;object-fit:cover" onerror="this.src='https://via.placeholder.com/220/f5f5f5/111?text=No'">`:'📦'}</div><div class="card-body"><div class="card-title">${p?.name|| (lang === 'ru' ? 'Товар' : 'Product')}</div><div class="card-price ${isDeleted?'st-archived':(stock?'':'card-nostock')}">${priceHtml}</div></div></div>`;
 }
-// 📦 КАРТОЧКА ТОВАРА
 window.openProd = async id => {
 try {
 const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', id));
@@ -2115,7 +2055,6 @@ if (!snap?.exists()) { alert(lang === 'ru' ? 'Товар не найден' : 'P
 curProd = { ...snap.data(), id };
 if($('p-id')) $('p-id').textContent = `ID: ${curProd?.productId || id}`;
 if($('p-name')) $('p-name').innerHTML = curProd?.name || (lang === 'ru' ? 'Товар' : 'Product');
-// 🔁 БАДЖИ ДЛЯ ПОЛЬЗОВАТЕЛЬСКИХ ТОВАРОВ
 if (curProd?.createdByUser) {
 show($('user-created-badge'));
 if (curProd?.editedByAdmin) {
@@ -2143,7 +2082,6 @@ if($('p-specs')) {
 $('p-specs').innerHTML=`<div class="spec-row"><span class="spec-l">${translations[lang].label_audience}</span><span class="spec-v">${curProd?.audience|| (lang === 'ru' ? 'Унисекс' : 'Unisex')}</span></div><div class="spec-row"><span class="spec-l">${translations[lang].label_type}</span><span class="spec-v">${curProd?.type||'-'}</span></div><div class="spec-row"><span class="spec-l">${translations[lang].label_material}</span><span class="spec-v">${curProd?.material||'-'}</span></div><div class="spec-row"><span class="spec-l">${translations[lang].label_collab}</span><span class="spec-v">${curProd?.collab|| (lang === 'ru' ? 'Нет' : 'No')}</span></div><div class="spec-row"><span class="spec-l">${translations[lang].label_weight}</span><span class="spec-v">${curProd?.weight||'-'} g</span></div><div class="spec-row"><span class="spec-l">${translations[lang].label_year}</span><span class="spec-v">${curProd?.year||'-'}</span></div><div class="spec-row"><span class="spec-l">${translations[lang].label_stock}</span><span class="spec-v">${curProd?.stock||0} ${lang === 'ru' ? 'шт' : 'pcs'}</span></div>`;
 }
 if($('p-desc')) $('p-desc').textContent = curProd?.desc || '';
-// 🔁 ЦЕНА С УЧЁТОМ СКИДКИ КРЕАТОРА
 let displayPrice = curProd?.price || 0;
 let discountText = '';
 if (user && userData) {
@@ -2160,7 +2098,6 @@ hide($('creator-discount-badge'));
 } else {
 hide($('creator-discount-badge'));
 }
-// 🔁 ПРОВЕРКА: УДАЛЁННЫЙ ТОВАР
 if (curProd?.deleted) {
 if($('p-price-usd')) $('p-price-usd').textContent = '-';
 if($('p-price-conv')) $('p-price-conv').textContent = '-';
@@ -2205,7 +2142,6 @@ console.error('openProd error:', e);
 alert(lang === 'ru' ? 'Ошибка загрузки товара' : 'Error loading product');
 }
 };
-// 🔁 ОБНОВЛЕНИЕ ГАЛЕРЕИ
 function updateGal() {
 if(!curProd) return;
 let imgs = [];
@@ -2234,16 +2170,13 @@ const len = (curProd?.images?.filter(img => img && img.trim() !== '')?.length) |
 galIdx = (galIdx + d + len) % len;
 updateGal();
 };
-// 🚀 ОФОРМЛЕНИЕ ЗАКАЗА — С ПРОВЕРКОЙ ДОСТАВКИ И СТОКА
 window.checkout = async () => {
 if(!user){openModal('login-modal');return;}
 if(!userData?.cart?.length){alert(lang === 'ru' ? 'Корзина пуста' : 'Cart is empty');return;}
-// 🔁 ПРОВЕРКА: доставка указана
 if(!userData?.deliveryCountry || !userData?.deliveryAddress?.[userData.deliveryCountry]){
 alert(lang === 'ru' ? '❌ Укажите адрес доставки в профиле перед оформлением заказа' : '❌ Please set delivery address in profile before checkout');
 navigate('profile'); return;
 }
-// 🔁 ПРОВЕРКА: наличие товаров
 for(const item of userData.cart) {
 const pSnap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', item?.pid));
 if(!pSnap?.exists()) continue;
@@ -2259,7 +2192,6 @@ closeModal('checkout-modal');
 const oid='ORD-'+genId(), total=parseFloat($('cart-total')?.textContent?.replace('$','')||'0');
 const order={id:oid,userId:user.uid,items:[...userData.cart],total,status: lang === 'ru' ? 'Ожидает оплату' : 'Awaiting Payment',tracking:'TRK-'+genId(),adminChangedStatus:false,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),deliveryAddress:userData.deliveryAddress[userData.deliveryCountry],deliveryCountry:userData.deliveryCountry};
 await setDoc(doc(db,'artifacts/byrmalda-prod/public/data/orders',oid),order);
-// 🔁 СПИСАНИЕ СТОКА
 for(const it of order.items) {
 const pSnap=await getDoc(doc(db,'artifacts/byrmalda-prod/public/data/products',it?.pid));
 if(pSnap?.exists()){
@@ -2272,7 +2204,6 @@ loadCartCount(); loadOrders();
 alert(`${lang === 'ru' ? '✅ Заказ #' : '✅ Order #'}${oid} ${lang === 'ru' ? 'создан! Статус: Ожидает оплату. Напишите @fueum для оплаты.' : 'created! Status: Awaiting Payment. Message @fueum to pay.'}`);
 navigate('profile');
 };
-// 📋 ЗАКАЗЫ — С ПРОВЕРКОЙ СТАТУСА ДЛЯ ОТМЕНЫ
 async function loadOrders() {
 if(!user) return;
 const c=$('orders-list');
@@ -2284,7 +2215,6 @@ if(c) {
 c.innerHTML=snap.docs.map(d=>{
 const o=d.data(); const st=o?.status|| (lang === 'ru' ? 'Ожидает оплату' : 'Awaiting Payment');
 const cls={'Ожидает оплату':'st-awaiting','Awaiting Payment':'st-awaiting','Создан':'st-created','Created':'st-created','Передача товара в доставку':'st-shipping','In Delivery':'st-shipping','В пути':'st-transit','In Transit':'st-transit','Доставлен':'st-delivered','Delivered':'st-delivered','Отменён':'st-cancelled','Cancelled':'st-cancelled','Архив':'st-archived','Archived':'st-archived'}[st]||'st-awaiting';
-// 🔁 ОТМЕНА ТОЛЬКО ПРИ "Ожидает оплату"
 const canCancel = st === (lang === 'ru' ? 'Ожидает оплату' : 'Awaiting Payment');
 const first=o?.items?.[0]||{};
 return `<div class="order-card" onclick="openProd('${first?.pid}')"><div class="order-img">${first?.img?`<img src="${first.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.src='https://via.placeholder.com/72/f5f5f5/111?text=No'">`:'📦'}</div><div class="order-info"><div class="order-name">${first?.name|| (lang === 'ru' ? 'Товар' : 'Product')}</div><span class="order-status ${cls}">${st}</span><div class="order-meta"><div>${lang === 'ru' ? 'Заказ: #' : 'Order: #'}${o?.id}</div><div>${lang === 'ru' ? 'Трекинг: ' : 'Tracking: '}${o?.tracking||'-'}</div><div>${lang === 'ru' ? 'Сумма: ' : 'Total: '}$${(o?.total||0).toFixed(2)}</div><div>${lang === 'ru' ? 'Дата: ' : 'Date: '}${fmtDate(o?.createdAt)}</div></div></div><div class="order-actions"><button class="btn-cancel" ${!canCancel?'disabled':''} onclick="event.stopPropagation();cancelOrder('${o?.id}','${st}')">×</button></div></div>`;
@@ -2293,13 +2223,11 @@ return `<div class="order-card" onclick="openProd('${first?.pid}')"><div class="
 } catch(e) { if(c) c.innerHTML=`<div class="text-center" style="padding:24px;color:var(--error)">${lang === 'ru' ? 'Ошибка' : 'Error'}</div>`; }
 }
 window.cancelOrder = async (oid, st) => {
-// 🔁 ПРОВЕРКА СТАТУСА
 if(st!== (lang === 'ru' ? 'Ожидает оплату' : 'Awaiting Payment')){alert(lang === 'ru' ? '❌ Нельзя отменить: заказ уже в обработке' : '❌ Cannot cancel: order already being processed');return;}
 if(!confirm(lang === 'ru' ? 'Отменить заказ?' : 'Cancel order?')) return;
 await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/orders',oid),{status: lang === 'ru' ? 'Отменён' : 'Cancelled',updatedAt:serverTimestamp()});
 loadOrders();
 };
-// 💬 ЧАТ — С АВТО-СООБЩЕНИЕМ ДЛЯ ПОКУПКИ КРЕАТОРСТВА
 async function loadChat() {
 if(!user) return;
 const c=$('chat-msgs');
@@ -2351,7 +2279,6 @@ function updateSupportBadge() {
 if($('support-badge')) $('support-badge').textContent=chatUnread;
 if($('nav-support')) $('nav-support').classList.toggle('has-badge',chatUnread>0);
 }
-// ⚙️ НАСТРОЙКИ & ОТЗЫВЫ
 window.toggleTheme = () => {
 theme = theme === 'light' ? 'dark' : 'light';
 localStorage.setItem('theme', theme);
@@ -2364,7 +2291,7 @@ if($('theme-ind')) $('theme-ind').textContent = theme === 'dark' ? '🌙' : '☀
 window.toggleLang = () => {
 lang = lang === 'ru' ? 'en' : 'ru';
 localStorage.setItem('lang', lang);
-applyTranslations(); // 🔁 ПРИМЕНЯЕМ ПЕРЕВОДЫ
+applyTranslations();
 };
 async function checkReviewStatus() {
 if (!user) return;
@@ -2475,12 +2402,11 @@ c.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px"
 }
 openModal('sizechart-modal');
 };
-// 🚚 ДОСТАВКА
 window.renderDelivery = () => {
 if(!user) return;
 show($('delivery-box'));
 if(userData?.deliveryCountry){
-if($('del-provider')) $('del-provider').textContent = userData.deliveryCountry==='cdek'?(lang === 'ru' ? '🇷🇺 СДЭК' : '🇷🇺 CDEK'):userData.deliveryCountry==='ua'?(lang === 'ru' ? '🇺🇦 UaExpress' : '🇺🇦 UaExpress'):(lang === 'ru' ? '🇺🇸 USmall' : '🇺🇸 USmall');
+if($('del-provider')) $('del-provider').textContent = userData.deliveryCountry==='cdek'?(lang === 'ru' ? '🇷🇺 СДЭК' : '🇷🇺 CDEK'):userData.deliveryCountry==='ua'?(lang === 'ru' ? '🇺🇦 UaExpress' : '🇺🇦 UaExpress'):(lang === 'ru' ? '🇺🇸 USmall' : '🇺 USmall');
 const addr=userData.deliveryAddress[userData.deliveryCountry];
 if($('del-addr')) $('del-addr').textContent = addr?`${addr.city}, ${addr.street}, ${addr.house}`: (lang === 'ru' ? 'Адрес не указан' : 'Address not set');
 } else {
@@ -2524,12 +2450,10 @@ usa:country==='usa'?{city,street,house}:userData.deliveryAddress?.usa
 }
 renderDelivery(); closeModal('delivery-modal');
 };
-// 🔁 ИНФОРМАЦИЯ О КРЕАТОРСТВЕ + ПОКУПКА
 window.openCreatorInfo = () => { openModal('creator-info-modal'); };
 window.buyCreatorLevel = () => {
 closeModal('creator-info-modal');
 navigate('support');
-// 🔁 АВТО-СООБЩЕНИЕ В ЧАТ
 setTimeout(async () => {
 if($('chat-input')) {
 $('chat-input').value = lang === 'ru' ? 'хочу купить уровень креатора' : 'I want to buy a creator level';
@@ -2537,7 +2461,6 @@ await sendMsg();
 }
 }, 500);
 };
-// 🛡️ АДМИН ПАНЕЛЬ
 async function loadAdminPanels(){
 loadPendingReviews();
 loadPendingAvatars();
@@ -2617,15 +2540,22 @@ $('edit-current-photos').innerHTML = (p?.images||[]).map(i=>`<img src="${i}" sty
 }
 if($('adm-edit-form')) {
 $('adm-edit-form').dataset.docId = snap.id;
+delete $('adm-edit-form').dataset.suggestionId;
+delete $('adm-edit-form').dataset.editingSuggestion;
 show($('adm-edit-form'));
 }
 } catch(e) { alert((lang === 'ru' ? 'Ошибка загрузки: ' : 'Load error: ') + e.message); }
 };
+// 🔁 ИСПРАВЛЕНИЕ: Функция сохранения теперь обрабатывает и предложения, и товары
 window.admSaveProduct = async () => {
-const docId = $('adm-edit-form')?.dataset?.docId;
-if(!docId) return;
+const isSuggestionEdit = $('adm-edit-form')?.dataset?.editingSuggestion === 'true';
+const targetId = isSuggestionEdit ? $('adm-edit-form')?.dataset?.suggestionId : $('adm-edit-form')?.dataset?.docId;
+
+if(!targetId) return;
+
 const collabType = $('edit-collab-type')?.value, collabName = $('edit-collab-name')?.value?.trim(),
 collab = collabType==='yes'&&collabName ? `Да, ${collabName}` : 'Нет';
+
 const u = {
 name: $('edit-name')?.value?.trim(),
 category: $('edit-cat')?.value,
@@ -2639,25 +2569,45 @@ color: $('edit-color')?.value?.trim(),
 sizes: $('edit-sizes')?.value?.trim(),
 year: parseInt($('edit-year')?.value)||2026,
 collab,
-desc: $('edit-desc')?.value?.trim(),
-updatedAt: serverTimestamp()
+desc: $('edit-desc')?.value?.trim()
 };
+
+// Обработка фото
 const files = $('edit-photos')?.files;
 if(files?.length>0){
-const cur = JSON.parse($('adm-edit-form')?.dataset?.curImgs || '[]');
+const cur = []; // Если редактируем предложение, фото пересоздаются
 for(let f of files){
 const fd = new FormData(); fd.append('image', f); fd.append('key', IMGBB_KEY);
 const res = await fetch('https://api.imgbb.com/1/upload', {method:'POST', body:fd});
 const d = await res.json();
 if(d?.success) cur.push(d?.data?.url);
 }
-u.images = cur;
+if(cur.length > 0) u.img = cur[0]; // Для предложений берем первое фото
 }
-await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/products', docId), u);
-alert(lang === 'ru' ? '✅ Сохранено' : '✅ Saved');
+
+if (isSuggestionEdit) {
+// Если это редактирование предложения, обновляем документ в suggestions
+// И ставим флаг adminEdited, чтобы approve знал, что админ правил
+u.adminEdited = true;
+await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', targetId), u);
+alert(lang === 'ru' ? '✅ Предложение сохранено! Нажмите "Одобрить" для публикации.' : '✅ Suggestion saved! Click "Approve" to publish.');
+} else {
+// Обычное сохранение товара
+if(u.img) u.images = [u.img]; // Формат для продуктов
+await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', targetId), u);
+alert(lang === 'ru' ? '✅ Товар сохранён' : '✅ Product saved');
+}
 hide($('adm-edit-form'));
 };
-// 🔁 УДАЛЕНИЕ/ВОССТАНОВЛЕНИЕ ТОВАРА
+
+window.admDeleteProduct = async () => {
+const pid = $('adm-delete-id')?.value?.trim();
+if(!pid) return;
+if(!confirm(lang === 'ru' ? 'Удалить?' : 'Delete?')) return;
+await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/products', pid), {deleted:true, published:false});
+alert(lang === 'ru' ? '✅ Удален' : '✅ Deleted');
+if($('adm-delete-id')) $('adm-delete-id').value = '';
+};
 window.admArchiveProduct = async () => {
 const pid = $('adm-manage-id')?.value?.trim();
 if(!pid) { alert(lang === 'ru' ? 'Введите ID товара' : 'Enter product ID'); return; }
@@ -2695,7 +2645,6 @@ alert(lang === 'ru' ? '✅ Товар восстановлен в каталог
 if($('adm-manage-id')) $('adm-manage-id').value = '';
 } catch(e) { alert((lang === 'ru' ? 'Ошибка: ' : 'Error: ') + e.message); }
 };
-// 🔁 ВЫДАЧА КРЕАТОРСТВА НА ПЕРИОД
 window.grantCreatorPeriod = async () => {
 const uid = $('grant-uid')?.value?.trim();
 const level = parseInt($('grant-level')?.value) || 1;
@@ -2706,12 +2655,10 @@ const startDate = new Date(startStr).getTime();
 const endDate = new Date(endStr).getTime();
 if(endDate <= startDate) { alert(lang === 'ru' ? 'Дата окончания должна быть позже даты начала' : 'End date must be after start date'); return; }
 try {
-// 🔁 ОБНОВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ
 await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', uid), {
 creatorLevel: level,
 creatorExpiryDate: endDate,
 hasVerifiedProduct: true,
-// 🔁 СБРОС ЛИМИТОВ ПРИ ВЫДАЧЕ
 suggestionUsed: 0,
 suggestionLastReset: getMoscowMidnight()
 });
@@ -2720,7 +2667,6 @@ $('grant-success').classList.remove('hidden');
 setTimeout(() => hide($('grant-success')), 3000);
 }
 alert(`${lang === 'ru' ? '✅ Креаторство уровня' : '✅ Creator level'} ${level} ${lang === 'ru' ? 'выдано до' : 'granted until'} ${new Date(endDate).toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US')}`);
-// Очистка полей
 if($('grant-uid')) $('grant-uid').value = '';
 if($('grant-start')) $('grant-start').value = '';
 if($('grant-end')) $('grant-end').value = '';
@@ -2728,15 +2674,6 @@ if($('grant-end')) $('grant-end').value = '';
 alert((lang === 'ru' ? 'Ошибка: ' : 'Error: ') + e.message);
 }
 };
-window.admDeleteProduct = async () => {
-const pid = $('adm-delete-id')?.value?.trim();
-if(!pid) return;
-if(!confirm(lang === 'ru' ? 'Удалить?' : 'Delete?')) return;
-await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/products', pid), {deleted:true, published:false});
-alert(lang === 'ru' ? '✅ Удален' : '✅ Deleted');
-if($('adm-delete-id')) $('adm-delete-id').value = '';
-};
-// 🔁 СИСТЕМА БАНОВ
 window.admBlockUser = async () => {
 const uid = $('adm-uid')?.value?.trim();
 if(!uid) return;
@@ -2850,7 +2787,6 @@ window.admRejectAvatar = async uid => {
 await updateDoc(doc(db,'artifacts/byrmalda-prod/users', uid), {avatarPending:null, avatarStatus:'rejected'});
 loadPendingAvatars();
 };
-// 🔁 ПРЕДЛОЖЕНИЯ ТОВАРОВ
 async function loadPendingSuggestions(){
 const c = $('adm-suggestions');
 if(c) c.innerHTML = '<div class="text-center"><div class="loading"></div></div>';
@@ -2877,6 +2813,7 @@ ${s?.img ? `<div style="margin:8px 0"><img src="${s.img}" style="max-width:200px
 }).join('') || (lang === 'ru' ? 'Нет предложений' : 'No suggestions');
 }
 }
+// 🔁 ИСПРАВЛЕНИЕ: Редактирование предложения теперь заполняет форму
 window.admEditSuggestion = async (id) => {
 const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
 if (!snap?.exists()) return;
@@ -2907,16 +2844,13 @@ $('adm-edit-form').dataset.editingSuggestion = 'true';
 show($('adm-edit-form'));
 }
 };
-window.admApproveSuggestion = async (id, editedData = null) => {
-let s;
-if (editedData) {
-s = editedData;
-} else {
+// 🔁 ИСПРАВЛЕНИЕ: Одобрение теперь учитывает флаг adminEdited
+window.admApproveSuggestion = async (id) => {
 const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
 if (!snap?.exists()) return;
-s = snap.data();
-}
-const wasEdited = !!editedData;
+const s = snap.data();
+const wasEdited = !!s.adminEdited;
+
 const prod = {
 productId: genId(),
 name: s?.name,
@@ -2936,11 +2870,12 @@ images: s?.img ? [s.img] : [],
 published: true,
 deleted: false,
 createdByUser: true,
-editedByAdmin: wasEdited,
+editedByAdmin: wasEdited, // Если админ редактировал, ставим true
 createdAt: serverTimestamp()
 };
 await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/products'), prod);
 await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id), { status: 'approved' });
+
 if (s?.uid && !wasEdited) {
 const userSnap = await getDoc(doc(db, 'artifacts/byrmalda-prod/users', s.uid));
 if (userSnap?.exists()) {
@@ -2973,6 +2908,7 @@ hasVerifiedProduct: true
 loadPendingSuggestions();
 alert(lang === 'ru' ? '✅ Товар опубликован!' : '✅ Product published!');
 };
+
 window.admRejectSuggestion = async id => {
 await deleteDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
 loadPendingSuggestions();
@@ -2998,7 +2934,6 @@ const n = $('sug-name')?.value?.trim(), c = $('sug-cat')?.value, t = $('sug-type
 p = parseFloat($('sug-price')?.value), stock = parseInt($('sug-stock')?.value)||10,
 weight = parseInt($('sug-weight')?.value)||200;
 if(!n||!t||isNaN(p)){alert(lang === 'ru' ? 'Заполните обязательные поля' : 'Fill in required fields');return;}
-// 🔁 ЗАГРУЗКА НЕСКОЛЬКИХ ФОТО
 let urls = [];
 const files = $('sug-img')?.files;
 if(files && files.length > 0){
@@ -3018,8 +2953,8 @@ type: t,
 price: p,
 stock: stock,
 weight: weight,
-img: urls[0] || '', // Первое фото как основное
-images: urls, // Все фото
+img: urls[0] || '',
+images: urls,
 audience: $('sug-aud')?.value,
 sizes: $('sug-sizes')?.value,
 material: $('sug-mat')?.value,
@@ -3053,7 +2988,6 @@ window.admMarkReportViewed = async id => {
 await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/reports', id), {status:'viewed'});
 loadReports();
 };
-// 🔁 ФУНКЦИИ ДЛЯ ТЕХНИЧЕСКОГО ПЕРЕРЫВА
 async function loadMaintenanceStatus() {
 if (user?.email !== ADMIN_EMAIL) return;
 try {
@@ -3133,7 +3067,6 @@ document.addEventListener('keydown', e => {
 if(e.key==='Escape') document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
 });
 }
-// 🔁 ЭКСПОРТ ФУНКЦИЙ
 Object.assign(window, {
 navigate, openModal, closeModal, openLogin, switchReg, doLogin, regStep1, regStep2,
 openAvatarModal, submitAvatar, filterType, handleSearch, openProd, setGal, galNav,
@@ -3149,7 +3082,7 @@ submitAvatarFromSettings, validateSingleFile, toggleMaintenance, saveMaintenance
 emergencyStopMaintenance, openCreatorInfo, buyCreatorLevel, admArchiveProduct, admRestoreProduct, grantCreatorPeriod,
 showUserProductWarning
 });
-console.log('🚀 BYRMALDA loaded. i18n enabled: RU/EN translations active.');
+console.log('🚀 BYRMALDA loaded. i18n + Admin Edit Suggestions Fixed.');
 </script>
 </body>
 </html>
