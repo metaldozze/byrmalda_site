@@ -2787,62 +2787,117 @@ window.admRejectAvatar = async uid => {
 await updateDoc(doc(db,'artifacts/byrmalda-prod/users', uid), {avatarPending:null, avatarStatus:'rejected'});
 loadPendingAvatars();
 };
+// 🔁 ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ПРЕДЛОЖЕНИЙ
 async function loadPendingSuggestions(){
-const c = $('adm-suggestions');
-if(c) c.innerHTML = '<div class="text-center"><div class="loading"></div></div>';
-if(user?.email!==ADMIN_EMAIL){ if(c) c.innerHTML=lang === 'ru' ? 'Доступ только для администратора' : 'Admin access only'; return; }
-const snap = await getDocs(query(collection(db,'artifacts/byrmalda-prod/public/data/suggestions'), where('status','==','pending')));
-if(c) {
-c.innerHTML = snap.docs.map(d=>{
-const s = d.data();
-return `<div class="mod-item">
-<div style="font-weight:500;margin-bottom:6px">${s?.name||'-'}</div>
-<div style="font-size:13px;color:var(--text-dim);margin:4px 0">
-<strong>${lang === 'ru' ? 'Категория:' : 'Category:'}</strong> ${s?.category||'-'} • <strong>${lang === 'ru' ? 'Тип:' : 'Type:'}</strong> ${s?.type||'-'} • <strong>${lang === 'ru' ? 'Цена:' : 'Price:'}</strong> $${s?.price||0}<br>
-<strong>${lang === 'ru' ? 'В наличии:' : 'Stock:'}</strong> ${s?.stock||10} • <strong>${lang === 'ru' ? 'Масса:' : 'Weight:'}</strong> ${s?.weight||200}g • <strong>${lang === 'ru' ? 'Для кого:' : 'For:'}</strong> ${s?.audience|| (lang === 'ru' ? 'Унисекс' : 'Unisex')}<br>
-<strong>${lang === 'ru' ? 'Размеры:' : 'Sizes:'}</strong> ${s?.sizes||'-'} • <strong>${lang === 'ru' ? 'Материал:' : 'Material:'}</strong> ${s?.material||'-'}<br>
-<strong>${lang === 'ru' ? 'Описание:' : 'Description:'}</strong> ${s?.desc||'-'}
-</div>
-${s?.img ? `<div style="margin:8px 0"><img src="${s.img}" style="max-width:200px;max-height:150px;border-radius:4px;object-fit:cover" onerror="this.src='https://placehold.co/200x150/f5f5f5/111?text=No'"></div>` : ''}
-<div class="actions">
-<button class="btn btn-sm" style="width:auto" onclick="admEditSuggestion('${d?.id}')">✏️ ${lang === 'ru' ? 'Редактировать' : 'Edit'}</button>
-<button class="btn btn-success btn-sm" style="width:auto" onclick="admApproveSuggestion('${d?.id}')">✅ ${lang === 'ru' ? 'Одобрить' : 'Approve'}</button>
-<button class="btn btn-danger btn-sm" style="width:auto" onclick="admRejectSuggestion('${d?.id}')">❌ ${lang === 'ru' ? 'Отклонить' : 'Reject'}</button>
-</div>
-</div>`;
-}).join('') || (lang === 'ru' ? 'Нет предложений' : 'No suggestions');
+    const c = $('adm-suggestions');
+    if(c) c.innerHTML = '<div class="text-center"><div class="loading"></div></div>';
+    
+    if(user?.email !== ADMIN_EMAIL){ 
+        if(c) c.innerHTML = lang === 'ru' ? 'Доступ только для администратора' : 'Admin access only'; 
+        return; 
+    }
+    
+    try {
+        const snap = await getDocs(query(
+            collection(db, 'artifacts/byrmalda-prod/public/data/suggestions'), 
+            where('status', '==', 'pending')
+        ));
+        
+        if(c) {
+            if(snap.empty) {
+                c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--text-dim)">${lang === 'ru' ? 'Нет предложений' : 'No suggestions'}</div>`;
+                return;
+            }
+            
+            c.innerHTML = snap.docs.map(d => {
+                const s = d.data();
+                // 🔁 Безопасная обработка изображения
+                const hasImg = s?.img && typeof s.img === 'string' && s.img.trim() !== '';
+                const imgUrl = hasImg ? s.img : '';
+                
+                return `<div class="mod-item">
+                    <div style="font-weight:500;margin-bottom:6px">${s?.name || '-'}</div>
+                    <div style="font-size:13px;color:var(--text-dim);margin:4px 0">
+                        <strong>${lang === 'ru' ? 'Категория:' : 'Category:'}</strong> ${s?.category || '-'} • 
+                        <strong>${lang === 'ru' ? 'Тип:' : 'Type:'}</strong> ${s?.type || '-'} • 
+                        <strong>${lang === 'ru' ? 'Цена:' : 'Price:'}</strong> $${s?.price || 0}<br>
+                        <strong>${lang === 'ru' ? 'В наличии:' : 'Stock:'}</strong> ${s?.stock || 10} • 
+                        <strong>${lang === 'ru' ? 'Масса:' : 'Weight:'}</strong> ${s?.weight || 200}g • 
+                        <strong>${lang === 'ru' ? 'Для кого:' : 'For:'}</strong> ${s?.audience || (lang === 'ru' ? 'Унисекс' : 'Unisex')}<br>
+                        <strong>${lang === 'ru' ? 'Размеры:' : 'Sizes:'}</strong> ${s?.sizes || '-'} • 
+                        <strong>${lang === 'ru' ? 'Материал:' : 'Material:'}</strong> ${s?.material || '-'}<br>
+                        <strong>${lang === 'ru' ? 'Описание:' : 'Description:'}</strong> ${s?.desc || '-'}
+                    </div>
+                    ${imgUrl ? `<div style="margin:8px 0"><img src="${imgUrl}" style="max-width:200px;max-height:150px;border-radius:4px;object-fit:cover" onerror="this.src='https://placehold.co/200x150/f5f5f5/111?text=No+Image'"></div>` : ''}
+                    <div class="actions">
+                        <button class="btn btn-sm" style="width:auto" onclick="admEditSuggestion('${d.id}')">✏️ ${lang === 'ru' ? 'Редактировать' : 'Edit'}</button>
+                        <button class="btn btn-success btn-sm" style="width:auto" onclick="admApproveSuggestion('${d.id}')">✅ ${lang === 'ru' ? 'Одобрить' : 'Approve'}</button>
+                        <button class="btn btn-danger btn-sm" style="width:auto" onclick="admRejectSuggestion('${d.id}')">❌ ${lang === 'ru' ? 'Отклонить' : 'Reject'}</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    } catch(e) {
+        console.error('loadPendingSuggestions error:', e);
+        if(c) c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--error)">${lang === 'ru' ? 'Ошибка загрузки' : 'Load error'}</div>`;
+    }
 }
-}
-// 🔁 ИСПРАВЛЕНИЕ: Редактирование предложения теперь заполняет форму
+
+// 🔁 ИСПРАВЛЕННАЯ ФУНКЦИЯ РЕДАКТИРОВАНИЯ ПРЕДЛОЖЕНИЯ
 window.admEditSuggestion = async (id) => {
-const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
-if (!snap?.exists()) return;
-const s = snap.data();
-if($('edit-name')) $('edit-name').value = s?.name || '';
-if($('edit-cat')) $('edit-cat').value = s?.category || '';
-if($('edit-type')) $('edit-type').value = s?.type || '';
-if($('edit-price')) $('edit-price').value = s?.price || '';
-if($('edit-stock')) $('edit-stock').value = s?.stock || 10;
-if($('edit-weight')) $('edit-weight').value = s?.weight || 200;
-if($('edit-aud')) $('edit-aud').value = s?.audience || 'unisex';
-if($('edit-mat')) $('edit-mat').value = s?.material || '';
-if($('edit-color')) $('edit-color').value = s?.color || '';
-if($('edit-sizes')) $('edit-sizes').value = s?.sizes || 'S,M,L';
-if($('edit-year')) $('edit-year').value = s?.year || new Date().getFullYear();
-if($('edit-desc')) $('edit-desc').value = s?.desc || '';
-if (s?.collab && s?.collab !== 'Нет') {
-if($('edit-collab-type')) $('edit-collab-type').value = 'yes';
-if($('edit-collab-name')) $('edit-collab-name').value = s?.collab?.replace('Да, ','') || '';
-show($('edit-collab-group'));
-} else {
-if($('edit-collab-type')) $('edit-collab-type').value = 'no';
-hide($('edit-collab-group'));
-}
-if($('adm-edit-form')) {
-$('adm-edit-form').dataset.suggestionId = id;
-$('adm-edit-form').dataset.editingSuggestion = 'true';
-show($('adm-edit-form'));
-}
+    try {
+        const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
+        if (!snap?.exists()) {
+            alert(lang === 'ru' ? 'Предложение не найдено' : 'Suggestion not found');
+            return;
+        }
+        
+        const s = snap.data();
+        
+        // Заполняем форму редактирования данными предложения
+        if($('edit-name')) $('edit-name').value = s?.name || '';
+        if($('edit-cat')) $('edit-cat').value = s?.category || '';
+        if($('edit-type')) $('edit-type').value = s?.type || '';
+        if($('edit-price')) $('edit-price').value = s?.price || '';
+        if($('edit-stock')) $('edit-stock').value = s?.stock || 10;
+        if($('edit-weight')) $('edit-weight').value = s?.weight || 200;
+        if($('edit-aud')) $('edit-aud').value = s?.audience || 'unisex';
+        if($('edit-mat')) $('edit-mat').value = s?.material || '';
+        if($('edit-color')) $('edit-color').value = s?.color || '';
+        if($('edit-sizes')) $('edit-sizes').value = s?.sizes || 'S,M,L';
+        if($('edit-year')) $('edit-year').value = s?.year || new Date().getFullYear();
+        if($('edit-desc')) $('edit-desc').value = s?.desc || '';
+        
+        // Обработка коллаборации
+        if (s?.collab && s?.collab !== 'Нет') {
+            if($('edit-collab-type')) $('edit-collab-type').value = 'yes';
+            if($('edit-collab-name')) $('edit-collab-name').value = s?.collab?.replace('Да, ', '') || '';
+            show($('edit-collab-group'));
+        } else {
+            if($('edit-collab-type')) $('edit-collab-type').value = 'no';
+            hide($('edit-collab-group'));
+        }
+        
+        // Показываем текущее фото если есть
+        if($('edit-current-photos')) {
+            const currentImg = s?.img || '';
+            $('edit-current-photos').innerHTML = currentImg && currentImg.trim() !== '' ? 
+                `<div style="margin:8px 0"><img src="${currentImg}" style="max-width:200px;border-radius:4px" onerror="this.src='https://placehold.co/200x150/f5f5f5/111?text=No+Image'"><div style="font-size:11px;color:var(--text-dim);margin-top:4px">${lang === 'ru' ? 'Текущее фото' : 'Current photo'}</div></div>` : 
+                (lang === 'ru' ? 'Нет фото' : 'No photos');
+        }
+        
+        // Показываем форму редактирования и сохраняем ID предложения
+        if($('adm-edit-form')) {
+            $('adm-edit-form').dataset.suggestionId = id;
+            $('adm-edit-form').dataset.editingSuggestion = 'true';
+            show($('adm-edit-form'));
+            // Прокручиваем к форме для удобства
+            $('adm-edit-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    } catch(e) {
+        console.error('admEditSuggestion error:', e);
+        alert((lang === 'ru' ? 'Ошибка: ' : 'Error: ') + e.message);
+    }
 };
 // 🔁 ИСПРАВЛЕНИЕ: Одобрение теперь учитывает флаг adminEdited
 window.admApproveSuggestion = async (id) => {
