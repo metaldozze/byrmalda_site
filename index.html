@@ -558,8 +558,15 @@ margin: 12px 0; font-size: 12px;
 .grant-creator-grid {
 display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;
 }
-.warning-list { margin: 16px 0; padding-left: 20px; }
-.warning-list li { margin: 8px 0; line-height: 1.5; color: var(--text-dim); }
+.warning-list {
+margin: 16px 0;
+padding-left: 20px;
+}
+.warning-list li {
+margin: 8px 0;
+line-height: 1.5;
+color: var(--text-dim);
+}
 @media (max-width: 1024px) {
 .sidebar { width: 64px; }
 .sidebar.expanded, .sidebar:hover { width: 220px; }
@@ -839,7 +846,8 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div class="form-group"><label class="form-label" data-i18n="label_photos">Фотографии</label><input type="file" class="admin-input" id="edit-photos" accept="image/*" multiple>
 <div id="edit-current-photos" style="margin-top:8px;font-size:12px;color:var(--text-dim)"></div></div>
 <div class="form-group"><label class="form-label" data-i18n="label_desc">Описание</label><textarea class="form-textarea" id="edit-desc"></textarea></div>
-<div class="btn-group"><button class="btn" onclick="admSaveProduct()" data-i18n="btn_save">Сохранить</button><button class="btn btn-outline" onclick="hide($('adm-edit-form'))" data-i18n="btn_cancel">Отмена</button></div>
+<!-- 🔁 ИСПРАВЛЕНИЕ: hide теперь в глобальной области -->
+<div class="btn-group"><button class="btn" onclick="admSaveProduct()" data-i18n="btn_save">Сохранить</button><button class="btn btn-outline" onclick="window.hide && window.hide($('adm-edit-form'))" data-i18n="btn_cancel">Отмена</button></div>
 </div>
 </div>
 <div class="admin-section">
@@ -929,6 +937,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </section>
 </main>
 </div>
+<!-- 🔁 МОДАЛЬНОЕ ОКНО: ПРЕДУПРЕЖДЕНИЕ О ТОВАРЕ ОТ ПОЛЬЗОВАТЕЛЯ -->
 <div class="modal" id="user-product-warning-modal">
 <div class="modal-content wide">
 <span class="modal-close" onclick="closeModal('user-product-warning-modal')">&times;</span>
@@ -944,6 +953,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <button class="btn mt-16" onclick="closeModal('user-product-warning-modal')" data-i18n="btn_understood">Понятно</button>
 </div>
 </div>
+<!-- 🔁 БАННЕР ТЕХНИЧЕСКОГО ПЕРЕРЫВА -->
 <div id="maintenance-overlay" class="maintenance-overlay hidden">
 <div class="maintenance-content">
 <div class="maintenance-icon">🔧</div>
@@ -952,6 +962,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <div id="maint-timer-display" class="maintenance-timer hidden">00:00:00</div>
 </div>
 </div>
+<!-- 🔁 БАННЕР БЛОКИРОВКИ -->
 <div id="ban-overlay" class="ban-overlay hidden">
 <div class="ban-content">
 <div class="ban-icon">🚫</div>
@@ -967,6 +978,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 <button class="btn btn-danger mt-16" onclick="logoutFromBan()" data-i18n="btn_logout">Выйти из аккаунта</button>
 </div>
 </div>
+<!-- 🔁 МОДАЛЬНОЕ ОКНО: СИСТЕМА КРЕАТОРСТВА -->
 <div class="modal" id="creator-info-modal">
 <div class="modal-content wide">
 <span class="modal-close" onclick="closeModal('creator-info-modal')">&times;</span>
@@ -1016,6 +1028,7 @@ padding: 8px; overflow-x: auto; border-right: none; border-bottom: 1px solid var
 </div>
 </div>
 </div>
+<!-- MODALS -->
 <div class="modal" id="login-modal">
 <div class="modal-content">
 <span class="modal-close" onclick="closeModal('login-modal')">&times;</span>
@@ -1183,7 +1196,6 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, se
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, limit, updateDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check.js";
-
 const translations = {
 ru: {
 nav_profile: "Профиль", nav_search: "Поиск", nav_catalog: "Каталог", nav_cart: "Корзина",
@@ -1366,7 +1378,6 @@ btn_save_schedule: "💾 Save Schedule", schedule_saved: "✅ Schedule saved!",
 btn_emergency_stop: "🚨 Emergency Stop"
 }
 };
-
 function applyTranslations() {
 const t = translations[lang];
 if (!t) return;
@@ -1387,7 +1398,6 @@ if (curProd) openProd(curProd.id);
 if (userData?.cart?.length) renderCart();
 genCatalog();
 }
-
 const firebaseConfig = {
 apiKey: "AIzaSyD0YkXZgk8gh01Y7XH3ZRVU5lCjGJ_IRCw",
 authDomain: "frwerwerwr.firebaseapp.com",
@@ -1403,26 +1413,23 @@ provider: new ReCaptchaV3Provider("6LchEOwsAAAAAPqAkyDyf2wFoucWytU6ThkQKoGB"),
 isTokenAutoRefreshEnabled: true
 });
 getToken(appCheck, true).then(() => console.log('🔐 App Check активирован')).catch(err => console.error('🔐 App Check ошибка:', err.message));
-
 const auth = getAuth(app), db = getFirestore(app), storage = getStorage(app);
 const IMGBB_KEY = "eeef3479094c5cf6bf42607927565065";
 const ADMIN_EMAIL = "sobakastalina123@gmail.com";
 const RATES = { USD_TO_RUB: 90, USD_TO_UAH: 37 };
 let user = null, userData = null, curProd = null, galIdx = 0, chatUnread = 0, lang = localStorage.getItem('lang') || 'ru', theme = localStorage.getItem('theme') || 'light', revStars = 0, carouselIdx = 0, carouselTimer = null, banTimerInterval = null, maintenanceTimerInterval = null;
-
 const heroImages = [
 "https://i.ibb.co/C5Pt8Rmh/IMG-20260517-222612.png",
-"https://i.ibb.co/TM8vNXDx/IMG_20260517-222236.png",
+"https://i.ibb.co/TM8vNXDx/IMG-20260517-222236.png",
 "https://i.ibb.co/N2t8MfX6/photo-2026-05-17-22-27-07.jpg",
 "https://i.ibb.co/mVYThhdY/photo-2026-05-17-22-27-01.jpg"
 ];
-
 const $ = id => document.getElementById(id);
-const show = el => el?.classList?.remove('hidden');
-const hide = el => el?.classList?.add('hidden');
+// 🔁 ИСПРАВЛЕНИЕ: hide и show теперь доступны глобально
+const show = el => { if(el) el.classList?.remove('hidden'); };
+const hide = el => { if(el) el.classList?.add('hidden'); };
 const fmtDate = ts => ts?.toDate?.()?.toLocaleDateString('ru-RU') || '...';
 const genId = () => Math.random().toString(36).substring(2, 10).toUpperCase();
-
 function parseTimeStr(timeStr) {
 const parts = timeStr.split(':').map(p => parseInt(p) || 0);
 while (parts.length < 4) parts.unshift(0);
@@ -1955,7 +1962,7 @@ const tot = (it?.price||0) * (it?.qty||1); sub+=tot; kg+=((it?.weight||200)*(it?
 const canChange = (it?.qty||1) <= currentStock;
 body.innerHTML += `<tr>
 <td><input type="number" class="qty-input" value="${it?.qty||1}" min="1" max="${currentStock}" data-pid="${it?.pid}" onchange="updCart('${it?.id}','qty',this.value, ${currentStock})" ${!canChange ? 'disabled style="color:var(--error)"' : ''}></td>
-<td class="flex items-center gap-8"><img class="cart-img" src="${it?.img||'https://placehold.co/60x60/f5f5f5/111?text=📦'}" onerror="this.src='https://via.placeholder.com/60/f5f5f5/111?text=No'"><div><div style="font-weight:500">${it?.name|| (lang === 'ru' ? 'Товар' : 'Product')}</div></div></td>
+<td class="flex items-center gap-8"><img class="cart-img" src="${it?.img||'https://placehold.co/60x60/f5f5f5/111?text=📦'}" onerror="this.src='https://placehold.co/60x60/f5f5f5/111?text=No'"><div><div style="font-weight:500">${it?.name|| (lang === 'ru' ? 'Товар' : 'Product')}</div></div></td>
 <td>${it?.size||'-'}</td><td>${it?.color||'-'}</td><td>$${it?.price||0}</td>
 <td><button class="btn-cancel" onclick="delCart('${it?.id}')">×</button></td>
 </tr>`;
@@ -1985,18 +1992,17 @@ await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid), {cart: userDat
 renderCart(); loadCartCount();
 }
 };
-// 🔁 ИСПРАВЛЕНИЕ: Поиск теперь работает на обоих языках, переводя запрос к значениям в базе данных (Russian)
 function genCatalog() {
 const cats = [
-{id:'tshirts', n: lang === 'ru' ? 'Футболки' : 'T-Shirts', ic:'T-shirts', t:'футболка'},
-{id:'hoodies', n: lang === 'ru' ? 'Толстовки' : 'Hoodies', ic:'hoodie', t:'толстовка'},
-{id:'longsleeve', n: lang === 'ru' ? 'Лонгсливы' : 'Longsleeves', ic:'longsleeves', t:'лонгслив'},
-{id:'sneakers', n: lang === 'ru' ? 'Кроссовки' : 'Sneakers', ic:'sneakers', t:'кроссовки'},
-{id:'acc', n: lang === 'ru' ? 'Аксессуары' : 'Accessories', ic:'accessories', t:'аксессуар'},
-{id:'pants', n: lang === 'ru' ? 'Штаны' : 'Pants', ic:'Pants', t:'штаны'},
-{id:'shorts', n: lang === 'ru' ? 'Шорты' : 'Shorts', ic:'Shorts', t:'шорты'},
-{id:'jackets', n: lang === 'ru' ? 'Куртки' : 'Jackets', ic:'Jackets', t:'куртка'},
-{id:'archive', n: lang === 'ru' ? 'Архив' : 'Archive', ic:'📁', t:'archive'}
+{id:'tshirts',n: lang === 'ru' ? 'Футболки' : 'T-Shirts',ic:'T-shirts',t: lang === 'ru' ? 'футболка' : 't-shirt'},
+{id:'hoodies',n: lang === 'ru' ? 'Толстовки' : 'Hoodies',ic:'hoodie',t: lang === 'ru' ? 'толстовка' : 'hoodie'},
+{id:'longsleeve',n: lang === 'ru' ? 'Лонгсливы' : 'Longsleeves',ic:'longsleeves',t: lang === 'ru' ? 'лонгслив' : 'longsleeve'},
+{id:'sneakers',n: lang === 'ru' ? 'Кроссовки' : 'Sneakers',ic:'sneakers',t: lang === 'ru' ? 'кроссовки' : 'sneakers'},
+{id:'acc',n: lang === 'ru' ? 'Аксессуары' : 'Accessories',ic:'accessories',t: lang === 'ru' ? 'аксессуар' : 'accessory'},
+{id:'pants',n: lang === 'ru' ? 'Штаны' : 'Pants',ic:'Pants',t: lang === 'ru' ? 'штаны' : 'pants'},
+{id:'shorts',n: lang === 'ru' ? 'Шорты' : 'Shorts',ic:'Shorts',t: lang === 'ru' ? 'шорты' : 'shorts'},
+{id:'jackets',n: lang === 'ru' ? 'Куртки' : 'Jackets',ic:'Jackets',t: lang === 'ru' ? 'куртка' : 'jacket'},
+{id:'archive',n: lang === 'ru' ? 'Архив' : 'Archive',ic:'📁',t: lang === 'ru' ? 'archive' : 'archive'}
 ];
 if($('catalog-grid')) {
 $('catalog-grid').innerHTML = cats.map(c => `<div class="cat-card" onclick="filterType('${c.t}')"><div class="card-img">${c.ic}</div><div class="card-body"><div class="card-title">${c.n}</div></div></div>`).join('');
@@ -2016,14 +2022,12 @@ if (!res.length && c) { c.innerHTML = `<div class="text-center" style="padding:3
 if(c) c.innerHTML = res.map(p => prodCard(p, true)).join('');
 return;
 }
-// 🔁 DATABASE MAPPING: English UI terms -> Russian DB terms
 const enToRu = {
 't-shirt': 'футболка', 'hoodie': 'толстовка', 'longsleeve': 'лонгслив', 'sneakers': 'кроссовки',
 'accessory': 'аксессуар', 'pants': 'штаны', 'shorts': 'шорты', 'jacket': 'куртка'
 };
 const searchQuery = enToRu[q] || q;
-
-const filterTypes = ['футболка','толстовка','кроссовки','аксессуар','штаны','шорты','куртка','лонгслив'];
+const filterTypes = lang === 'ru' ? ['футболка','толстовка','кроссовки','аксессуар','штаны','шорты','куртка','лонгслив'] : ['t-shirt','hoodie','sneakers','accessory','pants','shorts','jacket','longsleeve'];
 const isExactFilter = filterTypes.includes(searchQuery.toLowerCase());
 let snap;
 if (isExactFilter) {
@@ -2157,9 +2161,7 @@ $('p-main-img').onerror = function() { this.src = 'https://placehold.co/600x600/
 }
 if($('p-thumbs')) {
 $('p-thumbs').innerHTML = imgs.map((src, i) =>
-`<img src="${src}" class="thumb ${i===galIdx?'active':''}"
-onclick="setGal(${i})"
-onerror="this.src='https://via.placeholder.com/60/f5f5f5/111?text=No'">`
+`<img src="${src}" class="thumb ${i===galIdx?'active':''}" onclick="setGal(${i})" onerror="this.src='https://placehold.co/60x60/f5f5f5/111?text=No'">`
 ).join('');
 }
 }
@@ -2406,7 +2408,7 @@ window.renderDelivery = () => {
 if(!user) return;
 show($('delivery-box'));
 if(userData?.deliveryCountry){
-if($('del-provider')) $('del-provider').textContent = userData.deliveryCountry==='cdek'?(lang === 'ru' ? '🇷🇺 СДЭК' : '🇷🇺 CDEK'):userData.deliveryCountry==='ua'?(lang === 'ru' ? '🇺🇦 UaExpress' : '🇺🇦 UaExpress'):(lang === 'ru' ? '🇺🇸 USmall' : '🇺 USmall');
+if($('del-provider')) $('del-provider').textContent = userData.deliveryCountry==='cdek'?(lang === 'ru' ? '🇷🇺 СДЭК' : '🇷🇺 CDEK'):userData.deliveryCountry==='ua'?(lang === 'ru' ? '🇺🇦 UaExpress' : '🇺🇦 UaExpress'):(lang === 'ru' ? '🇺🇸 USmall' : '🇺🇸 USmall');
 const addr=userData.deliveryAddress[userData.deliveryCountry];
 if($('del-addr')) $('del-addr').textContent = addr?`${addr.city}, ${addr.street}, ${addr.house}`: (lang === 'ru' ? 'Адрес не указан' : 'Address not set');
 } else {
@@ -2546,16 +2548,13 @@ show($('adm-edit-form'));
 }
 } catch(e) { alert((lang === 'ru' ? 'Ошибка загрузки: ' : 'Load error: ') + e.message); }
 };
-// 🔁 ИСПРАВЛЕНИЕ: Функция сохранения теперь обрабатывает и предложения, и товары
+// 🔁 ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ
 window.admSaveProduct = async () => {
 const isSuggestionEdit = $('adm-edit-form')?.dataset?.editingSuggestion === 'true';
 const targetId = isSuggestionEdit ? $('adm-edit-form')?.dataset?.suggestionId : $('adm-edit-form')?.dataset?.docId;
-
-if(!targetId) return;
-
+if(!targetId) { alert(lang === 'ru' ? 'Ошибка: не указан документ для сохранения' : 'Error: no document ID'); return; }
 const collabType = $('edit-collab-type')?.value, collabName = $('edit-collab-name')?.value?.trim(),
 collab = collabType==='yes'&&collabName ? `Да, ${collabName}` : 'Нет';
-
 const u = {
 name: $('edit-name')?.value?.trim(),
 category: $('edit-cat')?.value,
@@ -2571,42 +2570,33 @@ year: parseInt($('edit-year')?.value)||2026,
 collab,
 desc: $('edit-desc')?.value?.trim()
 };
-
-// Обработка фото
 const files = $('edit-photos')?.files;
 if(files?.length>0){
-const cur = []; // Если редактируем предложение, фото пересоздаются
+const cur = [];
 for(let f of files){
 const fd = new FormData(); fd.append('image', f); fd.append('key', IMGBB_KEY);
 const res = await fetch('https://api.imgbb.com/1/upload', {method:'POST', body:fd});
 const d = await res.json();
 if(d?.success) cur.push(d?.data?.url);
 }
-if(cur.length > 0) u.img = cur[0]; // Для предложений берем первое фото
+if(cur.length > 0) u.img = cur[0];
 }
-
+try {
 if (isSuggestionEdit) {
-// Если это редактирование предложения, обновляем документ в suggestions
-// И ставим флаг adminEdited, чтобы approve знал, что админ правил
 u.adminEdited = true;
 await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', targetId), u);
 alert(lang === 'ru' ? '✅ Предложение сохранено! Нажмите "Одобрить" для публикации.' : '✅ Suggestion saved! Click "Approve" to publish.');
 } else {
-// Обычное сохранение товара
-if(u.img) u.images = [u.img]; // Формат для продуктов
+if(u.img) u.images = [u.img];
 await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', targetId), u);
 alert(lang === 'ru' ? '✅ Товар сохранён' : '✅ Product saved');
 }
 hide($('adm-edit-form'));
-};
-
-window.admDeleteProduct = async () => {
-const pid = $('adm-delete-id')?.value?.trim();
-if(!pid) return;
-if(!confirm(lang === 'ru' ? 'Удалить?' : 'Delete?')) return;
-await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/products', pid), {deleted:true, published:false});
-alert(lang === 'ru' ? '✅ Удален' : '✅ Deleted');
-if($('adm-delete-id')) $('adm-delete-id').value = '';
+if (isSuggestionEdit) loadPendingSuggestions();
+} catch(e) {
+console.error('admSaveProduct error:', e);
+alert((lang === 'ru' ? '❌ Ошибка сохранения: ' : '❌ Save error: ') + e.message);
+}
 };
 window.admArchiveProduct = async () => {
 const pid = $('adm-manage-id')?.value?.trim();
@@ -2674,6 +2664,14 @@ if($('grant-end')) $('grant-end').value = '';
 alert((lang === 'ru' ? 'Ошибка: ' : 'Error: ') + e.message);
 }
 };
+window.admDeleteProduct = async () => {
+const pid = $('adm-delete-id')?.value?.trim();
+if(!pid) return;
+if(!confirm(lang === 'ru' ? 'Удалить?' : 'Delete?')) return;
+await updateDoc(doc(db,'artifacts/byrmalda-prod/public/data/products', pid), {deleted:true, published:false});
+alert(lang === 'ru' ? '✅ Удален' : '✅ Deleted');
+if($('adm-delete-id')) $('adm-delete-id').value = '';
+};
 window.admBlockUser = async () => {
 const uid = $('adm-uid')?.value?.trim();
 if(!uid) return;
@@ -2718,7 +2716,7 @@ $('adm-order-res').innerHTML = `<div style="color:var(--error)">${lang === 'ru' 
 return;
 }
 const o = snap?.data(),
-items = (o?.items||[]).map(i=>`<div style="display:flex;gap:10px;margin:8px 0;padding:8px;background:var(--bg-soft);border-radius:4px"><img src="${i?.img||'https://placehold.co/50x50/f5f5f5/111?text=📦'}" style="width:50px;height:50px;object-fit:cover;border-radius:4px" onerror="this.src='https://via.placeholder.com/50/f5f5f5/111?text=No'"><div><div style="font-weight:500">${i?.name|| (lang === 'ru' ? 'Товар' : 'Product')}</div><div style="font-size:11px;color:var(--text-dim)">${i?.qty||0} ${lang === 'ru' ? 'шт' : 'pcs'} • ${i?.size||'-'} • ${i?.color||'-'}</div></div></div>`).join('')||'-';
+items = (o?.items||[]).map(i=>`<div style="display:flex;gap:10px;margin:8px 0;padding:8px;background:var(--bg-soft);border-radius:4px"><img src="${i?.img||'https://placehold.co/50x50/f5f5f5/111?text=📦'}" style="width:50px;height:50px;object-fit:cover;border-radius:4px" onerror="this.src='https://placehold.co/50x50/f5f5f5/111?text=No'"><div><div style="font-weight:500">${i?.name|| (lang === 'ru' ? 'Товар' : 'Product')}</div><div style="font-size:11px;color:var(--text-dim)">${i?.qty||0} ${lang === 'ru' ? 'шт' : 'pcs'} • ${i?.size||'-'} • ${i?.color||'-'}</div></div></div>`).join('')||'-';
 if($('adm-order-res')) {
 $('adm-order-res').innerHTML = `<div style="background:var(--bg);padding:16px;border-radius:6px"><div style="margin-bottom:8px"><strong>${lang === 'ru' ? 'Заказ:' : 'Order:'}</strong> #${o?.id} | <strong>${lang === 'ru' ? 'Трекинг:' : 'Tracking:'}</strong> ${o?.tracking||'-'}</div><div style="margin-bottom:12px"><strong>${lang === 'ru' ? 'Статус:' : 'Status:'}</strong> <span style="padding:4px 10px;border-radius:20px;font-size:12px;background:#cffafe">${o?.status||'-'}</span></div><div style="margin:12px 0"><strong>${lang === 'ru' ? 'Товары:' : 'Products:'}</strong></div>${items}<div style="margin-top:12px"><strong>${lang === 'ru' ? 'Действия:' : 'Actions:'}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn btn-sm" style="width:auto" onclick="admSetOrderStatus('${o?.id}','${lang === 'ru' ? 'Создан' : 'Created'}')">${lang === 'ru' ? 'Создан' : 'Created'}</button><button class="btn btn-sm" style="width:auto" onclick="admSetOrderStatus('${o?.id}','${lang === 'ru' ? 'Передача товара в доставку' : 'In Delivery'}')">${lang === 'ru' ? 'В доставку' : 'To Delivery'}</button><button class="btn btn-sm" style="width:auto" onclick="admSetOrderStatus('${o?.id}','${lang === 'ru' ? 'В пути' : 'In Transit'}')">${lang === 'ru' ? 'В пути' : 'In Transit'}</button><button class="btn btn-danger btn-sm" style="width:auto" onclick="admSetOrderStatus('${o?.id}','${lang === 'ru' ? 'Отменён' : 'Cancelled'}')">${lang === 'ru' ? 'Отмена' : 'Cancel'}</button></div></div></div>`;
 show($('adm-order-res'));
@@ -2775,7 +2773,9 @@ const snap = await getDocs(query(collection(db,'artifacts/byrmalda-prod/users'),
 if(c) {
 c.innerHTML = snap.docs.map(d=>{
 const u = d.data();
-return `<div class="mod-item flex items-center gap-12"><img src="${u?.avatarPending||'https://placehold.co/120x120/f5f5f5/111?text=No'}" style="width:120px;height:120px;border-radius:8px;object-fit:cover" onerror="this.src='https://placehold.co/120x120/f5f5f5/111?text=No'"><div style="flex:1"><div style="font-weight:500">${u?.name||'-'}</div><div style="font-size:11px;color:var(--text-dim)">UID: ${u?.uid?.substring(0,10)||'-'}...</div></div><div class="actions"><button class="btn btn-success btn-sm" onclick="admApproveAvatar('${u?.uid}','${u?.avatarPending}')">${lang === 'ru' ? 'Одобрить' : 'Approve'}</button><button class="btn btn-danger btn-sm" onclick="admRejectAvatar('${u?.uid}')">${lang === 'ru' ? 'Отклонить' : 'Reject'}</button></div></div>`;
+// 🔁 ИСПРАВЛЕНИЕ: правильная конкатенация вместо шаблонной строки
+const avatarUrl = u?.avatarPending ? 'https://placehold.co/120x120/f5f5f5/111?text=No' : u.avatarPending;
+return `<div class="mod-item flex items-center gap-12"><img src="${avatarUrl}" style="width:120px;height:120px;border-radius:8px;object-fit:cover" onerror="this.src='https://placehold.co/120x120/f5f5f5/111?text=No'"><div style="flex:1"><div style="font-weight:500">${u?.name||'-'}</div><div style="font-size:11px;color:var(--text-dim)">UID: ${u?.uid?.substring(0,10)||'-'}...</div></div><div class="actions"><button class="btn btn-success btn-sm" onclick="admApproveAvatar('${u?.uid}','${u?.avatarPending}')">${lang === 'ru' ? 'Одобрить' : 'Approve'}</button><button class="btn btn-danger btn-sm" onclick="admRejectAvatar('${u?.uid}')">${lang === 'ru' ? 'Отклонить' : 'Reject'}</button></div></div>`;
 }).join('') || (lang === 'ru' ? 'Нет заявок' : 'No pending items');
 }
 }
@@ -2789,123 +2789,106 @@ loadPendingAvatars();
 };
 // 🔁 ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ПРЕДЛОЖЕНИЙ
 async function loadPendingSuggestions(){
-    const c = $('adm-suggestions');
-    if(c) c.innerHTML = '<div class="text-center"><div class="loading"></div></div>';
-    
-    if(user?.email !== ADMIN_EMAIL){ 
-        if(c) c.innerHTML = lang === 'ru' ? 'Доступ только для администратора' : 'Admin access only'; 
-        return; 
-    }
-    
-    try {
-        const snap = await getDocs(query(
-            collection(db, 'artifacts/byrmalda-prod/public/data/suggestions'), 
-            where('status', '==', 'pending')
-        ));
-        
-        if(c) {
-            if(snap.empty) {
-                c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--text-dim)">${lang === 'ru' ? 'Нет предложений' : 'No suggestions'}</div>`;
-                return;
-            }
-            
-            c.innerHTML = snap.docs.map(d => {
-                const s = d.data();
-                // 🔁 Безопасная обработка изображения
-                const hasImg = s?.img && typeof s.img === 'string' && s.img.trim() !== '';
-                const imgUrl = hasImg ? s.img : '';
-                
-                return `<div class="mod-item">
-                    <div style="font-weight:500;margin-bottom:6px">${s?.name || '-'}</div>
-                    <div style="font-size:13px;color:var(--text-dim);margin:4px 0">
-                        <strong>${lang === 'ru' ? 'Категория:' : 'Category:'}</strong> ${s?.category || '-'} • 
-                        <strong>${lang === 'ru' ? 'Тип:' : 'Type:'}</strong> ${s?.type || '-'} • 
-                        <strong>${lang === 'ru' ? 'Цена:' : 'Price:'}</strong> $${s?.price || 0}<br>
-                        <strong>${lang === 'ru' ? 'В наличии:' : 'Stock:'}</strong> ${s?.stock || 10} • 
-                        <strong>${lang === 'ru' ? 'Масса:' : 'Weight:'}</strong> ${s?.weight || 200}g • 
-                        <strong>${lang === 'ru' ? 'Для кого:' : 'For:'}</strong> ${s?.audience || (lang === 'ru' ? 'Унисекс' : 'Unisex')}<br>
-                        <strong>${lang === 'ru' ? 'Размеры:' : 'Sizes:'}</strong> ${s?.sizes || '-'} • 
-                        <strong>${lang === 'ru' ? 'Материал:' : 'Material:'}</strong> ${s?.material || '-'}<br>
-                        <strong>${lang === 'ru' ? 'Описание:' : 'Description:'}</strong> ${s?.desc || '-'}
-                    </div>
-                    ${imgUrl ? `<div style="margin:8px 0"><img src="${imgUrl}" style="max-width:200px;max-height:150px;border-radius:4px;object-fit:cover" onerror="this.src='https://placehold.co/200x150/f5f5f5/111?text=No+Image'"></div>` : ''}
-                    <div class="actions">
-                        <button class="btn btn-sm" style="width:auto" onclick="admEditSuggestion('${d.id}')">✏️ ${lang === 'ru' ? 'Редактировать' : 'Edit'}</button>
-                        <button class="btn btn-success btn-sm" style="width:auto" onclick="admApproveSuggestion('${d.id}')">✅ ${lang === 'ru' ? 'Одобрить' : 'Approve'}</button>
-                        <button class="btn btn-danger btn-sm" style="width:auto" onclick="admRejectSuggestion('${d.id}')">❌ ${lang === 'ru' ? 'Отклонить' : 'Reject'}</button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-    } catch(e) {
-        console.error('loadPendingSuggestions error:', e);
-        if(c) c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--error)">${lang === 'ru' ? 'Ошибка загрузки' : 'Load error'}</div>`;
-    }
+const c = $('adm-suggestions');
+if(c) c.innerHTML = '<div class="text-center"><div class="loading"></div></div>';
+if(user?.email !== ADMIN_EMAIL){
+if(c) c.innerHTML = lang === 'ru' ? 'Доступ только для администратора' : 'Admin access only';
+return;
 }
-
+try {
+const snap = await getDocs(query(
+collection(db, 'artifacts/byrmalda-prod/public/data/suggestions'),
+where('status', '==', 'pending')
+));
+if(c) {
+if(snap.empty) {
+c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--text-dim)">${lang === 'ru' ? 'Нет предложений' : 'No suggestions'}</div>`;
+return;
+}
+c.innerHTML = snap.docs.map(d => {
+const s = d.data();
+const hasImg = s?.img && typeof s.img === 'string' && s.img.trim() !== '';
+// 🔁 ИСПРАВЛЕНИЕ: правильная конкатенация вместо ${imgUrl}
+const imgUrl = hasImg ? s.img : '';
+return `<div class="mod-item">
+<div style="font-weight:500;margin-bottom:6px">${s?.name || '-'}</div>
+<div style="font-size:13px;color:var(--text-dim);margin:4px 0">
+<strong>${lang === 'ru' ? 'Категория:' : 'Category:'}</strong> ${s?.category || '-'} •
+<strong>${lang === 'ru' ? 'Тип:' : 'Type:'}</strong> ${s?.type || '-'} •
+<strong>${lang === 'ru' ? 'Цена:' : 'Price:'}</strong> $${s?.price || 0}<br>
+<strong>${lang === 'ru' ? 'В наличии:' : 'Stock:'}</strong> ${s?.stock || 10} •
+<strong>${lang === 'ru' ? 'Масса:' : 'Weight:'}</strong> ${s?.weight || 200}g •
+<strong>${lang === 'ru' ? 'Для кого:' : 'For:'}</strong> ${s?.audience || (lang === 'ru' ? 'Унисекс' : 'Unisex')}<br>
+<strong>${lang === 'ru' ? 'Размеры:' : 'Sizes:'}</strong> ${s?.sizes || '-'} •
+<strong>${lang === 'ru' ? 'Материал:' : 'Material:'}</strong> ${s?.material || '-'}<br>
+<strong>${lang === 'ru' ? 'Описание:' : 'Description:'}</strong> ${s?.desc || '-'}
+</div>
+${imgUrl ? `<div style="margin:8px 0"><img src="${imgUrl}" style="max-width:200px;max-height:150px;border-radius:4px;object-fit:cover" onerror="this.src='https://placehold.co/200x150/f5f5f5/111?text=No+Image'"></div>` : ''}
+<div class="actions">
+<button class="btn btn-sm" style="width:auto" onclick="admEditSuggestion('${d.id}')">✏️ ${lang === 'ru' ? 'Редактировать' : 'Edit'}</button>
+<button class="btn btn-success btn-sm" style="width:auto" onclick="admApproveSuggestion('${d.id}')">✅ ${lang === 'ru' ? 'Одобрить' : 'Approve'}</button>
+<button class="btn btn-danger btn-sm" style="width:auto" onclick="admRejectSuggestion('${d.id}')">❌ ${lang === 'ru' ? 'Отклонить' : 'Reject'}</button>
+</div>
+</div>`;
+}).join('');
+}
+} catch(e) {
+console.error('loadPendingSuggestions error:', e);
+if(c) c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--error)">${lang === 'ru' ? 'Ошибка загрузки' : 'Load error'}</div>`;
+}
+}
 // 🔁 ИСПРАВЛЕННАЯ ФУНКЦИЯ РЕДАКТИРОВАНИЯ ПРЕДЛОЖЕНИЯ
 window.admEditSuggestion = async (id) => {
-    try {
-        const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
-        if (!snap?.exists()) {
-            alert(lang === 'ru' ? 'Предложение не найдено' : 'Suggestion not found');
-            return;
-        }
-        
-        const s = snap.data();
-        
-        // Заполняем форму редактирования данными предложения
-        if($('edit-name')) $('edit-name').value = s?.name || '';
-        if($('edit-cat')) $('edit-cat').value = s?.category || '';
-        if($('edit-type')) $('edit-type').value = s?.type || '';
-        if($('edit-price')) $('edit-price').value = s?.price || '';
-        if($('edit-stock')) $('edit-stock').value = s?.stock || 10;
-        if($('edit-weight')) $('edit-weight').value = s?.weight || 200;
-        if($('edit-aud')) $('edit-aud').value = s?.audience || 'unisex';
-        if($('edit-mat')) $('edit-mat').value = s?.material || '';
-        if($('edit-color')) $('edit-color').value = s?.color || '';
-        if($('edit-sizes')) $('edit-sizes').value = s?.sizes || 'S,M,L';
-        if($('edit-year')) $('edit-year').value = s?.year || new Date().getFullYear();
-        if($('edit-desc')) $('edit-desc').value = s?.desc || '';
-        
-        // Обработка коллаборации
-        if (s?.collab && s?.collab !== 'Нет') {
-            if($('edit-collab-type')) $('edit-collab-type').value = 'yes';
-            if($('edit-collab-name')) $('edit-collab-name').value = s?.collab?.replace('Да, ', '') || '';
-            show($('edit-collab-group'));
-        } else {
-            if($('edit-collab-type')) $('edit-collab-type').value = 'no';
-            hide($('edit-collab-group'));
-        }
-        
-        // Показываем текущее фото если есть
-        if($('edit-current-photos')) {
-            const currentImg = s?.img || '';
-            $('edit-current-photos').innerHTML = currentImg && currentImg.trim() !== '' ? 
-                `<div style="margin:8px 0"><img src="${currentImg}" style="max-width:200px;border-radius:4px" onerror="this.src='https://placehold.co/200x150/f5f5f5/111?text=No+Image'"><div style="font-size:11px;color:var(--text-dim);margin-top:4px">${lang === 'ru' ? 'Текущее фото' : 'Current photo'}</div></div>` : 
-                (lang === 'ru' ? 'Нет фото' : 'No photos');
-        }
-        
-        // Показываем форму редактирования и сохраняем ID предложения
-        if($('adm-edit-form')) {
-            $('adm-edit-form').dataset.suggestionId = id;
-            $('adm-edit-form').dataset.editingSuggestion = 'true';
-            show($('adm-edit-form'));
-            // Прокручиваем к форме для удобства
-            $('adm-edit-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    } catch(e) {
-        console.error('admEditSuggestion error:', e);
-        alert((lang === 'ru' ? 'Ошибка: ' : 'Error: ') + e.message);
-    }
+try {
+const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
+if (!snap?.exists()) {
+alert(lang === 'ru' ? 'Предложение не найдено' : 'Suggestion not found');
+return;
+}
+const s = snap.data();
+if($('edit-name')) $('edit-name').value = s?.name || '';
+if($('edit-cat')) $('edit-cat').value = s?.category || '';
+if($('edit-type')) $('edit-type').value = s?.type || '';
+if($('edit-price')) $('edit-price').value = s?.price || '';
+if($('edit-stock')) $('edit-stock').value = s?.stock || 10;
+if($('edit-weight')) $('edit-weight').value = s?.weight || 200;
+if($('edit-aud')) $('edit-aud').value = s?.audience || 'unisex';
+if($('edit-mat')) $('edit-mat').value = s?.material || '';
+if($('edit-color')) $('edit-color').value = s?.color || '';
+if($('edit-sizes')) $('edit-sizes').value = s?.sizes || 'S,M,L';
+if($('edit-year')) $('edit-year').value = s?.year || new Date().getFullYear();
+if($('edit-desc')) $('edit-desc').value = s?.desc || '';
+if (s?.collab && s?.collab !== 'Нет') {
+if($('edit-collab-type')) $('edit-collab-type').value = 'yes';
+if($('edit-collab-name')) $('edit-collab-name').value = s?.collab?.replace('Да, ', '') || '';
+show($('edit-collab-group'));
+} else {
+if($('edit-collab-type')) $('edit-collab-type').value = 'no';
+hide($('edit-collab-group'));
+}
+if($('edit-current-photos')) {
+const currentImg = s?.img || '';
+// 🔁 ИСПРАВЛЕНИЕ: правильная конкатенация вместо ${currentImg}
+$('edit-current-photos').innerHTML = currentImg && currentImg.trim() !== '' ?
+`<div style="margin:8px 0"><img src="${currentImg}" style="max-width:200px;border-radius:4px" onerror="this.src='https://placehold.co/200x150/f5f5f5/111?text=No+Image'"><div style="font-size:11px;color:var(--text-dim);margin-top:4px">${lang === 'ru' ? 'Текущее фото' : 'Current photo'}</div></div>` :
+(lang === 'ru' ? 'Нет фото' : 'No photos');
+}
+if($('adm-edit-form')) {
+$('adm-edit-form').dataset.suggestionId = id;
+$('adm-edit-form').dataset.editingSuggestion = 'true';
+show($('adm-edit-form'));
+$('adm-edit-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+} catch(e) {
+console.error('admEditSuggestion error:', e);
+alert((lang === 'ru' ? 'Ошибка: ' : 'Error: ') + e.message);
+}
 };
-// 🔁 ИСПРАВЛЕНИЕ: Одобрение теперь учитывает флаг adminEdited
 window.admApproveSuggestion = async (id) => {
 const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
 if (!snap?.exists()) return;
 const s = snap.data();
 const wasEdited = !!s.adminEdited;
-
 const prod = {
 productId: genId(),
 name: s?.name,
@@ -2925,12 +2908,11 @@ images: s?.img ? [s.img] : [],
 published: true,
 deleted: false,
 createdByUser: true,
-editedByAdmin: wasEdited, // Если админ редактировал, ставим true
+editedByAdmin: wasEdited,
 createdAt: serverTimestamp()
 };
 await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/products'), prod);
 await updateDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id), { status: 'approved' });
-
 if (s?.uid && !wasEdited) {
 const userSnap = await getDoc(doc(db, 'artifacts/byrmalda-prod/users', s.uid));
 if (userSnap?.exists()) {
@@ -2963,7 +2945,6 @@ hasVerifiedProduct: true
 loadPendingSuggestions();
 alert(lang === 'ru' ? '✅ Товар опубликован!' : '✅ Product published!');
 };
-
 window.admRejectSuggestion = async id => {
 await deleteDoc(doc(db, 'artifacts/byrmalda-prod/public/data/suggestions', id));
 loadPendingSuggestions();
@@ -3122,6 +3103,7 @@ document.addEventListener('keydown', e => {
 if(e.key==='Escape') document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
 });
 }
+// 🔁 ЭКСПОРТ: добавлены hide и show в глобальную область
 Object.assign(window, {
 navigate, openModal, closeModal, openLogin, switchReg, doLogin, regStep1, regStep2,
 openAvatarModal, submitAvatar, filterType, handleSearch, openProd, setGal, galNav,
@@ -3135,9 +3117,10 @@ toggleCollabInput, toggleEditCollabInput, openDeliveryModal, selectDelivery, sav
 carouselNav, confirmLogout, doLogout, logoutFromBan, openAvatarSettingsModal,
 submitAvatarFromSettings, validateSingleFile, toggleMaintenance, saveMaintenanceSchedule,
 emergencyStopMaintenance, openCreatorInfo, buyCreatorLevel, admArchiveProduct, admRestoreProduct, grantCreatorPeriod,
-showUserProductWarning
+showUserProductWarning,
+hide, show // 🔁 ДОБАВЛЕНО: теперь hide и show доступны в onclick
 });
-console.log('🚀 BYRMALDA loaded. i18n + Admin Edit Suggestions Fixed.');
+console.log('🚀 BYRMALDA loaded. All fixes applied: hide/show export, image URLs, suggestion save.');
 </script>
 </body>
 </html>
