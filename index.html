@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BYRMALDA — ARCHIVAL SPECIMEN SS26</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23060606'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%23f2efe9' font-family='serif'%3EB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -196,7 +197,7 @@ margin-bottom: 64px;
 position: relative;
 border-right: 1px solid var(--line);
 overflow: hidden;
-background: #040404;
+background: var(--bg-deep);
 min-height: 520px;
 display: flex;
 align-items: center;
@@ -215,7 +216,7 @@ position: absolute; bottom: 20px; left: 20px; z-index: 10;
 display: flex; gap: 8px;
 }
 .raw-nav-btn {
-background: rgba(8, 8, 8, 0.85);
+background: var(--glass);
 border: 1px solid var(--line-strong);
 color: var(--chalk);
 font-family: var(--font-mono);
@@ -288,7 +289,7 @@ filter: grayscale(20%) contrast(110%);
 }
 .specimen-tag {
 position: absolute; bottom: 12px; left: 12px;
-background: rgba(6, 6, 6, 0.88);
+background: var(--glass);
 padding: 6px 12px; border: 1px solid var(--line);
 font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
 color: var(--bone);
@@ -297,7 +298,7 @@ color: var(--bone);
 /* ARCHIVAL INTERACTIVE TOOLBAR (Unique Rick Owens Quirks) */
 .specimen-toolbar {
 position: fixed; bottom: 20px; right: 24px; z-index: 1000;
-display: flex; gap: 8px; background: rgba(8, 8, 8, 0.92);
+display: flex; gap: 8px; background: var(--glass-strong);
 border: 1px solid var(--line-strong); padding: 6px;
 backdrop-filter: blur(8px);
 box-shadow: 0 12px 36px rgba(0,0,0,0.6);
@@ -350,7 +351,7 @@ transform: translateY(-3px);
 }
 .card-img {
 width: 100%; aspect-ratio: 1/1; object-fit: cover;
-background: #000; display: flex; align-items: center; justify-content: center;
+background: var(--bg-deep); display: flex; align-items: center; justify-content: center;
 font-size: 28px; color: var(--bone-ghost); position: relative;
 overflow: hidden;
 border-bottom: 1px solid var(--line);
@@ -377,7 +378,7 @@ padding: 40px;
 .gallery { position: relative; }
 .main-img-wrap {
 position: relative; width: 100%; aspect-ratio: 1/1;
-border: 1px solid var(--line); overflow: hidden; background: #000;
+border: 1px solid var(--line); overflow: hidden; background: var(--bg-deep);
 margin-bottom: 16px;
 cursor: crosshair;
 user-select: none;
@@ -395,7 +396,7 @@ filter: grayscale(0%) contrast(105%);
 }
 .zoom-hint {
 position: absolute; top: 12px; left: 12px;
-background: rgba(6, 6, 6, 0.85);
+background: var(--glass);
 border: 1px solid var(--line);
 padding: 4px 8px; font-size: 9px; letter-spacing: 1.5px;
 text-transform: uppercase; color: var(--bone-ghost);
@@ -406,7 +407,7 @@ z-index: 6;
 position: absolute; bottom: 12px; right: 12px; display: flex; gap: 6px; z-index: 5;
 }
 .gallery-btn {
-background: rgba(8, 8, 8, 0.85); border: 1px solid var(--line-strong);
+background: var(--glass); border: 1px solid var(--line-strong);
 color: var(--chalk); font-family: var(--font-mono); font-size: 12px;
 width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
 cursor: pointer; transition: all 0.2s;
@@ -523,7 +524,7 @@ text-align: center; margin: 16px 0; font-size: 11px; letter-spacing: 2px; text-t
 
 /* Modals */
 .modal {
-display: none; position: fixed; inset: 0; background: rgba(5, 5, 5, 0.88);
+display: none; position: fixed; inset: 0; background: var(--overlay);
 z-index: 400; align-items: center; justify-content: center;
 backdrop-filter: blur(8px); padding: 20px;
 }
@@ -639,7 +640,7 @@ border-bottom: 1px solid var(--line); margin-bottom: 24px;
 }
 .avatar-wrap {
 position: relative; width: 104px; height: 104px; border: 1px solid var(--line-strong);
-background: #000; overflow: hidden; cursor: pointer; flex-shrink: 0;
+background: var(--bg-deep); overflow: hidden; cursor: pointer; flex-shrink: 0;
 }
 .avatar {
 width: 100%; height: 100%; object-fit: cover; display: flex;
@@ -687,7 +688,7 @@ font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
 
 /* Fullscreen Overlays (Ban & Maintenance) */
 .maintenance-overlay, .ban-overlay {
-position: fixed; inset: 0; background: rgba(4, 4, 4, 0.96);
+position: fixed; inset: 0; background: var(--overlay-strong);
 z-index: 10000; display: flex; align-items: center; justify-content: center;
 padding: 32px; backdrop-filter: blur(12px);
 }
@@ -741,11 +742,158 @@ padding: 8px; overflow-x: auto;
 .showcase-grid { grid-template-columns: 1fr; }
 .specimen-toolbar { bottom: 70px; right: 12px; }
 }
+
+/* ================= FIXES & ADDITIONS ================= */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg-void);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+h1, h2, h3, h4, p { margin: 0; }
+button, input, select, textarea { font-family: inherit; color: inherit; }
+a { color: inherit; }
+.opt-select option { background: var(--bg-void); color: var(--bone); }
+select { appearance: auto; }
+
+/* extra theme tokens (dark = default) */
+:root {
+  --bg-deep: #000;
+  --glass: rgba(8, 8, 8, 0.85);
+  --glass-strong: rgba(8, 8, 8, 0.92);
+  --overlay: rgba(5, 5, 5, 0.88);
+  --overlay-strong: rgba(4, 4, 4, 0.96);
+  --crack: rgba(220, 215, 205, 0.20);
+  --crack-fine: rgba(220, 215, 205, 0.11);
+  --vig-c: #000;
+  --vig-o: 0.55;
+  color-scheme: dark;
+}
+
+/* LIGHT THEME */
+:root[data-theme="light"] {
+  --bg-void: #f3f0e9;
+  --bg-surface: #eae6dc;
+  --bg-subtle: #dfdace;
+  --bg-card: #eeeae1;
+  --line: rgba(30, 27, 22, 0.14);
+  --line-strong: rgba(30, 27, 22, 0.42);
+  --bone: #2b2926;
+  --bone-dim: #5c5851;
+  --bone-ghost: #8b867c;
+  --chalk: #0d0d0c;
+  --dust: #d3cec2;
+  --bg-deep: #dcd7cb;
+  --glass: rgba(243, 240, 233, 0.88);
+  --glass-strong: rgba(243, 240, 233, 0.94);
+  --overlay: rgba(225, 220, 208, 0.88);
+  --overlay-strong: rgba(225, 220, 208, 0.97);
+  --crack: rgba(30, 27, 22, 0.26);
+  --crack-fine: rgba(30, 27, 22, 0.14);
+  --vig-c: #5d5546;
+  --vig-o: 0.28;
+  color-scheme: light;
+}
+:root[data-theme="light"] .grain-overlay { opacity: 0.08; mix-blend-mode: multiply; }
+:root[data-theme="light"] .scanlines { opacity: 0.08; }
+:root[data-theme="light"] .btn-success { background: #d6ead6; border-color: #7fb07f; color: #1f5a1f; }
+:root[data-theme="light"] .in-stock { color: #1f7a3a; }
+:root[data-theme="light"] .st-awaiting { color: #a35a00; }
+:root[data-theme="light"] .st-created { color: #01679a; }
+:root[data-theme="light"] .st-shipping { color: #12803b; }
+:root[data-theme="light"] .st-transit { color: #1d4ed8; }
+:root[data-theme="light"] .st-delivered { color: #7e22ce; }
+:root[data-theme="light"] .st-cancelled { color: #b42318; }
+
+/* PREVIEW IMAGES: show the whole photo, never crop */
+.card-img img,
+.showcase-cell img,
+.cart-img,
+.order-img,
+.thumb {
+  object-fit: contain !important;
+  background: var(--bg-deep);
+}
+.thumb { width: 64px; height: 64px; flex-shrink: 0; }
+.order-img { width: 72px; height: 72px; }
+.card-img { object-fit: initial; }
+.card-img img { width: 100%; height: 100%; }
+.main-img-wrap { touch-action: none; -webkit-user-drag: none; }
+.main-img { will-change: transform; transition: filter 0.3s, transform 0.18s ease-out; }
+.main-img-wrap.zooming .main-img { transform: scale(2.6); }
+
+/* missing classes */
+.card-body { padding: 14px 16px 16px; }
+.card-title {
+  font-family: var(--font-title); font-size: 13px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--chalk); line-height: 1.3;
+}
+.card-meta-stamp { font-size: 9px; letter-spacing: 2px; color: var(--bone-ghost); margin-bottom: 6px; text-transform: uppercase; }
+.card-price { font-size: 12px; letter-spacing: 1px; margin-top: 8px; color: var(--bone); }
+.card-nostock { color: var(--bone-dim); }
+.success { color: #86efac; font-size: 12px; letter-spacing: 1px; }
+:root[data-theme="light"] .success { color: #1f7a3a; }
+.verified { display: inline-block; font-size: 16px; margin-right: 6px; }
+.verified.creator-1 { color: var(--creator-1); }
+.verified.creator-2 { color: var(--creator-2); }
+.verified.creator-3 { color: var(--creator-3); }
+.verified.creator-4 { color: var(--creator-4); }
+.verified.creator-5 {
+  background: linear-gradient(90deg, var(--creator-5-start), var(--creator-5-end));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.review-stars-input span { transition: transform 0.1s; display: inline-block; }
+.review-stars-input span:hover { transform: scale(1.2); }
+.review-pending-tag {
+  font-size: 9px; letter-spacing: 1.5px; border: 1px dashed var(--line-strong);
+  padding: 2px 8px; color: var(--bone-dim); text-transform: uppercase;
+}
+.size-table { width: 100%; font-size: 11px; border-collapse: collapse; letter-spacing: 1px; }
+.size-table th { padding: 10px; text-align: left; border-bottom: 1px solid var(--line-strong); color: var(--bone-ghost); font-weight: 400; }
+.size-table td { padding: 9px 10px; border-bottom: 1px solid var(--line); }
+.delivery-option:hover { border-color: var(--line-strong) !important; }
+
+/* CRACKED ARCHIVE FRAME (screen edges) */
+.crack-frame {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 9988;
+}
+.crack-frame .vig-stop-a { stop-color: var(--vig-c); stop-opacity: 0; }
+.crack-frame .vig-stop-b { stop-color: var(--vig-c); stop-opacity: var(--vig-o); }
+.crack-frame .cracks path {
+  fill: none; stroke: var(--crack); stroke-width: 1.1;
+  stroke-linecap: round; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.crack-frame .cracks path.fine { stroke: var(--crack-fine); stroke-width: 0.8; }
+@media (max-width: 768px) { .crack-frame { opacity: 0.6; } }
+
 </style>
 </head>
 <body>
 <div class="grain-overlay" id="grain-canvas"></div>
 <div class="scanlines" id="scanlines-canvas"></div>
+<svg class="crack-frame" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+<defs><radialGradient id="vig" cx="50%" cy="50%" r="75%"><stop offset="62%" class="vig-stop-a"/><stop offset="100%" class="vig-stop-b"/></radialGradient></defs>
+<rect width="1000" height="1000" fill="url(#vig)"/>
+<g class="cracks">
+<path d="M0 120 L22 138 L16 176 L44 204 L38 248 L70 280 L62 330"/><path class="fine" d="M44 204 L84 196 L108 220"/>
+<path d="M0 560 L26 574 L18 620 L50 648 L44 700 L78 730 L70 786"/><path class="fine" d="M50 648 L92 660 L118 640"/>
+<path d="M0 880 L20 896 L14 940 L40 962"/>
+<path d="M1000 90 L972 110 L980 150 L950 176 L958 226 L926 252 L934 300"/><path class="fine" d="M950 176 L912 170 L890 190"/>
+<path d="M1000 470 L976 486 L984 530 L954 556 L962 604 L930 628"/><path class="fine" d="M954 556 L918 566 L896 548"/>
+<path d="M1000 800 L980 818 L988 860 L962 884 L968 930"/>
+<path d="M180 0 L196 24 L176 46 L204 72 L198 110"/><path class="fine" d="M204 72 L238 78 L256 62"/>
+<path d="M520 0 L506 22 L530 40 L518 76 L546 98"/><path d="M760 0 L772 28 L752 52 L782 78 L776 112"/>
+<path d="M240 1000 L256 976 L234 954 L262 928 L256 892"/><path class="fine" d="M262 928 L296 934 L318 914"/>
+<path d="M600 1000 L588 972 L614 950 L604 914 L632 890"/><path d="M860 1000 L872 974 L850 952 L880 926"/>
+<path d="M0 0 L36 34 L30 70 L64 96"/><path class="fine" d="M36 34 L74 28"/>
+<path d="M1000 0 L964 36 L970 70 L936 98"/><path d="M0 1000 L38 968 L32 934 L66 906"/><path d="M1000 1000 L962 966 L970 932 L938 906"/>
+</g></svg>
 
 <div class="app">
 <nav class="sidebar" id="sidebar">
@@ -756,7 +904,7 @@ padding: 8px; overflow-x: auto;
 
 <div class="nav-links">
 <button class="nav-btn" onclick="navigate('home')" id="nav-home">
-<span class="icon">01</span><span class="label">Архив</span>
+<span class="icon">01</span><span class="label" data-i18n="nav_home">Архив</span>
 </button>
 <button class="nav-btn" onclick="navigate('catalog')" id="nav-catalog">
 <span class="icon">02</span><span class="label" data-i18n="nav_catalog">Каталог</span>
@@ -871,10 +1019,11 @@ GEOMETRIC DRAPE. <span>RAW SILHOUETTE.</span>
 <!-- PRODUCT DETAILS -->
 <section id="product" class="page">
 <button class="btn btn-outline btn-sm" style="margin-bottom:24px;width:auto" onclick="navigate('catalog')" data-i18n="btn_back">← НАЗАД К КАТАЛОГУ</button>
-<div class="product-grid">
+<div class="product-grid cracked-monolith">
 <div class="gallery">
-<div class="main-img-wrap">
-<img src="" class="main-img" id="p-main-img" alt="" onerror="this.src='https://placehold.co/600x600/0a0a0a/d8d4cb?text=BYRMALDA+SPECIMEN'">
+<div class="main-img-wrap" id="main-img-wrap">
+<span class="zoom-hint" data-i18n="zoom_hint">[HOLD LMB TO INSPECT]</span>
+<img src="" class="main-img" id="p-main-img" draggable="false" alt="" onerror="this.src='https://placehold.co/600x600/0a0a0a/d8d4cb?text=BYRMALDA+SPECIMEN'">
 <div class="gallery-nav">
 <button class="gallery-btn" onclick="galNav(-1)">←</button>
 <button class="gallery-btn" onclick="galNav(1)">→</button>
@@ -1247,21 +1396,10 @@ GEOMETRIC DRAPE. <span>RAW SILHOUETTE.</span>
 </div>
 </div>
 </div>
-<!-- PRODUCT DETAILS -->
-<section id="product" class="page">
-<button class="btn btn-outline btn-sm" style="margin-bottom:24px;width:auto" onclick="navigate('catalog')" data-i18n="btn_back">← НАЗАД К КАТАЛОГУ</button>
-<div class="product-grid cracked-monolith">
-<div class="gallery">
-<div class="main-img-wrap" id="main-img-wrap">
-<span class="zoom-hint">[HOLD LMB TO INSPECT]</span>
-<img src="" class="main-img" id="p-main-img" alt="" onerror="this.src='https://placehold.co/600x600/0a0a0a/d8d4cb?text=BYRMALDA+SPECIMEN'">
-<div class="gallery-nav">
-<button class="gallery-btn" onclick="galNav(-1)">←</button>
-<button class="gallery-btn" onclick="galNav(1)">→</button>
-</div>
-</div>
-<div class="thumbs" id="p-thumbs"></div>
-</div>
+<div class="modal" id="logout-confirm-modal">
+<div class="modal-content text-center" style="max-width:420px">
+<span class="modal-close" onclick="closeModal('logout-confirm-modal')">&times;</span>
+<div class="modal-title" data-i18n="confirm_logout">Выйти из аккаунта?</div>
 <p style="color:var(--bone-ghost);font-size:11px;margin-bottom:24px" data-i18n="logout_warning">Все несохранённые изменения будут потеряны.</p>
 <div class="btn-group" style="justify-content:center">
 <button class="btn btn-danger btn-sm" onclick="doLogout()" data-i18n="btn_yes_logout">Да, выйти</button>
@@ -1367,15 +1505,15 @@ GEOMETRIC DRAPE. <span>RAW SILHOUETTE.</span>
 <label class="form-label" data-i18n="label_delivery_service">Служба доставки</label>
 <div class="delivery-option" onclick="selectDelivery('cdek')" style="margin:8px 0;padding:12px;background:var(--bg-void);border:1px solid var(--line);cursor:pointer">
 <input type="radio" name="del-opt" id="d-cdek" value="cdek">
-<label for="d-cdek" style="cursor:pointer;margin-left:8px;font-size:12px">🇷 СДЭК (Россия)</label>
+<label for="d-cdek" style="cursor:pointer;margin-left:8px;font-size:12px" data-i18n="del_cdek">🇷🇺 СДЭК (Россия)</label>
 </div>
 <div class="delivery-option" onclick="selectDelivery('ua')" style="margin:8px 0;padding:12px;background:var(--bg-void);border:1px solid var(--line);cursor:pointer">
 <input type="radio" name="del-opt" id="d-ua" value="ua">
-<label for="d-ua" style="cursor:pointer;margin-left:8px;font-size:12px">🇺🇦 UaExpress (Украина)</label>
+<label for="d-ua" style="cursor:pointer;margin-left:8px;font-size:12px" data-i18n="del_ua">🇺🇦 UaExpress (Украина)</label>
 </div>
 <div class="delivery-option" onclick="selectDelivery('usa')" style="margin:8px 0;padding:12px;background:var(--bg-void);border:1px solid var(--line);cursor:pointer">
 <input type="radio" name="del-opt" id="d-usa" value="usa">
-<label for="d-usa" style="cursor:pointer;margin-left:8px;font-size:12px">🇺 USmall (США)</label>
+<label for="d-usa" style="cursor:pointer;margin-left:8px;font-size:12px" data-i18n="del_usa">🇺🇸 USmall (США)</label>
 </div>
 </div>
 <div id="del-fields" class="hidden" style="margin-top:16px;padding:16px;background:var(--bg-void);border:1px solid var(--line)">
@@ -1602,26 +1740,58 @@ cat_pants: "Trousers", cat_shorts: "Pod Shorts", cat_jackets: "Outerwear", cat_a
 }
 };
 
-function applyTranslations() {
-const t = translations[lang];
-if (!t) return;
-document.querySelectorAll('[data-i18n]').forEach(el => {
-const key = el.getAttribute('data-i18n');
-if (t[key]) el.textContent = t[key];
-});
-document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-const key = el.getAttribute('data-i18n-placeholder');
-if (t[key]) el.placeholder = t[key];
-});
-document.querySelectorAll('[data-i18n-title]').forEach(el => {
-const key = el.getAttribute('data-i18n-title');
-if (t[key]) el.title = t[key];
-});
-if($('cur-lang')) $('cur-lang').textContent = lang.toUpperCase();
-if (curProd) openProd(curProd.id);
-if (userData?.cart?.length) renderCart();
-genCatalog();
-}
+
+
+/* ---- additional / corrected translations ---- */
+const EXTRA = {
+  ru: {
+    nav_home: "Архив",
+    quote1: "«Мода — это не просто одежда. Это способ рассказать историю без слов.»",
+    quote2: "«Каждая деталь имеет значение. Каждый шов — это обещание.»",
+    zoom_hint: "[ЗАЖМИТЕ ЛКМ — ПРИБЛИЖЕНИЕ]",
+    cat_shorts: "Шорты", cat_acc: "Аксессуары", cat_jackets: "Куртки", cat_pants: "Штаны",
+    spec_audience: "Для кого", spec_type: "Тип", spec_material: "Материал", spec_release: "Релиз", spec_stock: "Наличие",
+    units: "шт.", specimen_serial: "АРТИКУЛ", no_notes: "Описание отсутствует.",
+    nothing_found: "НИЧЕГО НЕ НАЙДЕНО", archive_empty: "АРХИВ ПУСТ", query_error: "ОШИБКА ЗАПРОСА",
+    no_orders: "ЗАКАЗОВ НЕТ", order_word: "ЗАКАЗ", total_word: "ИТОГО", preorder_label: "ПРЕДОРДЕР", archived_label: "В АРХИВЕ",
+    added_to_cart: "✅ Добавлено в корзину", over_stock: "❌ Превышено наличие. Максимум: ", cart_empty_alert: "Корзина пуста",
+    series: "СЕРИЯ 2026", already_review: "Вы уже оставили отзыв.", pick_rating: "❌ Выберите оценку (1-5 звёзд)",
+    enter_review: "❌ Напишите текст отзыва", review_sent: "✅ Отзыв отправлен на модерацию",
+    no_reviews: "ОТЗЫВОВ ПОКА НЕТ", reviews_error: "ОШИБКА ЗАГРУЗКИ ОТЗЫВОВ", review_pending_tag: "НА МОДЕРАЦИИ",
+    approve: "Одобрить", reject: "Отклонить", no_pending: "Нет отзывов на модерации",
+    report_sent: "✅ Жалоба отправлена", error_word: "Ошибка: ", fill_fields: "Заполните поля",
+    size_word: "РАЗМЕР", chest: "ГРУДЬ (СМ)", waist: "ТАЛИЯ (СМ)", hips: "БЁДРА (СМ)", foot: "СТОПА (СМ)",
+    size_title_clothing: "РАЗМЕРНАЯ СЕТКА (ОДЕЖДА)", size_title_footwear: "РАЗМЕРНАЯ СЕТКА (ОБУВЬ)",
+    del_cdek: "🇷🇺 СДЭК (Россия)", del_ua: "🇺🇦 UaExpress (Украина)", del_usa: "🇺🇸 USmall (США)",
+    fill_address: "Заполните город, улицу и дом", account_blocked: "❌ Аккаунт заблокирован",
+    limit_resets: "лимит обновится через", hours_short: "ч", avatar_sent: "✅ Аватарка отправлена на модерацию",
+    sent_word: "Отправлено", suggest_sent: "Отправлено"
+  },
+  en: {
+    nav_home: "Archive",
+    quote1: "“Fashion is not just clothing. It is a way of telling a story without words.”",
+    quote2: "“Every detail matters. Every seam is a promise.”",
+    zoom_hint: "[HOLD LMB TO INSPECT]",
+    cat_shorts: "Shorts", cat_acc: "Accessories", cat_jackets: "Jackets", cat_pants: "Trousers",
+    spec_audience: "For", spec_type: "Type", spec_material: "Material", spec_release: "Release", spec_stock: "Stock",
+    units: "pcs", specimen_serial: "SERIAL", no_notes: "No description provided.",
+    nothing_found: "NOTHING FOUND", archive_empty: "ARCHIVE IS EMPTY", query_error: "QUERY ERROR",
+    no_orders: "NO ORDERS", order_word: "ORDER", total_word: "TOTAL", preorder_label: "PRE-ORDER", archived_label: "ARCHIVED",
+    added_to_cart: "✅ Added to cart", over_stock: "❌ Not enough in stock. Max: ", cart_empty_alert: "Cart is empty",
+    series: "SERIES 2026", already_review: "You already left a review.", pick_rating: "❌ Please select a rating (1-5 stars)",
+    enter_review: "❌ Please enter review text", review_sent: "✅ Review submitted for moderation",
+    no_reviews: "NO REVIEWS YET", reviews_error: "FAILED TO LOAD REVIEWS", review_pending_tag: "PENDING MODERATION",
+    approve: "Approve", reject: "Reject", no_pending: "No reviews awaiting moderation",
+    report_sent: "✅ Report submitted", error_word: "Error: ", fill_fields: "Fill in all fields",
+    size_word: "SIZE", chest: "CHEST (CM)", waist: "WAIST (CM)", hips: "HIPS (CM)", foot: "FOOT (CM)",
+    size_title_clothing: "SIZE CHART (CLOTHING)", size_title_footwear: "SIZE CHART (FOOTWEAR)",
+    del_cdek: "🇷🇺 CDEK (Russia)", del_ua: "🇺🇦 UaExpress (Ukraine)", del_usa: "🇺🇸 USmall (USA)",
+    fill_address: "Fill in city, street and house", account_blocked: "❌ Account blocked",
+    limit_resets: "limit resets in", hours_short: "h", avatar_sent: "✅ Avatar sent for moderation",
+    sent_word: "Sent", suggest_sent: "Sent"
+  }
+};
+for (const l of ['ru', 'en']) Object.assign(translations[l], EXTRA[l]);
 
 const firebaseConfig = {
 apiKey: "AIzaSyD0YkXZgk8gh01Y7XH3ZRVU5lCjGJ_IRCw",
@@ -1645,149 +1815,224 @@ const IMGBB_KEY = "eeef3479094c5cf6bf42607927565065";
 const ADMIN_EMAIL = "sobakastalina123@gmail.com";
 const LIMITED_ADMIN_EMAIL = "negrazjpa@gmail.com";
 
-// Real-world exchange rates
-const RATES = { USD_TO_RUB: 82.80, USD_TO_UAH: 45.05 };
 
-let user = null, userData = null, curProd = null, galIdx = 0, chatUnread = 0, lang = localStorage.getItem('lang') || 'ru', theme = localStorage.getItem('theme') || 'dark', revStars = 0, carouselIdx = 0, carouselTimer = null, banTimerInterval = null, maintenanceTimerInterval = null;
+
+// Exchange rates: live values are loaded on start (see loadRates); these are only a fallback (CBR, 16.10.2026)
+const RATES = { USD_TO_RUB: 83.76, USD_TO_UAH: 44.89 };
+
+let user = null, userData = null, curProd = null, galIdx = 0, chatUnread = 0;
+let lang = localStorage.getItem('lang') === 'en' ? 'en' : 'ru';
+let theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+let revStars = 0, carouselIdx = 0, carouselTimer = null, banTimerInterval = null, maintenanceTimerInterval = null;
+let currentPage = 'home', lastChart = null, selDelivery = null, searchState = null, searchToken = 0;
 
 const heroImages = [
-"https://i.ibb.co/C5Pt8Rmh/IMG-20260517-222612.png",
-"https://i.ibb.co/TM8vNXDx/IMG_20260517-222236.png",
-"https://i.ibb.co/N2t8MfX6/photo-2026-05-17-22-27-07.jpg",
-"https://i.ibb.co/mVYThhdY/photo-2026-05-17-22-27-01.jpg"
+  "https://i.ibb.co/C5Pt8Rmh/IMG-20260517-222612.png",
+  "https://i.ibb.co/TM8vNXDx/IMG_20260517-222236.png",
+  "https://i.ibb.co/N2t8MfX6/photo-2026-05-17-22-27-07.jpg",
+  "https://i.ibb.co/mVYThhdY/photo-2026-05-17-22-27-01.jpg"
 ];
 
 const $ = id => document.getElementById(id);
+window.$ = $;
 const show = el => el?.classList?.remove('hidden');
 const hide = el => el?.classList?.add('hidden');
-const fmtDate = ts => ts?.toDate?.()?.toLocaleDateString('ru-RU') || '...';
+const fmtDate = ts => ts?.toDate?.()?.toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'en-GB') || '...';
 const genId = () => Math.random().toString(36).substring(2, 10).toUpperCase();
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const T = k => translations[lang]?.[k] ?? translations.ru?.[k] ?? k;
+const numLocale = () => lang === 'ru' ? 'ru-RU' : 'en-US';
 
 /* =========================================================================
-   ✨ REFINED CALM AMBIENT SOUND & TACTILE UI CLICKS (Web Audio API)
+   WORD DICTIONARY (types / colors / materials / audience / statuses)
    ========================================================================= */
-let audioCtx = null, droneOsc = null, droneGain = null, isDronePlaying = false;
+const WORD_PAIRS = [
+  ['футболка', 'T-shirt'], ['толстовка', 'Hoodie'], ['худи', 'Hoodie'], ['лонгслив', 'Longsleeve'], ['кроссовки', 'Sneakers'],
+  ['обувь', 'Footwear'], ['штаны', 'Trousers'], ['брюки', 'Trousers'], ['шорты', 'Shorts'], ['куртка', 'Jacket'],
+  ['аксессуар', 'Accessory'], ['свитшот', 'Sweatshirt'], ['джинсы', 'Jeans'], ['кепка', 'Cap'], ['сумка', 'Bag'],
+  ['ботинки', 'Boots'], ['рубашка', 'Shirt'], ['пальто', 'Coat'], ['жилет', 'Vest'], ['шапка', 'Beanie'],
+  ['ремень', 'Belt'], ['носки', 'Socks'], ['одежда', 'Clothing'],
+  ['чёрный', 'Black'], ['черный', 'Black'], ['белый', 'White'], ['серый', 'Gray'], ['красный', 'Red'], ['синий', 'Blue'],
+  ['зелёный', 'Green'], ['зеленый', 'Green'], ['бежевый', 'Beige'], ['коричневый', 'Brown'], ['бордовый', 'Burgundy'],
+  ['костяной', 'Bone'], ['жёлтый', 'Yellow'], ['желтый', 'Yellow'], ['розовый', 'Pink'], ['фиолетовый', 'Purple'],
+  ['оранжевый', 'Orange'], ['хаки', 'Khaki'], ['молочный', 'Milk'], ['графитовый', 'Graphite'],
+  ['хлопок', 'Cotton'], ['шерсть', 'Wool'], ['кожа', 'Leather'], ['деним', 'Denim'], ['нейлон', 'Nylon'],
+  ['полиэстер', 'Polyester'], ['лён', 'Linen'], ['шёлк', 'Silk'], ['флис', 'Fleece'], ['замша', 'Suede'],
+  ['унисекс', 'Unisex'], ['мужчина', 'Male'], ['женщина', 'Female'],
+  ['ожидает оплату', 'Awaiting payment'], ['создан', 'Created'], ['в пути', 'In transit'], ['доставлен', 'Delivered'],
+  ['отменён', 'Cancelled'], ['отменен', 'Cancelled'], ['отправлен', 'Shipped']
+];
+const RU2EN = new Map(), EN2RU = new Map();
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+WORD_PAIRS.forEach(([ru, en]) => {
+  RU2EN.set(ru.toLowerCase(), en);
+  if (!EN2RU.has(en.toLowerCase())) EN2RU.set(en.toLowerCase(), cap(ru));
+});
+function trWord(v) {
+  if (v === null || v === undefined) return '';
+  const s = String(v).trim();
+  const k = s.toLowerCase();
+  return lang === 'en' ? (RU2EN.get(k) || s) : (EN2RU.get(k) || s);
+}
+const trList = v => String(v || '').split(',').map(x => x.trim()).filter(Boolean);
+
+/* =========================================================================
+   SOUND: soft tab click + calm ambient pad
+   ========================================================================= */
+let audioCtx = null, padNodes = null, isDronePlaying = false;
 
 function getAudioContext() {
-if (!audioCtx) {
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-audioCtx = new AudioContext();
-}
-if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-return audioCtx;
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    audioCtx = new AC();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
 }
 
-// Tactile archival UI click sound
+// short, soft, clearly audible "tick" on tab switch
 function playTabClickSound() {
-try {
-const ctx = getAudioContext();
-const osc = ctx.createOscillator();
-const gain = ctx.createGain();
-osc.type = 'triangle';
-osc.frequency.setValueAtTime(140, ctx.currentTime);
-osc.frequency.exponentialRampToValueAtTime(45, ctx.currentTime + 0.05);
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, t);
+    master.gain.exponentialRampToValueAtTime(0.09, t + 0.008);
+    master.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+    master.connect(ctx.destination);
 
-gain.gain.setValueAtTime(0.04, ctx.currentTime);
-gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+    const o1 = ctx.createOscillator();
+    o1.type = 'sine';
+    o1.frequency.setValueAtTime(660, t);
+    o1.frequency.exponentialRampToValueAtTime(440, t + 0.09);
+    o1.connect(master);
+    o1.start(t); o1.stop(t + 0.13);
 
-osc.connect(gain);
-gain.connect(ctx.destination);
-osc.start();
-osc.stop(ctx.currentTime + 0.05);
-} catch(e) {}
+    const o2 = ctx.createOscillator();
+    o2.type = 'triangle';
+    o2.frequency.setValueAtTime(990, t);
+    o2.frequency.exponentialRampToValueAtTime(660, t + 0.05);
+    const g2 = ctx.createGain();
+    g2.gain.value = 0.35;
+    o2.connect(g2); g2.connect(master);
+    o2.start(t); o2.stop(t + 0.07);
+  } catch (e) { }
 }
 
-// Calming, meditative warm harmonic drone (No headache, gentle warmth)
+// warm, quiet pad: only mid/low-mid sines, slow breathing, no sub-bass
 function toggleDarkDrone() {
-const btn = $('soundscape-btn');
-const ctx = getAudioContext();
+  const btn = $('soundscape-btn');
+  const ctx = getAudioContext();
+  if (!ctx) return;
 
-if (isDronePlaying) {
-if (droneGain) {
-droneGain.gain.setTargetAtTime(0, ctx.currentTime, 0.4);
-setTimeout(() => {
-if (droneOsc) { droneOsc.stop(); droneOsc.disconnect(); droneOsc = null; }
-}, 450);
+  if (isDronePlaying && padNodes) {
+    const { master, oscs, lfo } = padNodes;
+    master.gain.cancelScheduledValues(ctx.currentTime);
+    master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.6);
+    setTimeout(() => {
+      oscs.forEach(o => { try { o.stop(); o.disconnect(); } catch (e) { } });
+      try { lfo.stop(); } catch (e) { }
+    }, 2800);
+    padNodes = null;
+    isDronePlaying = false;
+    btn?.classList.remove('active');
+    return;
+  }
+
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.0001, ctx.currentTime);
+  master.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 4);
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 700;
+  filter.Q.value = 0.3;
+
+  // slow breathing of the volume (very small depth)
+  const lfo = ctx.createOscillator();
+  const lfoGain = ctx.createGain();
+  lfo.frequency.value = 0.06;
+  lfoGain.gain.value = 0.006;
+  lfo.connect(lfoGain);
+  lfoGain.connect(master.gain);
+  lfo.start();
+
+  // C major-ish open chord: C3, G3, C4, E4 (soft, consonant)
+  const notes = [[130.81, 0.5], [196.0, 0.38], [261.63, 0.26], [329.63, 0.13]];
+  const oscs = [];
+  notes.forEach(([f, vol], i) => {
+    [-2, 2].forEach(cents => {
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = f;
+      o.detune.value = cents + i;
+      const g = ctx.createGain();
+      g.gain.value = vol / 2;
+      o.connect(g); g.connect(filter);
+      o.start();
+      oscs.push(o);
+    });
+  });
+  filter.connect(master);
+  master.connect(ctx.destination);
+
+  padNodes = { master, oscs, lfo };
+  isDronePlaying = true;
+  btn?.classList.add('active');
 }
-isDronePlaying = false;
-btn?.classList.remove('active');
-} else {
-droneGain = ctx.createGain();
-droneGain.gain.setValueAtTime(0.001, ctx.currentTime);
-droneGain.gain.exponentialRampToValueAtTime(0.025, ctx.currentTime + 2.5); // Very soft volume
 
-// Pure soft Sine wave (432Hz harmonic base tuned to deep 108Hz / 54Hz octave)
-droneOsc = ctx.createOscillator();
-droneOsc.type = 'sine';
-droneOsc.frequency.setValueAtTime(54, ctx.currentTime);
-
-const filter = ctx.createBiquadFilter();
-filter.type = 'lowpass';
-filter.frequency.setValueAtTime(90, ctx.currentTime);
-
-droneOsc.connect(filter);
-filter.connect(droneGain);
-droneGain.connect(ctx.destination);
-
-droneOsc.start();
-isDronePlaying = true;
-btn?.classList.add('active');
-}
-}
-
-/* =========================================================================
-   ✨ X-RAY SPECIMEN INVERTER
-   ========================================================================= */
 function toggleXrayMode() {
-const body = document.body;
-const btn = $('xray-toggle-btn');
-const active = body.classList.toggle('xray-mode');
-btn?.classList.toggle('active', active);
+  const active = document.body.classList.toggle('xray-mode');
+  $('xray-toggle-btn')?.classList.toggle('active', active);
 }
 
 /* =========================================================================
-   ✨ HOLD LMB TO ZOOM INSPECTION LOGIC
+   HOLD LMB TO ZOOM (zoom at cursor position)
    ========================================================================= */
 function setupHoldZoomInspection() {
-const wrap = $('main-img-wrap');
-const img = $('p-main-img');
-if (!wrap || !img) return;
+  const wrap = $('main-img-wrap');
+  const img = $('p-main-img');
+  if (!wrap || !img) return;
+  let holding = false;
 
-let isHolding = false;
+  const setOrigin = (cx, cy) => {
+    const r = wrap.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((cx - r.left) / r.width) * 100));
+    const y = Math.max(0, Math.min(100, ((cy - r.top) / r.height) * 100));
+    img.style.transformOrigin = `${x}% ${y}%`;
+  };
+  const start = e => {
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    if (e.target.closest('.gallery-nav')) return;
+    holding = true;
+    const p = e.touches ? e.touches[0] : e;
+    setOrigin(p.clientX, p.clientY);
+    wrap.classList.add('zooming');
+    if (e.type === 'mousedown') e.preventDefault();
+  };
+  const move = e => {
+    if (!holding) return;
+    const p = e.touches ? e.touches[0] : e;
+    setOrigin(p.clientX, p.clientY);
+  };
+  const end = () => {
+    if (!holding) return;
+    holding = false;
+    wrap.classList.remove('zooming');
+  };
 
-const startZoom = (e) => {
-if (e.button !== 0 && e.type !== 'touchstart') return; // Left mouse click or touch only
-isHolding = true;
-wrap.classList.add('zooming');
-updateZoomOrigin(e);
-};
-
-const endZoom = () => {
-isHolding = false;
-wrap.classList.remove('zooming');
-img.style.transformOrigin = 'center center';
-};
-
-const updateZoomOrigin = (e) => {
-if (!isHolding) return;
-const rect = wrap.getBoundingClientRect();
-const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
-img.style.transformOrigin = `${x}% ${y}%`;
-};
-
-wrap.addEventListener('mousedown', startZoom);
-window.addEventListener('mouseup', endZoom);
-wrap.addEventListener('mousemove', updateZoomOrigin);
-
-wrap.addEventListener('touchstart', startZoom, { passive: true });
-window.addEventListener('touchend', endZoom);
-wrap.addEventListener('touchmove', updateZoomOrigin, { passive: true });
+  wrap.addEventListener('mousedown', start);
+  window.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  wrap.addEventListener('touchstart', start, { passive: true });
+  window.addEventListener('touchmove', move, { passive: true });
+  window.addEventListener('touchend', end);
+  window.addEventListener('touchcancel', end);
+  wrap.addEventListener('dragstart', e => e.preventDefault());
 }
 
-// 🔁 Ban and Maintenance timers
 function parseTimeStr(timeStr) {
 const parts = timeStr.split(':').map(p => parseInt(p) || 0);
 while (parts.length < 4) parts.unshift(0);
@@ -1975,710 +2220,905 @@ renderProfile(); renderCreatorLimit();
 }
 }
 
-function initCarousel() {
-const slides = document.querySelectorAll('.hero-slide');
-slides.forEach((s,i) => { if(s) s.src = heroImages[i % heroImages.length]; });
-carouselIdx = 0; updateCarousel();
-carouselTimer = setInterval(() => carouselNav(1), 8000);
+
+
+/* =========================================================================
+   LIVE EXCHANGE RATES
+   ========================================================================= */
+async function loadRates() {
+  let cached = null;
+  try { cached = JSON.parse(localStorage.getItem('rates') || 'null'); } catch (e) { }
+  if (cached && cached.rub > 0 && cached.uah > 0) {
+    RATES.USD_TO_RUB = cached.rub; RATES.USD_TO_UAH = cached.uah;
+    if (Date.now() - cached.t < 6 * 3600 * 1000) return;
+  }
+  let rub = null, uah = null;
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD');
+    const j = await r.json();
+    if (j?.rates?.RUB > 0 && j?.rates?.UAH > 0) { rub = j.rates.RUB; uah = j.rates.UAH; }
+  } catch (e) { }
+  if (!rub) {
+    try {
+      const r = await fetch('https://www.cbr-xml-daily.ru/daily_json.js');
+      const j = await r.json();
+      const usd = j.Valute.USD.Value;
+      const uahRub = j.Valute.UAH.Value / j.Valute.UAH.Nominal;
+      if (usd > 0 && uahRub > 0) { rub = usd; uah = usd / uahRub; }
+    } catch (e) { }
+  }
+  if (rub && uah) {
+    RATES.USD_TO_RUB = rub; RATES.USD_TO_UAH = uah;
+    try { localStorage.setItem('rates', JSON.stringify({ rub, uah, t: Date.now() })); } catch (e) { }
+    if (currentPage === 'product') renderProd();
+    if (currentPage === 'cart') renderCart();
+  }
 }
 
-window.carouselNav = d => {
-const len = heroImages.length;
-carouselIdx = (carouselIdx + d + len) % len;
-updateCarousel();
-if(carouselTimer) clearInterval(carouselTimer);
-carouselTimer = setInterval(() => carouselNav(1), 8000);
+/* =========================================================================
+   i18n
+   ========================================================================= */
+function applyTranslations() {
+  const t = translations[lang];
+  if (!t) return;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] === undefined) return;
+    if (key === 'confirm_hint') el.innerHTML = t[key]; else el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key] !== undefined) el.placeholder = t[key];
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    if (t[key] !== undefined) el.title = t[key];
+  });
+  if ($('cur-lang')) $('cur-lang').textContent = lang.toUpperCase();
+
+  if (user) updateAuthUI(); else resetAuthUI();
+  if (user && userData) renderProfile();
+  renderCreatorLimit();
+  renderDelivery();
+  genCatalog();
+  if (currentPage === 'product') renderProd();
+  if (currentPage === 'cart') renderCart();
+  if (currentPage === 'search' && searchState) {
+    if (searchState.cat && $('search-input')) $('search-input').value = searchState.cat === 'archive' ? T('cat_archive') : T(CATS.find(c => c.id === searchState.cat)?.k);
+    runSearch();
+  }
+  if (currentPage === 'profile' && user) loadOrders();
+  if (currentPage === 'reviews') loadPublicReviews();
+  if (lastChart && $('sizechart-modal')?.classList.contains('active')) showSizeChart(lastChart);
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', theme);
+  if ($('theme-ind')) $('theme-ind').textContent = theme === 'dark' ? '🌙' : '☀️';
+}
+window.toggleTheme = () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', theme);
+  applyTheme();
+};
+window.toggleLang = () => {
+  lang = lang === 'ru' ? 'en' : 'ru';
+  localStorage.setItem('lang', lang);
+  applyTranslations();
 };
 
+/* =========================================================================
+   CAROUSEL
+   ========================================================================= */
+function initCarousel() {
+  document.querySelectorAll('.hero-slide').forEach((s, i) => { s.src = heroImages[i % heroImages.length]; });
+  carouselIdx = 0; updateCarousel();
+  carouselTimer = setInterval(() => window.carouselNav(1), 8000);
+}
+window.carouselNav = d => {
+  const len = heroImages.length;
+  carouselIdx = (carouselIdx + d + len) % len;
+  updateCarousel();
+  if (carouselTimer) clearInterval(carouselTimer);
+  carouselTimer = setInterval(() => window.carouselNav(1), 8000);
+};
 function updateCarousel() {
-document.querySelectorAll('.hero-slide').forEach((s,i) => {
-if(s) s.classList.toggle('active', i===carouselIdx);
-});
+  document.querySelectorAll('.hero-slide').forEach((s, i) => s.classList.toggle('active', i === carouselIdx));
 }
 
 window.showUserProductWarning = () => openModal('user-product-warning-modal');
 
-window.addEventListener('DOMContentLoaded', async () => {
-const url = new URL(window.location.href);
-const oob = url.searchParams.get('oobCode'), mode = url.searchParams.get('mode');
-if (oob && mode === 'verifyEmail') {
-applyActionCode(auth, oob).then(() => {
-url.searchParams.delete('oobCode'); url.searchParams.delete('mode');
-window.history.replaceState({}, '', url);
-alert(lang === 'ru' ? '✅ Email подтверждён!' : '✅ Email confirmed!');
-}).catch(e => alert((lang === 'ru' ? '❌ Ошибка: ' : '❌ Error: ') + e.message));
-}
-applyTheme(); initCarousel(); applyTranslations(); setupHoldZoomInspection(); setupReviewStarEvents();
-
-onAuthStateChanged(auth, async u => {
-if (u) {
-user = u; await loadUser(); updateAuthUI();
-if (u.email === ADMIN_EMAIL || u.email === LIMITED_ADMIN_EMAIL) {
-show($('nav-admin')); hide($('nav-suggest'));
-loadAdminPanels(); loadMaintenanceStatus();
-} else {
-hide($('nav-admin')); show($('nav-suggest'));
-}
-loadOrders(); loadChat(); checkReviewStatus(); renderDelivery();
-renderCreatorLimit();
-await checkAndShowBan();
-await checkAndShowMaintenance();
-await checkCreatorExpiry();
-} else {
-user = userData = null; resetAuthUI(); hide($('delivery-box')); hide($('ban-overlay')); hide($('maintenance-overlay'));
-}
-});
-loadCartCount(); genCatalog(); setupListeners(); setInterval(autoUpdateOrders, 300000);
-});
-
-async function loadUser() {
-if (!user) return;
-try {
-const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid));
-userData = snap.exists() ? snap.data() : await createUserDoc();
-renderProfile(); syncCartFromDB();
-} catch(e) {
-if (e.code === 'permission-denied') { await createUserDoc(); loadUser(); }
-}
-}
-
+/* =========================================================================
+   USER / AUTH
+   ========================================================================= */
 async function createUserDoc() {
-const d = {
-uid: user.uid, email: user.email, name: user.displayName || user.email.split('@')[0],
-avatar: null, avatarPending: null, registrationDate: serverTimestamp(),
-isBlocked: false, hasVerifiedProduct: false, language: lang, theme: 'dark',
-reviewStatus: 'none', deliveryCountry: null, deliveryAddress: { cdek: null, ua: null, usa: null },
-cart: [], isBanned: false, banType: null, banUntil: null, banDuration: null,
-creatorLevel: 0, creatorApprovedCount: 0, suggestionUsed: 0, suggestionLastReset: 0, creatorExpiryDate: null
-};
-await setDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), d, { merge: true });
-return d;
+  const d = {
+    uid: user.uid, email: user.email, name: user.displayName || user.email.split('@')[0],
+    avatar: null, avatarPending: null, registrationDate: serverTimestamp(),
+    isBlocked: false, hasVerifiedProduct: false, language: lang, theme: 'dark',
+    reviewStatus: 'none', deliveryCountry: null, deliveryAddress: { cdek: null, ua: null, usa: null },
+    cart: [], isBanned: false, banType: null, banUntil: null, banDuration: null,
+    creatorLevel: 0, creatorApprovedCount: 0, suggestionUsed: 0, suggestionLastReset: 0, creatorExpiryDate: null
+  };
+  await setDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), d, { merge: true });
+  return d;
+}
+
+async function loadUser(retry = true) {
+  if (!user) return;
+  try {
+    const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid));
+    userData = snap.exists() ? snap.data() : await createUserDoc();
+    renderProfile(); syncCartFromDB();
+  } catch (e) {
+    console.error('loadUser:', e);
+    if (e.code === 'permission-denied' && retry) {
+      try { await createUserDoc(); await loadUser(false); } catch (e2) { console.error(e2); }
+    }
+  }
 }
 
 function renderProfile() {
-if (!userData) return;
-if($('profile-name')) $('profile-name').textContent = userData.name || translations[lang].guest;
-if($('profile-id')) $('profile-id').textContent = user.uid.substring(0,10)+'...';
-if($('profile-email')) $('profile-email').textContent = user.email;
-if($('profile-date')) $('profile-date').textContent = fmtDate(userData.registrationDate);
-if($('avatar-display') && userData.avatar) {
-$('avatar-display').innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;object-fit:cover" onerror="this.src='https://placehold.co/96x96/0c0c0b/d8d4cb?text=👤'">`;
-}
-const level = getCreatorLevel(userData);
-if (level > 0 && $('profile-name')) {
-const colorClass = getCreatorColor(level);
-$('profile-name').innerHTML = `<span class="verified ${colorClass}">✓</span> ${userData.name}`;
-}
+  if (!userData || !user) return;
+  if ($('profile-name')) $('profile-name').textContent = userData.name || T('guest');
+  if ($('profile-id')) $('profile-id').textContent = user.uid.substring(0, 10) + '...';
+  if ($('profile-email')) $('profile-email').textContent = user.email;
+  if ($('profile-date')) $('profile-date').textContent = fmtDate(userData.registrationDate);
+  if ($('avatar-display') && userData.avatar) {
+    $('avatar-display').innerHTML = `<img src="${esc(userData.avatar)}" style="width:100%;height:100%;object-fit:cover" onerror="this.src='https://placehold.co/96x96/0c0c0b/d8d4cb?text=👤'">`;
+  }
+  const level = getCreatorLevel(userData);
+  if (level > 0 && $('profile-name')) {
+    $('profile-name').innerHTML = `<span class="verified ${getCreatorColor(level)}">✓</span>${esc(userData.name)}`;
+  }
 }
 
 function renderCreatorLimit() {
-const isAdmin = user?.email === ADMIN_EMAIL;
-const limitEl = $('creator-limit-settings');
-if (!user || !userData || !limitEl) { hide(limitEl); return; }
-const limit = getUserLimit(userData, isAdmin);
-const resetTime = formatTimeUntilReset(getTimeUntilReset());
-limitEl.textContent = `${limit.used}/${limit.max} • ${lang === 'ru' ? 'лимит обновится через' : 'limit in'} ${resetTime}`;
-show(limitEl);
+  const isAdmin = user?.email === ADMIN_EMAIL;
+  const limitEl = $('creator-limit-settings');
+  if (!limitEl) return;
+  if (!user || !userData) { hide(limitEl); return; }
+  const lim = getUserLimit(userData, isAdmin);
+  const hrs = Math.floor(getTimeUntilReset() / 3600000);
+  limitEl.textContent = `${lim.used}/${lim.max} • ${T('limit_resets')} ${hrs} ${T('hours_short')}`;
+  show(limitEl);
 }
 
 function updateAuthUI() {
-if($('auth-btn')) {
-$('auth-btn').textContent = translations[lang].btn_logout;
-$('auth-btn').onclick = () => openModal('logout-confirm-modal');
+  if ($('auth-btn')) {
+    $('auth-btn').textContent = T('btn_logout');
+    $('auth-btn').onclick = () => openModal('logout-confirm-modal');
+  }
+  if ($('user-email')) $('user-email').textContent = user?.email || T('not_authorized');
 }
-if($('user-email')) $('user-email').textContent = user?.email || translations[lang].not_authorized;
-}
-
 function resetAuthUI() {
-if($('auth-btn')) {
-$('auth-btn').textContent = translations[lang].btn_login;
-$('auth-btn').onclick = () => openModal('login-modal');
-}
-if($('user-email')) $('user-email').textContent = translations[lang].not_authorized;
-if($('profile-name')) $('profile-name').textContent = translations[lang].guest;
+  if ($('auth-btn')) {
+    $('auth-btn').textContent = T('btn_login');
+    $('auth-btn').onclick = () => openModal('login-modal');
+  }
+  if ($('user-email')) $('user-email').textContent = T('not_authorized');
+  if ($('profile-name')) $('profile-name').textContent = T('guest');
 }
 
 window.openLogin = () => openModal('login-modal');
 window.switchReg = () => { closeModal('login-modal'); openModal('reg-modal'); showStep(1); };
+
 window.doLogin = async () => {
-const email = $('log-email')?.value?.trim(), pass = $('log-pass')?.value;
-if($('log-err')) $('log-err').textContent = '';
-if (!email || !pass) { if($('log-err')) $('log-err').textContent = lang === 'ru' ? 'Заполните поля' : 'Fill fields'; return; }
-try {
-const cred = await signInWithEmailAndPassword(auth, email, pass);
-if (!cred.user.emailVerified) {
-await sendEmailVerification(cred.user, { url: window.location.href, handleCodeInApp: true });
-await signOut(auth);
-if($('log-err')) $('log-err').innerHTML = `✉️ ${lang === 'ru' ? 'Подтвердите почту' : 'Verify email'}`;
-return;
-}
-closeModal('login-modal');
-} catch(e) { if($('log-err')) $('log-err').textContent = lang === 'ru' ? 'Неверный email или пароль' : 'Invalid login'; }
+  const email = $('log-email')?.value?.trim(), pass = $('log-pass')?.value;
+  if ($('log-err')) $('log-err').textContent = '';
+  if (!email || !pass) { if ($('log-err')) $('log-err').textContent = T('fill_fields'); return; }
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    if (!cred.user.emailVerified) {
+      await sendEmailVerification(cred.user, { url: window.location.href, handleCodeInApp: true });
+      await signOut(auth);
+      if ($('log-err')) $('log-err').textContent = `✉️ ${lang === 'ru' ? 'Подтвердите почту' : 'Verify email'}`;
+      return;
+    }
+    closeModal('login-modal');
+  } catch (e) { if ($('log-err')) $('log-err').textContent = lang === 'ru' ? 'Неверный email или пароль' : 'Invalid login'; }
 };
 
 window.regStep1 = async () => {
-const email = $('reg-email')?.value?.trim(), name = $('reg-name')?.value?.trim(), p1 = $('reg-pass')?.value, p2 = $('reg-pass2')?.value;
-if (!email || !name || !p1 || !p2) { alert(lang === 'ru' ? 'Заполните все поля' : 'Fill all fields'); return; }
-if (p1 !== p2) { alert(lang === 'ru' ? 'Пароли не совпадают' : 'Passwords do not match'); return; }
-try {
-const cred = await createUserWithEmailAndPassword(auth, email, p1);
-await sendEmailVerification(cred.user, { url: window.location.href, handleCodeInApp: true });
-showStep(2);
-} catch(e) { alert(e.message); }
+  const email = $('reg-email')?.value?.trim(), name = $('reg-name')?.value?.trim(), p1 = $('reg-pass')?.value, p2 = $('reg-pass2')?.value;
+  if (!email || !name || !p1 || !p2) { alert(T('fill_fields')); return; }
+  if (p1 !== p2) { alert(lang === 'ru' ? 'Пароли не совпадают' : 'Passwords do not match'); return; }
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, p1);
+    await sendEmailVerification(cred.user, { url: window.location.href, handleCodeInApp: true });
+    showStep(2);
+  } catch (e) { alert(e.message); }
 };
 
 window.regStep2 = async () => {
-try {
-await auth.currentUser.reload();
-if (auth.currentUser.emailVerified) {
-await updateProfile(auth.currentUser, { displayName: $('reg-name').value });
-await createUserDoc();
-hide($('reg-step-2')); show($('reg-ok'));
-} else { alert(lang === 'ru' ? 'Почта ещё не подтверждена.' : 'Email not confirmed yet.'); }
-} catch(e) { alert(e.message); }
+  try {
+    await auth.currentUser.reload();
+    if (auth.currentUser.emailVerified) {
+      await updateProfile(auth.currentUser, { displayName: $('reg-name').value });
+      user = auth.currentUser;
+      userData = await createUserDoc();
+      renderProfile();
+      hide($('reg-step-2')); show($('reg-ok'));
+    } else { alert(lang === 'ru' ? 'Почта ещё не подтверждена.' : 'Email not confirmed yet.'); }
+  } catch (e) { alert(e.message); }
 };
 
 function showStep(n) {
-[1,2].forEach(i => { if($(`reg-step-${i}`)) $(`reg-step-${i}`).classList.add('hidden'); });
-if($('reg-ok')) $('reg-ok').classList.add('hidden');
-if($(`reg-step-${n}`)) $(`reg-step-${n}`).classList.remove('hidden');
+  [1, 2].forEach(i => $(`reg-step-${i}`)?.classList.add('hidden'));
+  $('reg-ok')?.classList.add('hidden');
+  $(`reg-step-${n}`)?.classList.remove('hidden');
 }
 
 window.confirmLogout = () => { if (!user) openModal('login-modal'); else openModal('logout-confirm-modal'); };
 window.doLogout = async () => { closeModal('logout-confirm-modal'); await signOut(auth); userData = null; loadCartCount(); navigate('home'); };
 window.logoutFromBan = async () => { await signOut(auth); hide($('ban-overlay')); userData = null; resetAuthUI(); navigate('home'); };
 
+/* =========================================================================
+   NAVIGATION / MODALS
+   ========================================================================= */
 window.navigate = page => {
-playTabClickSound();
-if (userData?.isBanned && page !== 'profile') { alert(lang === 'ru' ? '❌ Аккаунт заблокирован' : '❌ Account blocked'); return; }
-document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-if($(page)) $(page).classList.add('active');
-document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-const nb = $(`nav-${page}`); if (nb) nb.classList.add('active');
-if (page==='cart') renderCart(); if (page==='catalog') genCatalog();
-if (page==='profile' && user) { loadOrders(); renderDelivery(); checkAndShowBan(); }
-if (page==='reviews') loadPublicReviews();
-if (page==='admin' && (user?.email===ADMIN_EMAIL || user?.email===LIMITED_ADMIN_EMAIL)) loadAdminPanels();
-if (page==='support') { chatUnread=0; updateSupportBadge(); loadChat(); }
-window.scrollTo({ top: 0, behavior: 'smooth' });
+  playTabClickSound();
+  if (userData?.isBanned && page !== 'profile') { alert(T('account_blocked')); return; }
+  currentPage = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $(page)?.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  $(`nav-${page}`)?.classList.add('active');
+  if (page === 'cart') renderCart();
+  if (page === 'catalog') genCatalog();
+  if (page === 'profile' && user) { loadOrders(); renderDelivery(); checkAndShowBan(); }
+  if (page === 'reviews') loadPublicReviews();
+  if (page === 'admin' && (user?.email === ADMIN_EMAIL || user?.email === LIMITED_ADMIN_EMAIL)) loadAdminPanels();
+  if (page === 'support') { chatUnread = 0; updateSupportBadge(); loadChat(); }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-window.openModal = id => { if($(id)) $(id).classList.add('active'); };
-window.closeModal = id => { if($(id)) $(id).classList.remove('active'); };
-document.querySelectorAll('.modal').forEach(m => m.onclick = e => { if (e.target===m) m.classList.remove('active'); });
+window.openModal = id => { $(id)?.classList.add('active'); };
+window.closeModal = id => { $(id)?.classList.remove('active'); };
 
-window.openAvatarSettingsModal = () => { if (!user) { openModal('login-modal'); return; } openModal('avatar-settings-modal'); };
-window.validateSingleFile = (input) => { if (input.files.length > 1) { alert('Only 1 file allowed'); input.value = ''; } };
-
-window.submitAvatarFromSettings = async () => {
-const file = $('av-settings-file')?.files?.[0];
-if (!file) return;
-try {
-const fd = new FormData(); fd.append('image', file); fd.append('key', IMGBB_KEY);
-const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd });
-const data = await res.json();
-if (!data.success) throw new Error('Upload error');
-await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), {
-avatarPending: data.data.url, avatarStatus: 'pending', avatarSubmittedAt: serverTimestamp()
-});
-alert('✅ Аватарка отправлена на модерацию');
-closeModal('avatar-settings-modal');
-} catch(e) { alert(e.message); }
-};
-
-window.openAvatarModal = () => { if (!user) openModal('login-modal'); else openModal('avatar-modal'); };
-window.submitAvatar = async () => {
-const file = $('av-file')?.files?.[0];
-if (!file) return;
-try {
-const fd = new FormData(); fd.append('image', file); fd.append('key', IMGBB_KEY);
-const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd });
-const data = await res.json();
-if (!data.success) throw new Error('Upload error');
-await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), {
-avatarPending: data.data.url, avatarStatus: 'pending', avatarSubmittedAt: serverTimestamp()
-});
-alert('✅ Аватарка отправлена на модерацию');
-closeModal('avatar-modal');
-} catch(e) { alert(e.message); }
-};
-
-window.addToCart = async () => {
-if (!user) { openModal('login-modal'); return; }
-if (!userData || !curProd) return;
-let size = 'M', color = 'Black';
-const sizeEl = $('p-size'), colorEl = $('p-color');
-if (sizeEl) size = sizeEl.value || 'M';
-if (colorEl) color = colorEl.value || 'Black';
-const qty = parseInt($('p-qty')?.value) || 1;
-if (qty > (curProd?.stock || 0)) {
-alert(`❌ Превышено наличие. Максимум: ${curProd.stock}`);
-return;
+/* =========================================================================
+   AVATARS
+   ========================================================================= */
+async function uploadImgbb(file) {
+  const fd = new FormData(); fd.append('image', file); fd.append('key', IMGBB_KEY);
+  const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd });
+  const data = await res.json();
+  if (!data.success) throw new Error('Upload error');
+  return data.data.url;
 }
-const item = {
-id: `${curProd?.id}-${Date.now()}`, pid: curProd?.id, name: curProd?.name,
-img: curProd?.images?.[0]||'', size, color, qty, price: curProd?.price,
-weight: curProd?.weight||200, stock: curProd?.stock, at: new Date().toISOString()
-};
-if (!userData.cart) userData.cart = [];
-userData.cart.push(item);
-await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), { cart: userData.cart });
-loadCartCount(); alert('✅ Добавлено в корзину'); navigate('cart');
+async function submitAvatarFile(inputId, modalId) {
+  const file = $(inputId)?.files?.[0];
+  if (!file || !user) return;
+  try {
+    const url = await uploadImgbb(file);
+    await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), {
+      avatarPending: url, avatarStatus: 'pending', avatarSubmittedAt: serverTimestamp()
+    });
+    alert(T('avatar_sent'));
+    closeModal(modalId);
+  } catch (e) { alert(e.message); }
+}
+window.openAvatarSettingsModal = () => { if (!user) { openModal('login-modal'); return; } openModal('avatar-settings-modal'); };
+window.openAvatarModal = () => { if (!user) openModal('login-modal'); else openModal('avatar-modal'); };
+window.validateSingleFile = input => { if (input.files.length > 1) { alert('Only 1 file allowed'); input.value = ''; } };
+window.submitAvatarFromSettings = () => submitAvatarFile('av-settings-file', 'avatar-settings-modal');
+window.submitAvatar = () => submitAvatarFile('av-file', 'avatar-modal');
+
+/* =========================================================================
+   CART
+   ========================================================================= */
+window.addToCart = async () => {
+  if (!user) { openModal('login-modal'); return; }
+  if (!userData || !curProd || curProd.deleted) return;
+  const size = $('p-size')?.value || 'M';
+  const color = $('p-color')?.value || 'Black';
+  const stock = curProd.stock || 0;
+  let qty = Math.max(1, parseInt($('p-qty')?.value) || 1);
+  if (stock > 0 && qty > stock) { alert(T('over_stock') + stock); return; }
+  const item = {
+    id: `${curProd.id}-${Date.now()}`, pid: curProd.id, name: curProd.name,
+    img: curProd.images?.[0] || '', size, color, qty, price: curProd.price,
+    weight: curProd.weight || 200, stock: stock || 10, at: new Date().toISOString()
+  };
+  if (!userData.cart) userData.cart = [];
+  userData.cart.push(item);
+  await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), { cart: userData.cart });
+  loadCartCount(); alert(T('added_to_cart')); navigate('cart');
 };
 
 function loadCartCount() {
-const n = (userData?.cart||[]).reduce((s,i)=>s+(i?.qty||0),0);
-if($('cart-badge')) $('cart-badge').textContent = n;
-if($('nav-cart')) $('nav-cart').classList.toggle('has-badge', n>0);
+  const n = (userData?.cart || []).reduce((s, i) => s + (i?.qty || 0), 0);
+  if ($('cart-badge')) $('cart-badge').textContent = n;
+  $('nav-cart')?.classList.toggle('has-badge', n > 0);
 }
 function syncCartFromDB() { loadCartCount(); if (userData?.cart) renderCart(); }
 
-window.renderCart = async () => {
-const items = userData?.cart || [];
-const empty = $('cart-empty'), full = $('cart-full'), body = $('cart-items');
-if (!items.length) { if(empty) show(empty); if(full) hide(full); return; }
-if(empty) hide(empty); if(full) show(full);
-let sub=0, kg=0;
-if(body) {
-body.innerHTML = '';
-for (const it of items) {
-const tot = (it?.price||0) * (it?.qty||1); sub+=tot; kg+=((it?.weight||200)*(it?.qty||1))/1000;
-body.innerHTML += `<tr>
-<td><input type="number" class="qty-input" value="${it?.qty||1}" min="1" max="${it?.stock||10}" onchange="updCart('${it?.id}','qty',this.value, ${it?.stock||10})"></td>
-<td class="flex items-center gap-12"><img class="cart-img" src="${it?.img||'https://placehold.co/60x60/0a0a0a/d8d4cb?text=SPECIMEN'}"><div><div style="font-weight:700;letter-spacing:1px">${it?.name||'SPECIMEN'}</div><div style="font-size:9px;color:var(--bone-ghost)">ID: ${it?.pid}</div></div></td>
-<td>${it?.size||'-'}</td><td>${it?.color||'-'}</td><td>$${it?.price||0}</td>
-<td><button class="btn btn-outline btn-sm" onclick="delCart('${it?.id}')">✕</button></td>
-</tr>`;
+function cartTotals() {
+  const items = userData?.cart || [];
+  let sub = 0, kg = 0;
+  items.forEach(i => { sub += (i?.price || 0) * (i?.qty || 1); kg += ((i?.weight || 200) * (i?.qty || 1)) / 1000; });
+  const delRUB = Math.round(kg * 900);
+  const delUSD = delRUB / RATES.USD_TO_RUB;
+  return { sub, kg, delRUB, delUSD, total: sub + delUSD };
 }
-}
-const delRUB = Math.round(kg*900), delUSD = (delRUB/RATES.USD_TO_RUB).toFixed(2);
-if($('cart-total')) $('cart-total').textContent = `$${(sub+parseFloat(delUSD)).toFixed(2)}`;
-};
 
+window.renderCart = () => {
+  const items = userData?.cart || [];
+  const empty = $('cart-empty'), full = $('cart-full'), body = $('cart-items');
+  if (!items.length) { show(empty); hide(full); return; }
+  hide(empty); show(full);
+  if (body) {
+    body.innerHTML = items.map(it => `<tr>
+<td><input type="number" class="qty-input" value="${it?.qty || 1}" min="1" max="${it?.stock || 10}" onchange="updCart('${esc(it?.id)}','qty',this.value,${it?.stock || 10})"></td>
+<td><div class="flex items-center gap-12"><img class="cart-img" src="${esc(it?.img || 'https://placehold.co/60x60/0a0a0a/d8d4cb?text=SPECIMEN')}"><div><div style="font-weight:700;letter-spacing:1px">${esc(it?.name || 'SPECIMEN')}</div><div style="font-size:9px;color:var(--bone-ghost)">ID: ${esc(it?.pid)}</div></div></div></td>
+<td>${esc(it?.size || '-')}</td><td>${esc(trWord(it?.color) || '-')}</td><td>$${it?.price || 0}</td>
+<td><button class="btn btn-outline btn-sm" onclick="delCart('${esc(it?.id)}')">✕</button></td>
+</tr>`).join('');
+  }
+  if ($('cart-total')) $('cart-total').textContent = `$${cartTotals().total.toFixed(2)}`;
+};
 window.updCart = async (id, f, v, maxStock) => {
-const it = userData?.cart?.find(i => i?.id === id);
-if(!it) return;
-it.qty = Math.min(maxStock, Math.max(1, parseInt(v) || 1));
-await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid), {cart: userData.cart});
-renderCart(); loadCartCount();
+  const it = userData?.cart?.find(i => i?.id === id);
+  if (!it) return;
+  it.qty = Math.min(maxStock, Math.max(1, parseInt(v) || 1));
+  await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), { cart: userData.cart });
+  renderCart(); loadCartCount();
+};
+window.delCart = async id => {
+  if (!userData?.cart) return;
+  userData.cart = userData.cart.filter(i => i?.id !== id);
+  await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), { cart: userData.cart });
+  renderCart(); loadCartCount();
 };
 
-window.delCart = async id => {
-if(userData?.cart) {
-userData.cart = userData.cart.filter(i => i?.id !== id);
-await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid), {cart: userData.cart});
-renderCart(); loadCartCount();
-}
-};
+/* =========================================================================
+   CATALOG / SEARCH
+   ========================================================================= */
+const CATS = [
+  { id: 'tshirts', k: 'cat_tshirts', syn: ['футболк', 't-shirt', 'tshirt'] },
+  { id: 'hoodies', k: 'cat_hoodies', syn: ['толстовк', 'худи', 'hoodie', 'свитшот', 'sweatshirt'] },
+  { id: 'longsleeve', k: 'cat_longsleeve', syn: ['лонгслив', 'longsleeve', 'long sleeve'] },
+  { id: 'sneakers', k: 'cat_sneakers', syn: ['кроссовк', 'обув', 'footwear', 'sneaker', 'shoe', 'ботинк', 'boot'] },
+  { id: 'pants', k: 'cat_pants', syn: ['штаны', 'брюк', 'trouser', 'pants', 'джинс', 'jeans'] },
+  { id: 'shorts', k: 'cat_shorts', syn: ['шорт', 'short'] },
+  { id: 'jackets', k: 'cat_jackets', syn: ['куртк', 'jacket', 'outerwear', 'пальто', 'coat'] },
+  { id: 'acc', k: 'cat_acc', syn: ['аксессуар', 'accessor', 'artifact', 'кепк', 'сумк', 'ремен', 'belt', 'шапк', 'beanie', 'носк', 'sock'] },
+  { id: 'archive', k: 'cat_archive', syn: [] }
+];
 
 function genCatalog() {
-const t = translations[lang] || translations.ru;
-const cats = [
-{id:'tshirts',n: t.cat_tshirts,ic:'TSHIRT',t:'футболка'},
-{id:'hoodies',n: t.cat_hoodies,ic:'HOODIE',t:'толстовка'},
-{id:'longsleeve',n: t.cat_longsleeve,ic:'LONGSLEEVE',t:'лонгслив'},
-{id:'sneakers',n: t.cat_sneakers,ic:'FOOTWEAR',t:'кроссовки'},
-{id:'pants',n: t.cat_pants,ic:'TROUSERS',t:'штаны'},
-{id:'shorts',n: t.cat_shorts,ic:'POD SHORTS',t:'шорты'},
-{id:'jackets',n: t.cat_jackets,ic:'OUTERWEAR',t:'куртка'},
-{id:'acc',n: t.cat_acc,ic:'ARTIFACT',t:'аксессуар'},
-{id:'archive',n: t.cat_archive,ic:'ARCHIVE',t:'archive'}
-];
-if($('catalog-grid')) {
-$('catalog-grid').innerHTML = cats.map(c => `<div class="cat-card cracked-monolith" onclick="filterType('${c.t}')"><div class="card-img"><span style="font-family:var(--font-title);letter-spacing:3px">${c.ic}</span></div><div class="card-body"><div class="card-meta-stamp">SERIES 2026</div><div class="card-title">${c.n}</div></div></div>`).join('');
-}
+  const g = $('catalog-grid');
+  if (!g) return;
+  g.innerHTML = CATS.map((c, i) => `<div class="cat-card cracked-monolith" onclick="filterType('${c.id}')"><div class="card-img"><span style="font-family:var(--font-title);letter-spacing:4px;font-size:30px">${String(i + 1).padStart(2, '0')}</span></div><div class="card-body"><div class="card-meta-stamp">${esc(T('series'))}</div><div class="card-title">${esc(T(c.k))}</div></div></div>`).join('');
 }
 
-window.filterType = async type => { navigate('search'); if($('search-input')) $('search-input').value=type; await searchProds(type); };
-window.handleSearch = async e => { const q=e?.target?.value?.trim()?.toLowerCase(); if(q?.length>=2) await searchProds(q); else if($('search-results')) $('search-results').innerHTML=''; };
+window.filterType = async id => {
+  const c = CATS.find(x => x.id === id);
+  if (!c) return;
+  navigate('search');
+  searchState = { cat: id };
+  if ($('search-input')) $('search-input').value = T(c.k);
+  await runSearch();
+};
+window.handleSearch = async e => {
+  const q = e?.target?.value?.trim()?.toLowerCase();
+  if (q && q.length >= 2) { searchState = { q }; await runSearch(); }
+  else { searchState = null; if ($('search-results')) $('search-results').innerHTML = ''; }
+};
 
-async function searchProds(q) {
-const c = $('search-results');
-if(c) c.innerHTML = '<div class="text-center" style="padding:32px"><div class="loading"></div></div>';
-try {
-let coll = collection(db, 'artifacts/byrmalda-prod/public/data/products');
-if (q === 'archive') {
-const snap = await getDocs(query(coll, where('deleted','==',true)));
-const res = []; snap.forEach(d => res.push({...d.data(),id:d.id}));
-if(c) c.innerHTML = res.map(p => prodCard(p, true)).join('') || '<div class="text-center" style="padding:32px;color:var(--bone-ghost)">АРХИВ ПУСТ</div>';
-return;
-}
-const snap = await getDocs(query(coll, where('published','==',true), where('deleted','==',false)));
-const res = [];
-snap.forEach(d => {
-const p = d.data();
-if (`${p?.name||''} ${p?.type||''} ${p?.category||''} ${p?.desc||''}`.toLowerCase().includes(q)) res.push({...p,id:d.id});
-});
-if(c) c.innerHTML = res.map(p => prodCard(p, false)).join('') || '<div class="text-center" style="padding:32px;color:var(--bone-ghost)">НИЧЕГО НЕ НАЙДЕНО</div>';
-} catch(e) { if(c) c.innerHTML = '<div class="text-center" style="color:var(--blood-bright)">ОШИБКА ЗАПРОСА</div>'; }
+function productHaystack(p, strict) {
+  const typeBoth = [p?.type, trWord(p?.type), RU2EN.get(String(p?.type || '').toLowerCase()), EN2RU.get(String(p?.type || '').toLowerCase())].filter(Boolean).join(' ');
+  const base = strict ? `${typeBoth} ${p?.category || ''}` : `${p?.name || ''} ${typeBoth} ${p?.category || ''} ${p?.desc || ''}`;
+  return base.toLowerCase();
 }
 
-function prodCard(p, isArchive = false) {
-const stock = p?.stock > 0;
-const isDeleted = p?.deleted;
-let priceHtml = stock ? `$${p?.price||0}` : 'PRE-ORDER';
-if (isDeleted) priceHtml = 'ARCHIVED';
-return `<div class="prod-card cracked-monolith" onclick="openProd('${p?.id}')">
-<div class="card-img">${p?.images?.[0]?`<img src="${p.images[0]}" onerror="this.src='https://placehold.co/240x240/0a0a0a/d8d4cb?text=SPECIMEN'">`:'SPECIMEN'}</div>
+async function runSearch() {
+  const c = $('search-results');
+  if (!searchState || !c) return;
+  const my = ++searchToken;
+  c.innerHTML = '<div class="text-center" style="padding:32px"><div class="loading"></div></div>';
+  try {
+    const coll = collection(db, 'artifacts/byrmalda-prod/public/data/products');
+    if (searchState.cat === 'archive') {
+      const snap = await getDocs(query(coll, where('deleted', '==', true)));
+      if (my !== searchToken) return;
+      const res = []; snap.forEach(d => res.push({ ...d.data(), id: d.id }));
+      c.innerHTML = res.map(p => prodCard(p)).join('') || `<div class="text-center" style="padding:32px;color:var(--bone-ghost)">${esc(T('archive_empty'))}</div>`;
+      return;
+    }
+    const snap = await getDocs(query(coll, where('published', '==', true), where('deleted', '==', false)));
+    if (my !== searchToken) return;
+    const res = [];
+    snap.forEach(d => {
+      const p = d.data();
+      let ok;
+      if (searchState.cat) {
+        const cat = CATS.find(x => x.id === searchState.cat);
+        const h = productHaystack(p, true);
+        ok = cat.syn.some(s => h.includes(s));
+      } else {
+        ok = productHaystack(p, false).includes(searchState.q);
+      }
+      if (ok) res.push({ ...p, id: d.id });
+    });
+    c.innerHTML = res.map(p => prodCard(p)).join('') || `<div class="text-center" style="padding:32px;color:var(--bone-ghost)">${esc(T('nothing_found'))}</div>`;
+  } catch (e) {
+    console.error('search:', e);
+    if (my === searchToken) c.innerHTML = `<div class="text-center" style="color:var(--blood-bright)">${esc(T('query_error'))}</div>`;
+  }
+}
+
+function prodCard(p) {
+  const inStock = p?.stock > 0;
+  const isDeleted = !!p?.deleted;
+  let priceHtml = inStock ? `$${p?.price || 0}` : T('preorder_label');
+  if (isDeleted) priceHtml = T('archived_label');
+  const idShort = String(p?.productId || p?.id || '').substring(0, 8);
+  return `<div class="prod-card cracked-monolith" onclick="openProd('${esc(p?.id)}')">
+<div class="card-img">${p?.images?.[0] ? `<img src="${esc(p.images[0])}" alt="" onerror="this.src='https://placehold.co/240x240/0a0a0a/d8d4cb?text=SPECIMEN'">` : 'SPECIMEN'}</div>
 <div class="card-body">
-<div class="card-meta-stamp">#${p?.productId || p?.id.substring(0,6)} // ${p?.year || 2026}</div>
-<div class="card-title">${p?.name || 'SPECIMEN'}</div>
-<div class="card-price ${isDeleted?'st-archived':(stock?'':'card-nostock')}">${priceHtml}</div>
+<div class="card-meta-stamp">#${esc(idShort)} // ${esc(p?.year || 2026)}</div>
+<div class="card-title">${esc(p?.name || 'SPECIMEN')}</div>
+<div class="card-price ${isDeleted ? 'st-archived' : (inStock ? '' : 'card-nostock')}">${esc(priceHtml)}</div>
 </div>
 </div>`;
 }
 
+/* =========================================================================
+   PRODUCT PAGE
+   ========================================================================= */
 window.openProd = async id => {
-try {
-const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', id));
-if (!snap?.exists()) return;
-curProd = { ...snap.data(), id };
-if($('p-id')) $('p-id').textContent = `SPECIMEN SERIAL: ${curProd?.productId || id}`;
-if($('p-name')) $('p-name').textContent = curProd?.name;
-if($('p-desc')) $('p-desc').textContent = curProd?.desc || 'No archival notes provided.';
-
-if($('p-specs')) {
-$('p-specs').innerHTML = `
-<div class="spec-row"><span class="spec-l">AUDIENCE:</span><span class="spec-v">${curProd?.audience||'UNISEX'}</span></div>
-<div class="spec-row"><span class="spec-l">SILHOUETTE:</span><span class="spec-v">${curProd?.type||'-'}</span></div>
-<div class="spec-row"><span class="spec-l">MATERIAL:</span><span class="spec-v">${curProd?.material||'RAW WOOL'}</span></div>
-<div class="spec-row"><span class="spec-l">RELEASE:</span><span class="spec-v">${curProd?.year||2026}</span></div>
-<div class="spec-row"><span class="spec-l">STOCK:</span><span class="spec-v">${curProd?.stock||0} UNITS</span></div>
-`;
-}
-
-const colors=(curProd?.color||'Black,Bone').split(',').map(c=>c.trim());
-const sizes=(curProd?.sizes||'S,M,L,XL').split(',').map(s=>s.trim());
-if($('p-color')) $('p-color').innerHTML = colors.map(c=>`<option value="${c}">${c}</option>`).join('');
-if($('p-size')) $('p-size').innerHTML = sizes.map(s=>`<option value="${s}">${s}</option>`).join('');
-
-let displayPrice = curProd?.price || 0;
-if($('p-price-usd')) $('p-price-usd').textContent = `$${displayPrice.toFixed(2)}`;
-if($('p-price-conv')) $('p-price-conv').textContent = `≈ ${Math.round(displayPrice*RATES.USD_TO_RUB).toLocaleString()} ₽ / ≈ ${Math.round(displayPrice*RATES.USD_TO_UAH).toLocaleString()} ₴`;
-
-galIdx = 0; updateGal(); navigate('product');
-} catch(e) { console.error(e); }
+  try {
+    const snap = await getDoc(doc(db, 'artifacts/byrmalda-prod/public/data/products', id));
+    if (!snap?.exists()) return;
+    curProd = { ...snap.data(), id };
+    galIdx = 0;
+    renderProd();
+    updateGal();
+    navigate('product');
+  } catch (e) { console.error(e); }
 };
 
-function updateGal() {
-if(!curProd) return;
-const imgs = curProd?.images?.length ? curProd.images : ['https://placehold.co/600x600/0a0a0a/d8d4cb?text=BYRMALDA+SPECIMEN'];
-if($('p-main-img')) $('p-main-img').src = imgs[galIdx] || imgs[0];
-if($('p-thumbs')) {
-$('p-thumbs').innerHTML = imgs.map((s, i) => `<img src="${s}" class="thumb ${i===galIdx?'active':''}" onclick="setGal(${i})">`).join('');
+function renderProd() {
+  const p = curProd;
+  if (!p) return;
+  const loc = numLocale();
+  if ($('p-id')) $('p-id').textContent = `${T('specimen_serial')}: ${p.productId || p.id}`;
+  if ($('p-name')) $('p-name').textContent = p.name || '';
+  if ($('p-desc')) $('p-desc').textContent = p.desc || T('no_notes');
+
+  if ($('p-specs')) {
+    $('p-specs').innerHTML = `
+<div class="spec-row"><span class="spec-l">${esc(T('spec_audience'))}:</span><span class="spec-v">${esc(trWord(p.audience || 'unisex'))}</span></div>
+<div class="spec-row"><span class="spec-l">${esc(T('spec_type'))}:</span><span class="spec-v">${esc(trWord(p.type) || '-')}</span></div>
+<div class="spec-row"><span class="spec-l">${esc(T('spec_material'))}:</span><span class="spec-v">${esc(trList(p.material).map(trWord).join(', ') || '-')}</span></div>
+<div class="spec-row"><span class="spec-l">${esc(T('spec_release'))}:</span><span class="spec-v">${esc(p.year || 2026)}</span></div>
+<div class="spec-row"><span class="spec-l">${esc(T('spec_stock'))}:</span><span class="spec-v">${p.stock || 0} ${esc(T('units'))}</span></div>`;
+  }
+
+  const colors = trList(p.color || 'Black,Bone');
+  const sizes = trList(p.sizes || 'S,M,L,XL');
+  const prevC = $('p-color')?.value, prevS = $('p-size')?.value;
+  if ($('p-color')) {
+    $('p-color').innerHTML = colors.map(c => `<option value="${esc(c)}">${esc(trWord(c))}</option>`).join('');
+    if (prevC && colors.includes(prevC)) $('p-color').value = prevC;
+  }
+  if ($('p-size')) {
+    $('p-size').innerHTML = sizes.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+    if (prevS && sizes.includes(prevS)) $('p-size').value = prevS;
+  }
+
+  const price = Number(p.price) || 0;
+  if ($('p-price-usd')) $('p-price-usd').textContent = `$${price.toFixed(2)}`;
+  if ($('p-price-conv')) $('p-price-conv').textContent = `≈ ${Math.round(price * RATES.USD_TO_RUB).toLocaleString(loc)} ₽ / ≈ ${Math.round(price * RATES.USD_TO_UAH).toLocaleString(loc)} ₴`;
+
+  const stock = p.stock || 0;
+  if ($('p-stock')) {
+    $('p-stock').className = 'stock ' + (stock > 0 ? 'in-stock' : 'out-stock');
+    $('p-stock').textContent = p.deleted ? T('deleted') : (stock > 0 ? `${T('in_stock')} — ${stock}` : T('out_stock'));
+  }
+  if (p.deleted) show($('p-deleted-notice')); else hide($('p-deleted-notice'));
+  if ($('p-action')) {
+    $('p-action').disabled = !!p.deleted;
+    $('p-action').textContent = stock > 0 ? T('btn_buy') : T('preorder');
+    $('p-action').style.opacity = p.deleted ? '0.4' : '1';
+  }
+  if ($('p-qty')) $('p-qty').max = stock > 0 ? Math.min(10, stock) : 10;
 }
+
+function updateGal() {
+  if (!curProd) return;
+  const imgs = curProd.images?.length ? curProd.images : ['https://placehold.co/600x600/0a0a0a/d8d4cb?text=BYRMALDA+SPECIMEN'];
+  if ($('p-main-img')) $('p-main-img').src = imgs[galIdx] || imgs[0];
+  if ($('p-thumbs')) $('p-thumbs').innerHTML = imgs.map((s, i) => `<img src="${esc(s)}" class="thumb ${i === galIdx ? 'active' : ''}" onclick="setGal(${i})" alt="">`).join('');
 }
 window.setGal = i => { galIdx = i; updateGal(); };
 window.galNav = d => {
-if(!curProd) return;
-const len = curProd?.images?.length || 1;
-galIdx = (galIdx + d + len) % len;
-updateGal();
+  if (!curProd) return;
+  const len = curProd.images?.length || 1;
+  galIdx = (galIdx + d + len) % len;
+  updateGal();
 };
 
-window.checkout = async () => {
-if(!user){openModal('login-modal');return;}
-if(!userData?.cart?.length){alert('Корзина пуста');return;}
-openModal('checkout-modal');
+/* =========================================================================
+   CHECKOUT / ORDERS
+   ========================================================================= */
+window.checkout = () => {
+  if (!user) { openModal('login-modal'); return; }
+  if (!userData?.cart?.length) { alert(T('cart_empty_alert')); return; }
+  openModal('checkout-modal');
 };
 
 window.confirmCheckout = async () => {
-closeModal('checkout-modal');
-const oid = 'ORD-'+genId();
-const total = parseFloat($('cart-total')?.textContent?.replace('$','')||'0');
-const order = {
-id: oid, userId: user.uid, items: [...userData.cart], total,
-status: 'Ожидает оплату', tracking: 'TRK-'+genId(), adminChangedStatus: false,
-createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+  closeModal('checkout-modal');
+  const oid = 'ORD-' + genId();
+  const order = {
+    id: oid, userId: user.uid, items: [...userData.cart], total: Number(cartTotals().total.toFixed(2)),
+    status: 'Ожидает оплату', tracking: 'TRK-' + genId(), adminChangedStatus: false,
+    createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+  };
+  await setDoc(doc(db, 'artifacts/byrmalda-prod/public/data/orders', oid), order);
+  userData.cart = [];
+  await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), { cart: [] });
+  loadCartCount(); loadOrders(); navigate('profile');
 };
-await setDoc(doc(db,'artifacts/byrmalda-prod/public/data/orders',oid), order);
-userData.cart = [];
-await updateDoc(doc(db,'artifacts/byrmalda-prod/users',user.uid),{cart:[]});
-loadCartCount(); loadOrders(); navigate('profile');
-};
+
+function statusClass(s) {
+  const x = String(s || '').toLowerCase();
+  if (x.includes('оплат') || x.includes('await')) return 'st-awaiting';
+  if (x.includes('созд') || x.includes('creat')) return 'st-created';
+  if (x.includes('доставлен') || x.includes('deliver')) return 'st-delivered';
+  if (x.includes('пути') || x.includes('transit')) return 'st-transit';
+  if (x.includes('отправ') || x.includes('ship')) return 'st-shipping';
+  if (x.includes('отмен') || x.includes('cancel')) return 'st-cancelled';
+  return 'st-created';
+}
 
 async function loadOrders() {
-if(!user) return;
-const c=$('orders-list');
-if(!c) return;
-try {
-const snap=await getDocs(query(collection(db,'artifacts/byrmalda-prod/public/data/orders'),where('userId','==',user.uid),orderBy('createdAt','desc'),limit(30)));
-if(snap.empty) { c.innerHTML='<div class="text-center" style="padding:24px;color:var(--bone-ghost)">ЗАКАЗОВ НЕТ</div>'; return; }
-c.innerHTML = snap.docs.map(d=>{
-const o = d.data();
-const first = o.items?.[0] || {};
-return `<div class="order-card cracked-monolith" onclick="openProd('${first.pid}')">
-<img src="${first.img}" class="order-img" onerror="this.src='https://placehold.co/72x72/0a0a0a/d8d4cb?text=ITEM'">
+  if (!user) return;
+  const c = $('orders-list');
+  if (!c) return;
+  try {
+    const snap = await getDocs(query(collection(db, 'artifacts/byrmalda-prod/public/data/orders'), where('userId', '==', user.uid), limit(50)));
+    if (snap.empty) { c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--bone-ghost)">${esc(T('no_orders'))}</div>`; return; }
+    const orders = snap.docs.map(d => d.data()).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    c.innerHTML = orders.map(o => {
+      const first = o.items?.[0] || {};
+      return `<div class="order-card cracked-monolith" onclick="openProd('${esc(first.pid)}')">
+<img src="${esc(first.img)}" class="order-img" alt="" onerror="this.src='https://placehold.co/72x72/0a0a0a/d8d4cb?text=ITEM'">
 <div style="flex:1">
-<div style="font-weight:700;letter-spacing:1px">${first.name || 'SPECIMEN'}</div>
-<span class="order-status st-created">${o.status || 'CREATED'}</span>
-<div style="font-size:10px;color:var(--bone-ghost);margin-top:6px">ORDER: #${o.id} • TOTAL: $${o.total}</div>
+<div style="font-weight:700;letter-spacing:1px">${esc(first.name || 'SPECIMEN')}</div>
+<span class="order-status ${statusClass(o.status)}">${esc(trWord(o.status) || 'CREATED')}</span>
+<div style="font-size:10px;color:var(--bone-ghost);margin-top:6px">${esc(T('order_word'))}: #${esc(o.id)} • ${esc(T('total_word'))}: $${esc(o.total)}</div>
 </div>
 </div>`;
-}).join('');
-} catch(e) { console.error(e); }
+    }).join('');
+  } catch (e) { console.error('loadOrders:', e); }
 }
-
-async function loadChat() {
-if(!user) return;
-const c=$('chat-msgs');
-if(!c) return;
-try {
-const snap=await getDocs(query(collection(db,'artifacts/byrmalda-prod/public/data/support'),orderBy('ts','asc'),limit(150)));
-c.innerHTML = '';
-snap.forEach(d => {
-const m = d.data();
-if(user.email===ADMIN_EMAIL || m.uid===user.uid) {
-const isU = m.uid === user.uid;
-c.innerHTML += `<div class="msg ${isU?'user':'admin'}"><div>${m.text}</div><div class="msg-meta">${m.name} • ${fmtDate(m.ts)}</div></div>`;
-}
-});
-c.scrollTop = c.scrollHeight;
-} catch(e) { console.error(e); }
-}
-
-window.sendMsg = async () => {
-const txt=$('chat-input')?.value?.trim();
-if(!txt||!user) return;
-const msg={uid:user.uid,name:userData?.name||'USER',text:txt,ts:serverTimestamp(),isAdmin:user.email===ADMIN_EMAIL};
-await addDoc(collection(db,'artifacts/byrmalda-prod/public/data/support'),msg);
-if($('chat-input')) $('chat-input').value='';
-loadChat();
-};
-
-function updateSupportBadge() {
-if($('support-badge')) $('support-badge').textContent = chatUnread;
-}
-
-window.toggleTheme = () => {
-theme = theme === 'dark' ? 'light' : 'dark';
-localStorage.setItem('theme', theme);
-applyTheme();
-};
-
-function applyTheme() {
-document.documentElement.setAttribute('data-theme', theme);
-if($('theme-ind')) $('theme-ind').textContent = theme === 'dark' ? '🌙' : '☀️';
-}
-
-window.toggleLang = () => {
-lang = lang === 'ru' ? 'en' : 'ru';
-localStorage.setItem('lang', lang);
-applyTranslations();
-};
 
 /* =========================================================================
-   ⭐ REVIEWS & RATINGS SYSTEM
+   SUPPORT CHAT
    ========================================================================= */
+async function loadChat() {
+  if (!user) return;
+  const c = $('chat-msgs');
+  if (!c) return;
+  try {
+    const coll = collection(db, 'artifacts/byrmalda-prod/public/data/support');
+    const isAdm = user.email === ADMIN_EMAIL;
+    const snap = await getDocs(isAdm ? query(coll, orderBy('ts', 'asc'), limit(150)) : query(coll, where('uid', '==', user.uid), limit(150)));
+    const msgs = snap.docs.map(d => d.data()).sort((a, b) => (a.ts?.seconds || 0) - (b.ts?.seconds || 0));
+    c.innerHTML = msgs.map(m => {
+      const isU = m.uid === user.uid;
+      return `<div class="msg ${isU ? 'user' : 'admin'}"><div>${esc(m.text)}</div><div class="msg-meta">${esc(m.name)} • ${fmtDate(m.ts)}</div></div>`;
+    }).join('');
+    c.scrollTop = c.scrollHeight;
+  } catch (e) { console.error('loadChat:', e); }
+}
+window.sendMsg = async () => {
+  const txt = $('chat-input')?.value?.trim();
+  if (!txt || !user) return;
+  await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/support'), {
+    uid: user.uid, name: userData?.name || 'USER', text: txt, ts: serverTimestamp(), isAdmin: user.email === ADMIN_EMAIL
+  });
+  if ($('chat-input')) $('chat-input').value = '';
+  loadChat();
+};
+function updateSupportBadge() {
+  if ($('support-badge')) $('support-badge').textContent = chatUnread;
+}
+
+/* =========================================================================
+   REVIEWS
+   ========================================================================= */
+const REVIEWS_PATH = 'artifacts/byrmalda-prod/public/data/reviews';
+
 function setupReviewStarEvents() {
-const starsContainer = $('rev-stars');
-if (!starsContainer) return;
-const stars = starsContainer.querySelectorAll('span');
-stars.forEach((star, index) => {
-star.style.cursor = 'pointer';
-star.onclick = () => setRating(index + 1);
-});
+  const box = $('rev-stars');
+  if (!box) return;
+  box.classList.add('review-stars-input');
+  box.querySelectorAll('span').forEach((star, i) => {
+    star.style.cursor = 'pointer';
+    star.addEventListener('click', () => window.setRating(i + 1));
+  });
 }
 
 window.setRating = n => {
-revStars = n;
-const starsContainer = $('rev-stars');
-if (!starsContainer) return;
-const stars = starsContainer.querySelectorAll('span');
-stars.forEach((star, index) => {
-star.textContent = index < revStars ? '★' : '☆';
-star.style.color = index < revStars ? 'var(--chalk)' : 'var(--bone-ghost)';
-});
+  revStars = n;
+  $('rev-stars')?.querySelectorAll('span').forEach((star, i) => {
+    star.textContent = i < n ? '★' : '☆';
+    star.style.color = i < n ? 'var(--chalk)' : 'var(--bone-ghost)';
+  });
 };
 
 window.openReviewModal = () => {
-if (!user) { openModal('login-modal'); return; }
-if (userData?.reviewStatus === 'pending' || userData?.reviewStatus === 'approved') {
-alert(lang === 'ru' ? 'Вы уже оставили отзыв.' : 'You already left a review.');
-return;
-}
-revStars = 0;
-setRating(0);
-if($('rev-text')) $('rev-text').value = '';
-if($('rev-err')) $('rev-err').textContent = '';
-openModal('review-modal');
+  if (!user) { openModal('login-modal'); return; }
+  if (userData?.reviewStatus === 'pending' || userData?.reviewStatus === 'approved') { alert(T('already_review')); return; }
+  window.setRating(0);
+  if ($('rev-text')) $('rev-text').value = '';
+  if ($('rev-err')) $('rev-err').textContent = '';
+  openModal('review-modal');
 };
 
 window.submitReview = async () => {
-if (!user) { openModal('login-modal'); return; }
-const err = $('rev-err');
-if (!revStars) {
-if(err) err.textContent = lang === 'ru' ? '❌ Выберите оценку (1-5 звёзд)' : '❌ Please select star rating';
-return;
-}
-const text = $('rev-text')?.value?.trim();
-if (!text) {
-if(err) err.textContent = lang === 'ru' ? '❌ Напишите текст отзыва' : '❌ Please enter review text';
-return;
-}
-try {
-await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/reviews'), {
-uid: user.uid,
-name: userData?.name || user.email.split('@')[0],
-rating: revStars,
-text,
-status: 'pending',
-ts: serverTimestamp()
-});
-if(userData) userData.reviewStatus = 'pending';
-await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), { reviewStatus: 'pending' });
-alert(lang === 'ru' ? '✅ Отзыв отправлен на модерацию' : '✅ Review submitted for moderation');
-closeModal('review-modal');
-} catch(e) {
-if(err) err.textContent = (lang === 'ru' ? 'Ошибка: ' : 'Error: ') + e.message;
-}
+  if (!user) { openModal('login-modal'); return; }
+  const err = $('rev-err');
+  if (err) err.textContent = '';
+  if (!revStars) { if (err) err.textContent = T('pick_rating'); return; }
+  const text = $('rev-text')?.value?.trim();
+  if (!text) { if (err) err.textContent = T('enter_review'); return; }
+  try {
+    await addDoc(collection(db, REVIEWS_PATH), {
+      uid: user.uid, name: userData?.name || user.email.split('@')[0],
+      rating: revStars, text, status: 'pending', ts: serverTimestamp()
+    });
+  } catch (e) {
+    console.error('submitReview:', e);
+    if (err) err.textContent = T('error_word') + e.message;
+    return;
+  }
+  try {
+    await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), { reviewStatus: 'pending' });
+    if (userData) userData.reviewStatus = 'pending';
+  } catch (e) { console.error('reviewStatus update:', e); }
+  alert(T('review_sent'));
+  closeModal('review-modal');
+  if (currentPage === 'reviews') loadPublicReviews();
 };
 
-window.loadPublicReviews = async () => {
-const c = $('reviews-list');
-if (!c) return;
-c.innerHTML = '<div class="text-center" style="padding:24px"><div class="loading"></div></div>';
-try {
-const snap = await getDocs(query(collection(db, 'artifacts/byrmalda-prod/public/data/reviews'), where('status', '==', 'approved'), orderBy('ts', 'desc'), limit(50)));
-if (snap.empty) {
-c.innerHTML = `<div class="text-center" style="padding:48px;color:var(--bone-ghost);letter-spacing:2px">${lang === 'ru' ? 'ОТЗЫВОВ ПОКА НЕТ' : 'NO REVIEWS YET'}</div>`;
-return;
-}
-c.innerHTML = snap.docs.map(d => {
-const r = d.data();
-const stars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
-return `<div class="review-card cracked-monolith" style="background:var(--bg-surface);border:1px solid var(--line);padding:20px;margin-bottom:16px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<span style="font-weight:700;letter-spacing:1px;font-size:13px">${r.name || 'ANONYMOUS'}</span>
+function reviewCardHtml(r, pending) {
+  const rating = Math.min(5, Math.max(1, r.rating || 5));
+  const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+  return `<div class="review-card cracked-monolith" style="background:var(--bg-surface);border:1px solid var(--line);padding:20px;margin-bottom:16px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:12px;flex-wrap:wrap">
+<span style="font-weight:700;letter-spacing:1px;font-size:13px">${esc(r.name || 'ANONYMOUS')}</span>
 <span style="color:var(--chalk);letter-spacing:3px;font-size:14px">${stars}</span>
 </div>
-<div style="font-size:12px;color:var(--bone);line-height:1.6;margin-bottom:8px">${r.text}</div>
-<div style="font-size:9px;color:var(--bone-ghost);letter-spacing:1px;text-transform:uppercase">${fmtDate(r.ts)}</div>
+<div style="font-size:12px;color:var(--bone);line-height:1.6;margin-bottom:8px;white-space:pre-wrap">${esc(r.text)}</div>
+<div style="display:flex;gap:10px;align-items:center"><span style="font-size:9px;color:var(--bone-ghost);letter-spacing:1px;text-transform:uppercase">${fmtDate(r.ts)}</span>${pending ? `<span class="review-pending-tag">${esc(T('review_pending_tag'))}</span>` : ''}</div>
 </div>`;
-}).join('');
-} catch(e) {
-console.error(e);
-c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--blood-bright)">ОШИБКА ЗАГРУЗКИ</div>`;
 }
+
+window.loadPublicReviews = async () => {
+  const c = $('reviews-list');
+  if (!c) return;
+  c.innerHTML = '<div class="text-center" style="padding:24px"><div class="loading"></div></div>';
+  let approved = [], own = [];
+  try {
+    // single equality filter: no composite index needed; sort on the client
+    const snap = await getDocs(query(collection(db, REVIEWS_PATH), where('status', '==', 'approved')));
+    approved = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.ts?.seconds || 0) - (a.ts?.seconds || 0)).slice(0, 50);
+  } catch (e) {
+    console.error('loadPublicReviews:', e);
+    c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--blood-bright)">${esc(T('reviews_error'))}</div>`;
+    return;
+  }
+  if (user) {
+    try {
+      const s2 = await getDocs(query(collection(db, REVIEWS_PATH), where('uid', '==', user.uid)));
+      own = s2.docs.map(d => ({ id: d.id, ...d.data() })).filter(r => r.status === 'pending');
+    } catch (e) { /* own pending reviews are optional */ }
+  }
+  if (!approved.length && !own.length) {
+    c.innerHTML = `<div class="text-center" style="padding:48px;color:var(--bone-ghost);letter-spacing:2px">${esc(T('no_reviews'))}</div>`;
+    return;
+  }
+  c.innerHTML = own.map(r => reviewCardHtml(r, true)).join('') + approved.map(r => reviewCardHtml(r, false)).join('');
 };
 
-async function checkReviewStatus() {}
+/* admin: review moderation */
+async function loadAdminReviews() {
+  const box = $('adm-reviews-mod');
+  if (!box) return;
+  try {
+    const snap = await getDocs(query(collection(db, REVIEWS_PATH), where('status', '==', 'pending')));
+    if (snap.empty) { box.innerHTML = `<div style="font-size:11px;color:var(--bone-ghost)">${esc(T('no_pending'))}</div>`; return; }
+    box.innerHTML = snap.docs.map(d => {
+      const r = d.data();
+      return `<div class="mod-item">
+<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><b>${esc(r.name)}</b><span>${'★'.repeat(r.rating || 0)}${'☆'.repeat(5 - (r.rating || 0))}</span></div>
+<div style="font-size:12px;margin:8px 0;white-space:pre-wrap">${esc(r.text)}</div>
+<div class="btn-group"><button class="btn btn-success btn-sm" onclick="moderateReview('${esc(d.id)}','approved')">${esc(T('approve'))}</button><button class="btn btn-danger btn-sm" onclick="moderateReview('${esc(d.id)}','rejected')">${esc(T('reject'))}</button></div>
+</div>`;
+    }).join('');
+  } catch (e) { console.error('loadAdminReviews:', e); box.innerHTML = `<div style="color:var(--blood-bright);font-size:11px">${esc(e.message)}</div>`; }
+}
+window.moderateReview = async (id, status) => {
+  try {
+    const ref = doc(db, REVIEWS_PATH, id);
+    const snap = await getDoc(ref);
+    const uid = snap.data()?.uid;
+    await updateDoc(ref, { status });
+    if (uid) {
+      try { await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', uid), { reviewStatus: status === 'approved' ? 'approved' : 'none' }); } catch (e) { console.error(e); }
+    }
+    loadAdminReviews();
+  } catch (e) { alert(e.message); }
+};
+
+async function checkReviewStatus() { }
 
 /* =========================================================================
-   🚨 REPORTS
+   REPORTS
    ========================================================================= */
 window.openReport = () => openModal('report-modal');
 window.submitReport = async () => {
-if (!user) { openModal('login-modal'); return; }
-const txt = $('rep-text')?.value?.trim();
-if (!txt) return;
-try {
-await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/reports'), {
-uid: user.uid,
-name: userData?.name || user.email.split('@')[0],
-text: txt,
-ts: serverTimestamp(),
-status: 'new'
-});
-alert(lang === 'ru' ? '✅ Жалоба отправлена' : '✅ Report submitted');
-closeModal('report-modal');
-if($('rep-text')) $('rep-text').value = '';
-} catch(e) {
-alert(e.message);
-}
+  if (!user) { openModal('login-modal'); return; }
+  const txt = $('rep-text')?.value?.trim();
+  if (!txt) return;
+  try {
+    await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/reports'), {
+      uid: user.uid, name: userData?.name || user.email.split('@')[0], text: txt, ts: serverTimestamp(), status: 'new'
+    });
+    alert(T('report_sent'));
+    closeModal('report-modal');
+    if ($('rep-text')) $('rep-text').value = '';
+  } catch (e) { alert(e.message); }
 };
 
 /* =========================================================================
-   📏 SIZE CHARTS (Distinct Clothing vs Footwear)
+   SIZE CHARTS
    ========================================================================= */
 window.showSizeChart = type => {
-const c = $('sz-content');
-const title = $('sz-title');
-if(!c) return;
-
-if (type === 'footwear') {
-if(title) title.textContent = lang === 'ru' ? 'РАЗМЕРНАЯ СЕТКА (ОБУВЬ)' : 'SIZE CHART (FOOTWEAR)';
-c.innerHTML = `<table style="width:100%;font-size:11px;border-collapse:collapse;letter-spacing:1px">
-<tr style="border-bottom:1px solid var(--line-strong)"><th style="padding:10px;text-align:left">RU</th><th>EU</th><th>US</th><th>СТОПА (СМ)</th></tr>
-<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">39</td><td>40</td><td>7.0</td><td>25.5</td></tr>
-<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">40</td><td>41</td><td>8.0</td><td>26.0</td></tr>
-<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">41</td><td>42</td><td>8.5</td><td>26.5</td></tr>
-<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">42</td><td>43</td><td>9.5</td><td>27.5</td></tr>
-<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">43</td><td>44</td><td>10.5</td><td>28.0</td></tr>
-<tr><td style="padding:8px">44</td><td>45</td><td>11.5</td><td>29.0</td></tr>
-</table>`;
-} else {
-if(title) title.textContent = lang === 'ru' ? 'РАЗМЕРНАЯ СЕТКА (ОДЕЖДА)' : 'SIZE CHART (CLOTHING)';
-c.innerHTML = `<table style="width:100%;font-size:11px;border-collapse:collapse;letter-spacing:1px">
-<tr style="border-bottom:1px solid var(--line-strong)"><th style="padding:10px;text-align:left">РАЗМЕР</th><th>ГРУДЬ (СМ)</th><th>ТАЛИЯ (СМ)</th><th>БЁДРА (СМ)</th></tr>
-<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">44 (XS)</td><td>86-90</td><td>70-74</td><td>88-92</td></tr>
-<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">46 (S)</td><td>90-94</td><td>74-78</td><td>92-96</td></tr>
-<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">48 (M)</td><td>94-98</td><td>78-82</td><td>96-100</td></tr>
-<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">50 (L)</td><td>98-102</td><td>82-86</td><td>100-104</td></tr>
-<tr><td style="padding:8px">52 (XL)</td><td>102-106</td><td>86-90</td><td>104-108</td></tr>
-</table>`;
-}
-openModal('sizechart-modal');
+  const c = $('sz-content'), title = $('sz-title');
+  if (!c) return;
+  lastChart = type === 'footwear' ? 'footwear' : 'clothing';
+  if (lastChart === 'footwear') {
+    if (title) title.textContent = T('size_title_footwear');
+    const rows = [[39, 40, '7.0', '25.5'], [40, 41, '8.0', '26.0'], [41, 42, '8.5', '26.5'], [42, 43, '9.5', '27.5'], [43, 44, '10.5', '28.0'], [44, 45, '11.5', '29.0']];
+    c.innerHTML = `<table class="size-table"><thead><tr><th>RU</th><th>EU</th><th>US</th><th>${esc(T('foot'))}</th></tr></thead><tbody>${rows.map(r => `<tr>${r.map(x => `<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  } else {
+    if (title) title.textContent = T('size_title_clothing');
+    const rows = [['44 (XS)', '86-90', '70-74', '88-92'], ['46 (S)', '90-94', '74-78', '92-96'], ['48 (M)', '94-98', '78-82', '96-100'], ['50 (L)', '98-102', '82-86', '100-104'], ['52 (XL)', '102-106', '86-90', '104-108']];
+    c.innerHTML = `<table class="size-table"><thead><tr><th>${esc(T('size_word'))}</th><th>${esc(T('chest'))}</th><th>${esc(T('waist'))}</th><th>${esc(T('hips'))}</th></tr></thead><tbody>${rows.map(r => `<tr>${r.map(x => `<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  }
+  openModal('sizechart-modal');
 };
+
+/* =========================================================================
+   DELIVERY
+   ========================================================================= */
+function deliveryName(k) { return T({ cdek: 'del_cdek', ua: 'del_ua', usa: 'del_usa' }[k]); }
 
 window.renderDelivery = () => {
-if(!user) return;
-show($('delivery-box'));
-if(userData?.deliveryCountry) {
-$('del-provider').textContent = userData.deliveryCountry.toUpperCase();
-}
+  if (!user) return;
+  show($('delivery-box'));
+  const c = userData?.deliveryCountry;
+  const a = c ? userData?.deliveryAddress?.[c] : null;
+  if ($('del-provider')) $('del-provider').textContent = c ? deliveryName(c) : T('delivery_not_set');
+  if ($('del-addr')) $('del-addr').textContent = a ? [a.city, a.street, a.house].filter(Boolean).join(', ') : '';
 };
-window.openDeliveryModal = () => openModal('delivery-modal');
-window.selectDelivery = c => show($('del-fields'));
+window.openDeliveryModal = () => {
+  if (!user) { openModal('login-modal'); return; }
+  const c = userData?.deliveryCountry;
+  if (c) window.selectDelivery(c);
+  openModal('delivery-modal');
+};
+window.selectDelivery = c => {
+  selDelivery = c;
+  const r = $('d-' + c); if (r) r.checked = true;
+  const a = userData?.deliveryAddress?.[c] || {};
+  if ($('del-city')) $('del-city').value = a.city || '';
+  if ($('del-street')) $('del-street').value = a.street || '';
+  if ($('del-house')) $('del-house').value = a.house || '';
+  show($('del-fields'));
+};
 window.saveDelivery = async () => {
-closeModal('delivery-modal');
-renderDelivery();
+  if (!user || !selDelivery) return;
+  const city = $('del-city')?.value?.trim(), street = $('del-street')?.value?.trim(), house = $('del-house')?.value?.trim();
+  if (!city || !street || !house) { alert(T('fill_address')); return; }
+  const addr = { ...(userData?.deliveryAddress || {}), [selDelivery]: { city, street, house } };
+  try {
+    await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), { deliveryCountry: selDelivery, deliveryAddress: addr });
+    userData.deliveryCountry = selDelivery; userData.deliveryAddress = addr;
+    closeModal('delivery-modal');
+    renderDelivery();
+  } catch (e) { alert(e.message); }
 };
 
 window.openCreatorInfo = () => openModal('creator-info-modal');
 window.buyCreatorLevel = () => { closeModal('creator-info-modal'); navigate('support'); };
 
-async function loadAdminPanels() {}
-window.toggleCollabInput = () => {};
-window.toggleEditCollabInput = () => {};
+/* =========================================================================
+   ADMIN (only reviews moderation is implemented; the rest are placeholders as before)
+   ========================================================================= */
+async function loadAdminPanels() { await loadAdminReviews(); }
+window.toggleCollabInput = () => { $('adm-collab-group')?.classList.toggle('hidden', $('adm-collab-type')?.value !== 'yes'); };
+window.toggleEditCollabInput = () => { $('edit-collab-group')?.classList.toggle('hidden', $('edit-collab-type')?.value !== 'yes'); };
 window.admCreateProduct = async () => alert('Опубликовано');
-window.admLoadProduct = async () => {};
-window.admSaveProduct = async () => {};
-window.admArchiveProduct = async () => {};
-window.admRestoreProduct = async () => {};
-window.grantCreatorPeriod = async () => {};
-window.admBlockUser = async () => {};
-window.admUnblockUser = async () => {};
-window.admTempBanUser = async () => {};
-window.admUnbanAfterUser = async () => {};
-window.admFindOrder = async () => {};
+window.admLoadProduct = async () => { };
+window.admSaveProduct = async () => { };
+window.admArchiveProduct = async () => { };
+window.admRestoreProduct = async () => { };
+window.grantCreatorPeriod = async () => { };
+window.admBlockUser = async () => { };
+window.admUnblockUser = async () => { };
+window.admTempBanUser = async () => { };
+window.admUnbanAfterUser = async () => { };
+window.admFindOrder = async () => { };
 window.openSuggest = () => openModal('suggest-modal');
-window.submitSuggestion = async () => { closeModal('suggest-modal'); alert('Отправлено'); };
-window.loadMaintenanceStatus = async () => {};
-window.toggleMaintenance = async () => {};
-window.saveMaintenanceSchedule = async () => {};
-window.emergencyStopMaintenance = async () => {};
-async function autoUpdateOrders() {}
+window.submitSuggestion = async () => { closeModal('suggest-modal'); alert(T('suggest_sent')); };
+window.loadMaintenanceStatus = async () => { };
+window.toggleMaintenance = async () => { };
+window.saveMaintenanceSchedule = async () => { };
+window.emergencyStopMaintenance = async () => { };
+async function autoUpdateOrders() { }
 
-function setupListeners() {
-document.addEventListener('keydown', e => {
-if(e.key === 'Escape') document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
-});
+Object.assign(window, { toggleDarkDrone, toggleXrayMode, hide, show });
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+function init() {
+  const url = new URL(window.location.href);
+  const oob = url.searchParams.get('oobCode'), mode = url.searchParams.get('mode');
+  if (oob && mode === 'verifyEmail') {
+    applyActionCode(auth, oob).then(() => {
+      url.searchParams.delete('oobCode'); url.searchParams.delete('mode');
+      window.history.replaceState({}, '', url);
+      alert(lang === 'ru' ? '✅ Email подтверждён!' : '✅ Email confirmed!');
+    }).catch(e => alert((lang === 'ru' ? '❌ Ошибка: ' : '❌ Error: ') + e.message));
+  }
+
+  document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); }));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
+  });
+
+  applyTheme();
+  initCarousel();
+  setupHoldZoomInspection();
+  setupReviewStarEvents();
+  applyTranslations();
+  loadRates();
+  loadCartCount();
+  genCatalog();
+  setInterval(autoUpdateOrders, 300000);
+
+  onAuthStateChanged(auth, async u => {
+    if (u) {
+      user = u; await loadUser(); updateAuthUI();
+      if (u.email === ADMIN_EMAIL || u.email === LIMITED_ADMIN_EMAIL) {
+        show($('nav-admin')); hide($('nav-suggest'));
+        loadAdminPanels(); loadMaintenanceStatus();
+      } else {
+        hide($('nav-admin')); show($('nav-suggest'));
+      }
+      loadOrders(); loadChat(); checkReviewStatus(); renderDelivery();
+      renderCreatorLimit();
+      await checkAndShowBan();
+      await checkAndShowMaintenance();
+      await checkCreatorExpiry();
+    } else {
+      user = userData = null; resetAuthUI(); hide($('delivery-box')); hide($('ban-overlay')); hide($('maintenance-overlay'));
+    }
+  });
 }
 
-Object.assign(window, {
-navigate, openModal, closeModal, openLogin, switchReg, doLogin, regStep1, regStep2,
-openAvatarModal, submitAvatar, filterType, handleSearch, openProd, setGal, galNav,
-addToCart, updCart, delCart, checkout, confirmCheckout, sendMsg,
-toggleTheme, toggleLang, openReviewModal, openReport, submitReview, submitReport, loadPublicReviews, setRating, showSizeChart,
-openAvatarSettingsModal, submitAvatarFromSettings, validateSingleFile,
-openDeliveryModal, selectDelivery, saveDelivery, carouselNav, confirmLogout, doLogout,
-logoutFromBan, toggleMaintenance, saveMaintenanceSchedule, emergencyStopMaintenance,
-openCreatorInfo, buyCreatorLevel, admArchiveProduct, admRestoreProduct, grantCreatorPeriod,
-showUserProductWarning, toggleDarkDrone, toggleXrayMode, hide, show
-});
-
+init();
 console.log('⚡ BYRMALDA ARCHIVAL RIG LOADED // RICK OWENS PALETTE ACTIVE');
+
 </script>
 </body>
 </html>
