@@ -1876,6 +1876,15 @@ function trWord(v) {
 }
 const trList = v => String(v || '').split(',').map(x => x.trim()).filter(Boolean);
 
+/* ---- Hoodie family: худи = толстовка = зип худи = hoodie = zip hoodie ---- */
+const HOODIE_ALIASES = 'толстовка худи зип худи зип-худи hoodie zip hoodie zip-up hoodie';
+const isHoodieText = v => { const t = String(v || '').toLowerCase().replace(/ё/g, 'е'); return /(худи|толстовк|hoodie|hoody)/.test(t) || (/(зип|zip[\s-]*up)/.test(t) && /(худи|толстовк|hoodie|hoody|кофт)/.test(t)); };
+// canonical type stored in DB: all hoodie variants become "Толстовка"
+function normalizeType(raw) {
+  const s = String(raw || '').trim();
+  return isHoodieText(s) ? 'Толстовка' : s;
+}
+
 /* =========================================================================
    SOUND: soft tab click + calm ambient pad
    ========================================================================= */
@@ -1922,7 +1931,7 @@ function playTabClickSound() {
 }
 
 // warm, quiet pad: only mid/low-mid sines, slow breathing, no sub-bass
-function togglePadDrone() {
+function toggleDarkDrone() {
   const btn = $('soundscape-btn');
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -1981,25 +1990,6 @@ function togglePadDrone() {
   padNodes = { master, oscs, lfo };
   isDronePlaying = true;
   btn?.classList.add('active');
-}
-
-// ---- Track player: put your own audio file next to the HTML and set the name here ----
-const TRACK_SRC = 'alberto-balsalm.mp3';
-let trackAudio = null;
-function toggleDarkDrone() {
-  const btn = $('soundscape-btn');
-  if (!trackAudio) {
-    trackAudio = new Audio(TRACK_SRC);
-    trackAudio.loop = true;
-    trackAudio.volume = 0.5;
-    trackAudio.addEventListener('error', () => {
-      trackAudio = null;
-      btn?.classList.remove('active');
-      alert((lang === 'ru' ? 'Файл трека не найден: ' : 'Track file not found: ') + TRACK_SRC);
-    });
-  }
-  if (!trackAudio.paused) { trackAudio.pause(); btn?.classList.remove('active'); return; }
-  trackAudio.play().then(() => btn?.classList.add('active')).catch(() => { });
 }
 
 function toggleXrayMode() {
@@ -2627,7 +2617,8 @@ window.handleSearch = async e => {
 };
 
 function productHaystack(p, strict) {
-  const typeBoth = [p?.type, trWord(p?.type), RU2EN.get(String(p?.type || '').toLowerCase()), EN2RU.get(String(p?.type || '').toLowerCase())].filter(Boolean).join(' ');
+  const hoodieAliases = (isHoodieText(p?.type) || isHoodieText(p?.typeRaw) || p?.typeGroup === 'hoodies') ? HOODIE_ALIASES : '';
+  const typeBoth = [p?.type, p?.typeRaw, hoodieAliases, trWord(p?.type), RU2EN.get(String(p?.type || '').toLowerCase()), EN2RU.get(String(p?.type || '').toLowerCase())].filter(Boolean).join(' ');
   const base = strict ? `${typeBoth} ${p?.category || ''}` : `${p?.name || ''} ${typeBoth} ${p?.category || ''} ${p?.desc || ''}`;
   return base.toLowerCase();
 }
@@ -2657,7 +2648,9 @@ async function runSearch() {
         const h = productHaystack(p, true);
         ok = cat.syn.some(s => h.includes(s));
       } else {
-        ok = productHaystack(p, false).includes(searchState.q);
+        const hay = productHaystack(p, false);
+        const q = searchState.q;
+        ok = hay.includes(q) || (isHoodieText(q) && hay.includes('hoodie'));
       }
       if (ok) res.push({ ...p, id: d.id });
     });
@@ -2738,6 +2731,8 @@ function renderProd() {
     $('p-stock').textContent = p.deleted ? T('deleted') : (stock > 0 ? `${T('in_stock')} — ${stock}` : T('out_stock'));
   }
   if (p.deleted) show($('p-deleted-notice')); else hide($('p-deleted-notice'));
+  if (p.userCreated) show($('user-created-badge')); else hide($('user-created-badge'));
+  if (p.adminEdited) show($('admin-edited-badge')); else hide($('admin-edited-badge'));
   if ($('p-action')) {
     $('p-action').disabled = !!p.deleted;
     $('p-action').textContent = stock > 0 ? T('btn_buy') : T('preorder');
@@ -3065,11 +3060,154 @@ window.buyCreatorLevel = () => { closeModal('creator-info-modal'); navigate('sup
 async function loadAdminPanels() { await loadAdminReviews(); }
 window.toggleCollabInput = () => { $('adm-collab-group')?.classList.toggle('hidden', $('adm-collab-type')?.value !== 'yes'); };
 window.toggleEditCollabInput = () => { $('edit-collab-group')?.classList.toggle('hidden', $('edit-collab-type')?.value !== 'yes'); };
-window.admCreateProduct = async () => alert('Опубликовано');
-window.admLoadProduct = async () => { };
-window.admSaveProduct = async () => { };
-window.admArchiveProduct = async () => { };
-window.admRestoreProduct = async () => { };
+/* ---- product admin: create / load / save / archive / restore ---- */
+const PRODUCTS_PATH = 'artifacts/byrmalda-prod/public/data/products';
+const L = (ru, en) => lang === 'ru' ? ru : en;
+const isAnyAdmin = () => !!user && (user.email === ADMIN_EMAIL || user.email === LIMITED_ADMIN_EMAIL);
+const val = id => ($(id)?.value ?? '').trim();
+const cleanList = v => trList(v).join(',');
+const admErr = e => (e?.code === 'permission-denied' || /permission/i.test(e?.message || ''))
+  ? L('Нет прав: правила Firestore не разрешают запись в products этому аккаунту.', 'Permission denied: Firestore rules do not allow writing to products for this account.')
+  : (e?.message || String(e));
+
+async function uploadPhotos(files) {
+  const list = Array.from(files || []).slice(0, 10);
+  const urls = [];
+  for (const f of list) urls.push(await uploadImgbb(f)); // sequential: keeps imgbb happy and order stable
+  return urls;
+}
+
+function readProductForm(prefix) {
+  const collabOn = val(`${prefix}-collab-type`) === 'yes';
+  const typeRaw = val(`${prefix}-type`);
+  const type = normalizeType(typeRaw);
+  const data = {
+    name: val(`${prefix}-name`),
+    category: val(`${prefix}-cat`) || 'clothing',
+    type,
+    typeRaw,
+    typeGroup: isHoodieText(typeRaw) ? 'hoodies' : '',
+    price: Math.round((parseFloat(val(`${prefix}-price`)) || 0) * 100) / 100,
+    stock: parseInt(val(`${prefix}-stock`), 10),
+    weight: parseInt(val(`${prefix}-weight`), 10),
+    audience: val(`${prefix}-aud`) || 'unisex',
+    material: val(`${prefix}-mat`),
+    color: cleanList(val(`${prefix}-color`)),
+    sizes: cleanList(val(`${prefix}-sizes`)),
+    year: parseInt(val(`${prefix}-year`), 10) || new Date().getFullYear(),
+    collab: collabOn,
+    collabName: collabOn ? val(`${prefix}-collab-name`) : '',
+    desc: val(`${prefix}-desc`)
+  };
+  return data;
+}
+function validateProduct(d) {
+  if (!d.name) return L('Укажите название', 'Enter a name');
+  if (!d.type) return L('Укажите тип (например: худи)', 'Enter a type (e.g. hoodie)');
+  if (!(d.price > 0)) return L('Цена должна быть больше 0', 'Price must be greater than 0');
+  if (!Number.isFinite(d.stock) || d.stock < 0) return L('Укажите количество в наличии (0 или больше)', 'Enter stock (0 or more)');
+  if (!Number.isFinite(d.weight) || d.weight <= 0) return L('Укажите массу в граммах', 'Enter weight in grams');
+  return null;
+}
+function setBusy(btn, busy, label) {
+  if (!btn) return;
+  if (busy) { btn.dataset.label = btn.textContent; btn.textContent = label; btn.disabled = true; }
+  else { btn.textContent = btn.dataset.label || btn.textContent; btn.disabled = false; }
+}
+
+window.admCreateProduct = async () => {
+  if (!isAnyAdmin()) { alert(L('Нет доступа', 'Access denied')); return; }
+  const btn = document.querySelector('button[onclick="admCreateProduct()"]');
+  const data = readProductForm('adm');
+  const bad = validateProduct(data);
+  if (bad) { alert(bad); return; }
+  setBusy(btn, true, L('Публикуем…', 'Publishing…'));
+  try {
+    const images = await uploadPhotos($('adm-photos')?.files);
+    let pid = genId();
+    for (let i = 0; i < 5; i++) { // avoid id collisions
+      if (!(await getDoc(doc(db, PRODUCTS_PATH, pid))).exists()) break;
+      pid = genId();
+    }
+    await setDoc(doc(db, PRODUCTS_PATH, pid), {
+      ...data,
+      productId: pid,
+      images,
+      published: true,
+      deleted: false,
+      userCreated: false,
+      adminEdited: false,
+      createdBy: user.uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    ['name','type','price','stock','weight','mat','color','sizes','year','collab-name','desc'].forEach(k => { const el = $(`adm-${k}`); if (el) el.value = ''; });
+    if ($('adm-photos')) $('adm-photos').value = '';
+    if ($('adm-aud')) $('adm-aud').value = 'unisex';
+    if ($('adm-collab-type')) { $('adm-collab-type').value = 'no'; toggleCollabInput(); }
+    alert(L(`✅ Товар опубликован. ID: ${pid}`, `✅ Product published. ID: ${pid}`));
+  } catch (e) {
+    console.error('admCreateProduct:', e);
+    alert(L('❌ Ошибка публикации: ', '❌ Publish error: ') + admErr(e));
+  } finally { setBusy(btn, false); }
+};
+
+let admEditing = null; // { id, images }
+window.admLoadProduct = async () => {
+  const id = val('adm-edit-id');
+  if (!id) { alert(L('Введите ID товара', 'Enter product ID')); return; }
+  try {
+    const snap = await getDoc(doc(db, PRODUCTS_PATH, id));
+    if (!snap.exists()) { alert(L('Товар не найден', 'Product not found')); hide($('adm-edit-form')); return; }
+    const p = snap.data();
+    admEditing = { id, images: Array.isArray(p.images) ? p.images : [] };
+    const set = (k, v) => { const el = $(`edit-${k}`); if (el) el.value = v ?? ''; };
+    set('name', p.name); set('cat', p.category || 'clothing'); set('type', p.typeRaw || p.type);
+    set('price', p.price); set('stock', p.stock); set('weight', p.weight); set('aud', p.audience || 'unisex');
+    set('mat', p.material); set('color', p.color); set('sizes', p.sizes); set('year', p.year);
+    set('collab-type', p.collab ? 'yes' : 'no'); set('collab-name', p.collabName); set('desc', p.desc);
+    toggleEditCollabInput();
+    if ($('edit-photos')) $('edit-photos').value = '';
+    const cur = $('edit-current-photos');
+    if (cur) cur.innerHTML = admEditing.images.length
+      ? admEditing.images.map(u => `<img src="${esc(u)}" alt="" style="width:48px;height:48px;object-fit:cover;margin:0 6px 6px 0;border:1px solid var(--bone-ghost)">`).join('') + `<div>${esc(L('Новые фото заменят текущие. Если не выбирать — останутся прежние.', 'New photos replace the current ones. Leave empty to keep them.'))}</div>`
+      : esc(L('Фото нет', 'No photos'));
+    show($('adm-edit-form'));
+  } catch (e) { console.error('admLoadProduct:', e); alert(L('❌ Ошибка загрузки: ', '❌ Load error: ') + admErr(e)); }
+};
+
+window.admSaveProduct = async () => {
+  if (!isAnyAdmin() || !admEditing) { alert(L('Сначала загрузите товар', 'Load a product first')); return; }
+  const btn = document.querySelector('button[onclick="admSaveProduct()"]');
+  const data = readProductForm('edit');
+  const bad = validateProduct(data);
+  if (bad) { alert(bad); return; }
+  setBusy(btn, true, L('Сохраняем…', 'Saving…'));
+  try {
+    const files = $('edit-photos')?.files;
+    if (files?.length) data.images = await uploadPhotos(files);
+    await updateDoc(doc(db, PRODUCTS_PATH, admEditing.id), { ...data, adminEdited: true, updatedAt: serverTimestamp() });
+    hide($('adm-edit-form')); admEditing = null;
+    alert(L('✅ Изменения сохранены', '✅ Changes saved'));
+  } catch (e) { console.error('admSaveProduct:', e); alert(L('❌ Ошибка сохранения: ', '❌ Save error: ') + admErr(e)); }
+  finally { setBusy(btn, false); }
+};
+
+async function setProductDeleted(flag) {
+  if (!isAnyAdmin()) return;
+  const id = val('adm-manage-id');
+  if (!id) { alert(L('Введите ID товара', 'Enter product ID')); return; }
+  try {
+    const ref = doc(db, PRODUCTS_PATH, id);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) { alert(L('Товар не найден', 'Product not found')); return; }
+    if (flag && !confirm(L(`Переместить «${snap.data().name}» в архив?`, `Move "${snap.data().name}" to archive?`))) return;
+    await updateDoc(ref, { deleted: flag, updatedAt: serverTimestamp() });
+    alert(flag ? L('🗑️ Товар перемещён в архив', '🗑️ Product archived') : L('♻️ Товар восстановлен', '♻️ Product restored'));
+  } catch (e) { console.error('setProductDeleted:', e); alert(L('❌ Ошибка: ', '❌ Error: ') + admErr(e)); }
+}
+window.admArchiveProduct = () => setProductDeleted(true);
+window.admRestoreProduct = () => setProductDeleted(false);
 window.grantCreatorPeriod = async () => { };
 window.admBlockUser = async () => { };
 window.admUnblockUser = async () => { };
