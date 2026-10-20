@@ -1922,7 +1922,7 @@ function playTabClickSound() {
 }
 
 // warm, quiet pad: only mid/low-mid sines, slow breathing, no sub-bass
-function toggleDarkDrone() {
+function togglePadDrone() {
   const btn = $('soundscape-btn');
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -1981,6 +1981,25 @@ function toggleDarkDrone() {
   padNodes = { master, oscs, lfo };
   isDronePlaying = true;
   btn?.classList.add('active');
+}
+
+// ---- Track player: put your own audio file next to the HTML and set the name here ----
+const TRACK_SRC = 'alberto-balsalm.mp3';
+let trackAudio = null;
+function toggleDarkDrone() {
+  const btn = $('soundscape-btn');
+  if (!trackAudio) {
+    trackAudio = new Audio(TRACK_SRC);
+    trackAudio.loop = true;
+    trackAudio.volume = 0.5;
+    trackAudio.addEventListener('error', () => {
+      trackAudio = null;
+      btn?.classList.remove('active');
+      alert((lang === 'ru' ? 'Файл трека не найден: ' : 'Track file not found: ') + TRACK_SRC);
+    });
+  }
+  if (!trackAudio.paused) { trackAudio.pause(); btn?.classList.remove('active'); return; }
+  trackAudio.play().then(() => btn?.classList.add('active')).catch(() => { });
 }
 
 function toggleXrayMode() {
