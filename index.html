@@ -34,33 +34,21 @@
 --shadow-brutal: 0 0 0 1px var(--line);
 }
 
-[data-theme="light"] {
---bg-void: #e8e5df;
---bg-surface: #ded9d0;
---bg-subtle: #d3ccc1;
---bg-card: #dfdad1;
---line: rgba(20, 18, 16, 0.16);
---line-strong: rgba(20, 18, 16, 0.5);
---bone: #141312;
---bone-dim: #54514c;
---bone-ghost: #8c877e;
---chalk: #070707;
---dust: #c5bdb0;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { background: var(--bg-void); color: var(--bone); scroll-behavior: smooth; }
-body {
-font-family: var(--font-mono);
-background: var(--bg-void);
-color: var(--bone);
-min-height: 100vh;
-line-height: 1.45;
-letter-spacing: -0.01em;
-overflow-x: hidden;
+/* Distressed / Cracked Border Texture around hero and monolith cards */
+.cracked-monolith {
 position: relative;
-selection-background-color: var(--bone);
-selection-color: var(--bg-void);
+border: 1px solid var(--line-strong);
+box-shadow: inset 0 0 14px rgba(0,0,0,0.8);
+background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+background-size: 24px 24px;
+}
+.cracked-monolith::before {
+content: ""; position: absolute; inset: -2px;
+pointer-events: none;
+border: 1px dashed rgba(220, 215, 205, 0.18);
+mask-image: linear-gradient(45deg, black 40%, transparent 45%, black 50%, transparent 65%, black 80%);
+-webkit-mask-image: linear-gradient(45deg, black 40%, transparent 45%, black 50%, transparent 65%, black 80%);
+z-index: 4;
 }
 
 /* Custom Archival Noise & Scanline Overlay */
@@ -208,15 +196,18 @@ margin-bottom: 64px;
 position: relative;
 border-right: 1px solid var(--line);
 overflow: hidden;
-background: #000;
+background: #040404;
 min-height: 520px;
+display: flex;
+align-items: center;
+justify-content: center;
 }
 .hero-slide {
 position: absolute; inset: 0; width: 100%; height: 100%;
-object-fit: cover; opacity: 0;
-filter: grayscale(100%) contrast(125%) brightness(85%);
+object-fit: contain; opacity: 0;
+filter: grayscale(100%) contrast(115%) brightness(95%);
 transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s ease;
-transform: scale(1.04);
+transform: scale(0.98);
 }
 .hero-slide.active { opacity: 1; transform: scale(1); z-index: 2; }
 .hero-controls {
@@ -373,22 +364,7 @@ transition: transform 0.4s ease, filter 0.4s ease;
 filter: grayscale(0%) contrast(105%);
 transform: scale(1.04);
 }
-.card-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.card-meta-stamp {
-font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--bone-ghost);
-}
-.card-title {
-font-family: var(--font-title); font-size: 14px;
-letter-spacing: 1px; text-transform: uppercase; color: var(--chalk);
-line-height: 1.3;
-}
-.card-price {
-font-size: 13px; font-weight: 700; color: var(--bone);
-letter-spacing: 1px; margin-top: auto;
-}
-.card-nostock { color: var(--blood-bright); font-weight: 400; }
-
-/* Product Page Detailed Specification */
+/* Product Page Detailed Specification with Hold-to-Zoom Inspection */
 .product-grid {
 display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px;
 max-width: 1380px; margin: 0 auto;
@@ -403,13 +379,29 @@ padding: 40px;
 position: relative; width: 100%; aspect-ratio: 1/1;
 border: 1px solid var(--line); overflow: hidden; background: #000;
 margin-bottom: 16px;
+cursor: crosshair;
+user-select: none;
 }
 .main-img {
-width: 100%; height: 100%; object-fit: cover;
+width: 100%; height: 100%; object-fit: contain;
 filter: grayscale(100%) contrast(115%);
-cursor: crosshair; transition: filter 0.3s;
+transition: filter 0.3s, transform 0.15s ease-out;
+transform-origin: center center;
+pointer-events: none;
 }
-.main-img:hover { filter: grayscale(0%) contrast(105%); }
+.main-img-wrap.zooming .main-img {
+transform: scale(2.5);
+filter: grayscale(0%) contrast(105%);
+}
+.zoom-hint {
+position: absolute; top: 12px; left: 12px;
+background: rgba(6, 6, 6, 0.85);
+border: 1px solid var(--line);
+padding: 4px 8px; font-size: 9px; letter-spacing: 1.5px;
+text-transform: uppercase; color: var(--bone-ghost);
+pointer-events: none;
+z-index: 6;
+}
 .gallery-nav {
 position: absolute; bottom: 12px; right: 12px; display: flex; gap: 6px; z-index: 5;
 }
@@ -1213,27 +1205,31 @@ GEOMETRIC DRAPE. <span>RAW SILHOUETTE.</span>
 
 <!-- MODALS -->
 <div class="modal" id="login-modal">
-<div class="modal-content">
+<div class="modal-content cracked-monolith">
 <span class="modal-close" onclick="closeModal('login-modal')">&times;</span>
 <div class="modal-title" data-i18n="modal_login">Вход</div>
-<div class="form-group"><label class="form-label" data-i18n="label_email">Email</label><input type="email" class="form-input" id="log-email"></div>
-<div class="form-group"><label class="form-label" data-i18n="label_password">Пароль</label><input type="password" class="form-input" id="log-pass"></div>
-<button class="btn" onclick="doLogin()" data-i18n="btn_login">Войти</button>
+<form onsubmit="event.preventDefault(); doLogin();">
+<div class="form-group"><label class="form-label" data-i18n="label_email">Email</label><input type="email" class="form-input" id="log-email" autocomplete="email"></div>
+<div class="form-group"><label class="form-label" data-i18n="label_password">Пароль</label><input type="password" class="form-input" id="log-pass" autocomplete="current-password"></div>
+<button type="submit" class="btn" data-i18n="btn_login">Войти</button>
+</form>
 <div class="error" id="log-err" style="color:var(--blood-bright);font-size:11px;margin-top:8px;text-align:center"></div>
 <span class="link" onclick="switchReg()" data-i18n="no_account">Нет аккаунта? Зарегистрироваться</span>
 </div>
 </div>
 
 <div class="modal" id="reg-modal">
-<div class="modal-content">
+<div class="modal-content cracked-monolith">
 <span class="modal-close" onclick="closeModal('reg-modal')">&times;</span>
 <div class="modal-title" id="reg-title" data-i18n="modal_register">Регистрация</div>
 <div id="reg-step-1">
-<div class="form-group"><label class="form-label" data-i18n="label_email">Email *</label><input type="email" class="form-input" id="reg-email"></div>
-<div class="form-group"><label class="form-label" data-i18n="label_name">Имя *</label><input type="text" class="form-input" id="reg-name"></div>
-<div class="form-group"><label class="form-label" data-i18n="label_password">Пароль *</label><input type="password" class="form-input" id="reg-pass"></div>
-<div class="form-group"><label class="form-label" data-i18n="label_password_confirm">Повтор пароля *</label><input type="password" class="form-input" id="reg-pass2"></div>
-<button class="btn" onclick="regStep1()" data-i18n="btn_next">Далее</button>
+<form onsubmit="event.preventDefault(); regStep1();">
+<div class="form-group"><label class="form-label" data-i18n="label_email">Email *</label><input type="email" class="form-input" id="reg-email" autocomplete="email"></div>
+<div class="form-group"><label class="form-label" data-i18n="label_name">Имя *</label><input type="text" class="form-input" id="reg-name" autocomplete="name"></div>
+<div class="form-group"><label class="form-label" data-i18n="label_password">Пароль *</label><input type="password" class="form-input" id="reg-pass" autocomplete="new-password"></div>
+<div class="form-group"><label class="form-label" data-i18n="label_password_confirm">Повтор пароля *</label><input type="password" class="form-input" id="reg-pass2" autocomplete="new-password"></div>
+<button type="submit" class="btn" data-i18n="btn_next">Далее</button>
+</form>
 <div class="error" id="reg-err" style="color:var(--blood-bright);font-size:11px;margin-top:8px;text-align:center"></div>
 </div>
 <div id="reg-step-2" class="hidden text-center">
@@ -1251,11 +1247,21 @@ GEOMETRIC DRAPE. <span>RAW SILHOUETTE.</span>
 </div>
 </div>
 </div>
-
-<div class="modal" id="logout-confirm-modal">
-<div class="modal-content text-center">
-<span class="modal-close" onclick="closeModal('logout-confirm-modal')">&times;</span>
-<div class="modal-title" data-i18n="confirm_logout">Выйти из аккаунта?</div>
+<!-- PRODUCT DETAILS -->
+<section id="product" class="page">
+<button class="btn btn-outline btn-sm" style="margin-bottom:24px;width:auto" onclick="navigate('catalog')" data-i18n="btn_back">← НАЗАД К КАТАЛОГУ</button>
+<div class="product-grid cracked-monolith">
+<div class="gallery">
+<div class="main-img-wrap" id="main-img-wrap">
+<span class="zoom-hint">[HOLD LMB TO INSPECT]</span>
+<img src="" class="main-img" id="p-main-img" alt="" onerror="this.src='https://placehold.co/600x600/0a0a0a/d8d4cb?text=BYRMALDA+SPECIMEN'">
+<div class="gallery-nav">
+<button class="gallery-btn" onclick="galNav(-1)">←</button>
+<button class="gallery-btn" onclick="galNav(1)">→</button>
+</div>
+</div>
+<div class="thumbs" id="p-thumbs"></div>
+</div>
 <p style="color:var(--bone-ghost);font-size:11px;margin-bottom:24px" data-i18n="logout_warning">Все несохранённые изменения будут потеряны.</p>
 <div class="btn-group" style="justify-content:center">
 <button class="btn btn-danger btn-sm" onclick="doLogout()" data-i18n="btn_yes_logout">Да, выйти</button>
@@ -1443,7 +1449,7 @@ import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.g
 
 const translations = {
 ru: {
-nav_profile: "Профиль", nav_search: "Поиск", nav_catalog: "Каталог", nav_cart: "Корзина",
+nav_home: "Архив", nav_profile: "Профиль", nav_search: "Поиск", nav_catalog: "Каталог", nav_cart: "Корзина",
 nav_support: "Поддержка", nav_settings: "Настройки", nav_reviews: "Отзывы",
 nav_admin: "Панель", nav_suggest: "Предложить",
 guest: "Гость", not_authorized: "Не авторизован", btn_login: "Войти", btn_logout: "Выйти из аккаунта",
@@ -1455,7 +1461,7 @@ btn_theme: "Тема", btn_lang: "Язык", btn_review: "Оставить от�
 creator: "Креаторство", settings: "Настройки", reviews: "Отзывы", catalog: "Каталог", cart: "Корзина",
 support: "Поддержка", admin_panel: "Панель администратора",
 my_orders: "Мои заказы", loading_orders: "Загрузка заказов...", delivery_not_set: "Доставка не указана",
-edit_avatar: "Изменить аватарку", search_placeholder: "Поиск: футболка, толстовка, кроссовки...",
+edit_avatar: "Изменить аватарку", search_placeholder: "ПОИСК: ФУТБОЛКА, ТОЛСТОВКА, КРОССОВКИ...",
 label_size: "Размер", label_color: "Цвет", label_quantity: "Количество", label_price: "Цена ($)",
 label_stock: "В наличии", label_weight: "Масса (г)", label_audience: "Для кого", label_material: "Материал",
 label_sizes: "Размеры", label_year: "Год релиза", label_collab: "Коллаборация", label_desc: "Описание",
@@ -1477,6 +1483,7 @@ btn_submit_mod: "Отправить на модерацию", leave_review: "О�
 label_text: "Текст", report: "Пожаловаться", label_issue: "Описание проблемы",
 checkout: "Оформление", payment_hint: "Для оплаты напишите админу в телеграм:",
 payment_note: "После оплаты заказ появится в профиле.", size_chart: "Размерная сетка",
+size_chart_clothing: "Размерная сетка (одежда)", size_chart_footwear: "Размерная сетка (обувь)",
 select_delivery: "Выбор доставки", label_delivery_service: "Служба доставки",
 label_city: "Город", label_street: "Улица", label_house: "Дом / Номер ПВЗ",
 btn_save_close: "💾 Сохранить и закрыть", delivery_warning: "⚠️ Указывайте точный адрес. При ошибке заказ утилизируется без возврата.",
@@ -1513,10 +1520,12 @@ enter_unban_uid: "UID для отложенной разблокировки", b
 enter_order_id: "ID или трек", btn_find: "Найти", btn_enable_maintenance: "Включить тех. перерыв",
 btn_disable_maintenance: "Выключить тех. перерыв", label_start_msk: "Начало (МСК)", label_end_msk: "Окончание (МСК)",
 btn_save_schedule: "💾 Сохранить расписание", schedule_saved: "✅ Расписание сохранено!",
-btn_emergency_stop: "🚨 Экстренно выключить по времени"
+btn_emergency_stop: "🚨 Экстренно выключить по времени",
+cat_tshirts: "Футболки", cat_hoodies: "Толстовки", cat_longsleeve: "Лонгсливы", cat_sneakers: "Обувь",
+cat_pants: "Штаны", cat_shorts: "Шорты", cat_jackets: "Куртки", cat_acc: "Аксессуары", cat_archive: "Архив"
 },
 en: {
-nav_profile: "Profile", nav_search: "Search", nav_catalog: "Catalog", nav_cart: "Cart",
+nav_home: "Archive", nav_profile: "Profile", nav_search: "Search", nav_catalog: "Catalog", nav_cart: "Cart",
 nav_support: "Support", nav_settings: "Settings", nav_reviews: "Reviews",
 nav_admin: "Admin", nav_suggest: "Suggest",
 guest: "Guest", not_authorized: "Not authorized", btn_login: "Sign In", btn_logout: "Sign Out",
@@ -1528,7 +1537,7 @@ btn_theme: "Theme", btn_lang: "Language", btn_review: "Leave Review", btn_change
 creator: "Creator", settings: "Settings", reviews: "Reviews", catalog: "Catalog", cart: "Cart",
 support: "Support", admin_panel: "Admin Panel",
 my_orders: "My Orders", loading_orders: "Loading orders...", delivery_not_set: "Delivery not set",
-edit_avatar: "Change avatar", search_placeholder: "Search: t-shirt, hoodie, sneakers...",
+edit_avatar: "Change avatar", search_placeholder: "SEARCH: T-SHIRT, HOODIE, SNEAKERS...",
 label_size: "Size", label_color: "Color", label_quantity: "Quantity", label_price: "Price ($)",
 label_stock: "In Stock", label_weight: "Weight (g)", label_audience: "For", label_material: "Material",
 label_sizes: "Sizes", label_year: "Release Year", label_collab: "Collaboration", label_desc: "Description",
@@ -1550,6 +1559,7 @@ btn_submit_mod: "Submit for Moderation", leave_review: "Leave Review", label_rat
 label_text: "Text", report: "Report", label_issue: "Problem Description",
 checkout: "Checkout", payment_hint: "For payment, message the admin on Telegram:",
 payment_note: "After payment, the order will appear in your profile.", size_chart: "Size Chart",
+size_chart_clothing: "Size Chart (Clothing)", size_chart_footwear: "Size Chart (Footwear)",
 select_delivery: "Select Delivery", label_delivery_service: "Delivery Service",
 label_city: "City", label_street: "Street", label_house: "House / Pickup Point #",
 btn_save_close: "💾 Save & Close", delivery_warning: "⚠️ Enter exact address. Orders with wrong address are disposed without refund.",
@@ -1586,7 +1596,9 @@ enter_unban_uid: "UID for scheduled unban", btn_unban_after: "Unblock After",
 enter_order_id: "Order ID or Tracking", btn_find: "Find", btn_enable_maintenance: "Enable Maintenance",
 btn_disable_maintenance: "Disable Maintenance", label_start_msk: "Start (MSK)", label_end_msk: "End (MSK)",
 btn_save_schedule: "💾 Save Schedule", schedule_saved: "✅ Schedule saved!",
-btn_emergency_stop: "🚨 Emergency Stop"
+btn_emergency_stop: "🚨 Emergency Stop",
+cat_tshirts: "T-Shirts", cat_hoodies: "Hoodies", cat_longsleeve: "Longsleeves", cat_sneakers: "Footwear",
+cat_pants: "Trousers", cat_shorts: "Pod Shorts", cat_jackets: "Outerwear", cat_acc: "Artifacts", cat_archive: "Archive"
 }
 };
 
@@ -1632,7 +1644,9 @@ const auth = getAuth(app), db = getFirestore(app), storage = getStorage(app);
 const IMGBB_KEY = "eeef3479094c5cf6bf42607927565065";
 const ADMIN_EMAIL = "sobakastalina123@gmail.com";
 const LIMITED_ADMIN_EMAIL = "negrazjpa@gmail.com";
-const RATES = { USD_TO_RUB: 90, USD_TO_UAH: 37 };
+
+// Real-world exchange rates
+const RATES = { USD_TO_RUB: 82.80, USD_TO_UAH: 45.05 };
 
 let user = null, userData = null, curProd = null, galIdx = 0, chatUnread = 0, lang = localStorage.getItem('lang') || 'ru', theme = localStorage.getItem('theme') || 'dark', revStars = 0, carouselIdx = 0, carouselTimer = null, banTimerInterval = null, maintenanceTimerInterval = null;
 
@@ -1650,66 +1664,127 @@ const fmtDate = ts => ts?.toDate?.()?.toLocaleDateString('ru-RU') || '...';
 const genId = () => Math.random().toString(36).substring(2, 10).toUpperCase();
 
 /* =========================================================================
-   ✨ RICK OWENS ATELIER AUDIO GENERATOR (Native Procedural Dark Drone Synth)
+   ✨ REFINED CALM AMBIENT SOUND & TACTILE UI CLICKS (Web Audio API)
    ========================================================================= */
-let audioCtx = null, droneOsc1 = null, droneOsc2 = null, droneGain = null, isDronePlaying = false;
+let audioCtx = null, droneOsc = null, droneGain = null, isDronePlaying = false;
 
-function toggleDarkDrone() {
-const btn = $('soundscape-btn');
+function getAudioContext() {
 if (!audioCtx) {
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 audioCtx = new AudioContext();
 }
+if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+return audioCtx;
+}
+
+// Tactile archival UI click sound
+function playTabClickSound() {
+try {
+const ctx = getAudioContext();
+const osc = ctx.createOscillator();
+const gain = ctx.createGain();
+osc.type = 'triangle';
+osc.frequency.setValueAtTime(140, ctx.currentTime);
+osc.frequency.exponentialRampToValueAtTime(45, ctx.currentTime + 0.05);
+
+gain.gain.setValueAtTime(0.04, ctx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+
+osc.connect(gain);
+gain.connect(ctx.destination);
+osc.start();
+osc.stop(ctx.currentTime + 0.05);
+} catch(e) {}
+}
+
+// Calming, meditative warm harmonic drone (No headache, gentle warmth)
+function toggleDarkDrone() {
+const btn = $('soundscape-btn');
+const ctx = getAudioContext();
+
 if (isDronePlaying) {
 if (droneGain) {
-droneGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.4);
+droneGain.gain.setTargetAtTime(0, ctx.currentTime, 0.4);
 setTimeout(() => {
-if (droneOsc1) { droneOsc1.stop(); droneOsc1.disconnect(); }
-if (droneOsc2) { droneOsc2.stop(); droneOsc2.disconnect(); }
-droneOsc1 = droneOsc2 = null;
-}, 500);
+if (droneOsc) { droneOsc.stop(); droneOsc.disconnect(); droneOsc = null; }
+}, 450);
 }
 isDronePlaying = false;
 btn?.classList.remove('active');
 } else {
-if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-droneGain = audioCtx.createGain();
-droneGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-droneGain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 3);
+droneGain = ctx.createGain();
+droneGain.gain.setValueAtTime(0.001, ctx.currentTime);
+droneGain.gain.exponentialRampToValueAtTime(0.025, ctx.currentTime + 2.5); // Very soft volume
 
-// Low dark sub-bass drone
-droneOsc1 = audioCtx.createOscillator();
-droneOsc1.type = 'sawtooth';
-droneOsc1.frequency.setValueAtTime(55, audioCtx.currentTime); // A1 note
+// Pure soft Sine wave (432Hz harmonic base tuned to deep 108Hz / 54Hz octave)
+droneOsc = ctx.createOscillator();
+droneOsc.type = 'sine';
+droneOsc.frequency.setValueAtTime(54, ctx.currentTime);
 
-droneOsc2 = audioCtx.createOscillator();
-droneOsc2.type = 'sine';
-droneOsc2.frequency.setValueAtTime(54.4, audioCtx.currentTime); // Slight detune for analog beat
-
-const filter = audioCtx.createBiquadFilter();
+const filter = ctx.createBiquadFilter();
 filter.type = 'lowpass';
-filter.frequency.setValueAtTime(120, audioCtx.currentTime);
+filter.frequency.setValueAtTime(90, ctx.currentTime);
 
-droneOsc1.connect(filter);
-droneOsc2.connect(filter);
+droneOsc.connect(filter);
 filter.connect(droneGain);
-droneGain.connect(audioCtx.destination);
+droneGain.connect(ctx.destination);
 
-droneOsc1.start();
-droneOsc2.start();
+droneOsc.start();
 isDronePlaying = true;
 btn?.classList.add('active');
 }
 }
 
 /* =========================================================================
-   ✨ X-RAY SPECIMEN INVERTER (Unique Dark Aesthetics Viewport)
+   ✨ X-RAY SPECIMEN INVERTER
    ========================================================================= */
 function toggleXrayMode() {
 const body = document.body;
 const btn = $('xray-toggle-btn');
 const active = body.classList.toggle('xray-mode');
 btn?.classList.toggle('active', active);
+}
+
+/* =========================================================================
+   ✨ HOLD LMB TO ZOOM INSPECTION LOGIC
+   ========================================================================= */
+function setupHoldZoomInspection() {
+const wrap = $('main-img-wrap');
+const img = $('p-main-img');
+if (!wrap || !img) return;
+
+let isHolding = false;
+
+const startZoom = (e) => {
+if (e.button !== 0 && e.type !== 'touchstart') return; // Left mouse click or touch only
+isHolding = true;
+wrap.classList.add('zooming');
+updateZoomOrigin(e);
+};
+
+const endZoom = () => {
+isHolding = false;
+wrap.classList.remove('zooming');
+img.style.transformOrigin = 'center center';
+};
+
+const updateZoomOrigin = (e) => {
+if (!isHolding) return;
+const rect = wrap.getBoundingClientRect();
+const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+img.style.transformOrigin = `${x}% ${y}%`;
+};
+
+wrap.addEventListener('mousedown', startZoom);
+window.addEventListener('mouseup', endZoom);
+wrap.addEventListener('mousemove', updateZoomOrigin);
+
+wrap.addEventListener('touchstart', startZoom, { passive: true });
+window.addEventListener('touchend', endZoom);
+wrap.addEventListener('touchmove', updateZoomOrigin, { passive: true });
 }
 
 // 🔁 Ban and Maintenance timers
@@ -1933,7 +2008,7 @@ window.history.replaceState({}, '', url);
 alert(lang === 'ru' ? '✅ Email подтверждён!' : '✅ Email confirmed!');
 }).catch(e => alert((lang === 'ru' ? '❌ Ошибка: ' : '❌ Error: ') + e.message));
 }
-applyTheme(); initCarousel(); applyTranslations();
+applyTheme(); initCarousel(); applyTranslations(); setupHoldZoomInspection(); setupReviewStarEvents();
 
 onAuthStateChanged(auth, async u => {
 if (u) {
@@ -2074,6 +2149,7 @@ window.doLogout = async () => { closeModal('logout-confirm-modal'); await signOu
 window.logoutFromBan = async () => { await signOut(auth); hide($('ban-overlay')); userData = null; resetAuthUI(); navigate('home'); };
 
 window.navigate = page => {
+playTabClickSound();
 if (userData?.isBanned && page !== 'profile') { alert(lang === 'ru' ? '❌ Аккаунт заблокирован' : '❌ Account blocked'); return; }
 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 if($(page)) $(page).classList.add('active');
@@ -2196,19 +2272,20 @@ renderCart(); loadCartCount();
 };
 
 function genCatalog() {
+const t = translations[lang] || translations.ru;
 const cats = [
-{id:'tshirts',n:'Футболки',ic:'TSHIRT',t:'футболка'},
-{id:'hoodies',n:'Толстовки',ic:'HOODIE',t:'толстовка'},
-{id:'longsleeve',n:'Лонгсливы',ic:'LONGSLEEVE',t:'лонгслив'},
-{id:'sneakers',n:'Обувь',ic:'FOOTWEAR',t:'кроссовки'},
-{id:'pants',n:'Штаны',ic:'TROUSERS',t:'штаны'},
-{id:'shorts',n:'Шорты',ic:'POD SHORTS',t:'шорты'},
-{id:'jackets',n:'Куртки',ic:'OUTERWEAR',t:'куртка'},
-{id:'acc',n:'Аксессуары',ic:'ARTIFACT',t:'аксессуар'},
-{id:'archive',n:'Архив',ic:'ARCHIVE',t:'archive'}
+{id:'tshirts',n: t.cat_tshirts,ic:'TSHIRT',t:'футболка'},
+{id:'hoodies',n: t.cat_hoodies,ic:'HOODIE',t:'толстовка'},
+{id:'longsleeve',n: t.cat_longsleeve,ic:'LONGSLEEVE',t:'лонгслив'},
+{id:'sneakers',n: t.cat_sneakers,ic:'FOOTWEAR',t:'кроссовки'},
+{id:'pants',n: t.cat_pants,ic:'TROUSERS',t:'штаны'},
+{id:'shorts',n: t.cat_shorts,ic:'POD SHORTS',t:'шорты'},
+{id:'jackets',n: t.cat_jackets,ic:'OUTERWEAR',t:'куртка'},
+{id:'acc',n: t.cat_acc,ic:'ARTIFACT',t:'аксессуар'},
+{id:'archive',n: t.cat_archive,ic:'ARCHIVE',t:'archive'}
 ];
 if($('catalog-grid')) {
-$('catalog-grid').innerHTML = cats.map(c => `<div class="cat-card" onclick="filterType('${c.t}')"><div class="card-img"><span style="font-family:var(--font-title);letter-spacing:3px">${c.ic}</span></div><div class="card-body"><div class="card-meta-stamp">SERIES 2026</div><div class="card-title">${c.n}</div></div></div>`).join('');
+$('catalog-grid').innerHTML = cats.map(c => `<div class="cat-card cracked-monolith" onclick="filterType('${c.t}')"><div class="card-img"><span style="font-family:var(--font-title);letter-spacing:3px">${c.ic}</span></div><div class="card-body"><div class="card-meta-stamp">SERIES 2026</div><div class="card-title">${c.n}</div></div></div>`).join('');
 }
 }
 
@@ -2241,7 +2318,7 @@ const stock = p?.stock > 0;
 const isDeleted = p?.deleted;
 let priceHtml = stock ? `$${p?.price||0}` : 'PRE-ORDER';
 if (isDeleted) priceHtml = 'ARCHIVED';
-return `<div class="prod-card" onclick="openProd('${p?.id}')">
+return `<div class="prod-card cracked-monolith" onclick="openProd('${p?.id}')">
 <div class="card-img">${p?.images?.[0]?`<img src="${p.images[0]}" onerror="this.src='https://placehold.co/240x240/0a0a0a/d8d4cb?text=SPECIMEN'">`:'SPECIMEN'}</div>
 <div class="card-body">
 <div class="card-meta-stamp">#${p?.productId || p?.id.substring(0,6)} // ${p?.year || 2026}</div>
@@ -2330,7 +2407,7 @@ if(snap.empty) { c.innerHTML='<div class="text-center" style="padding:24px;color
 c.innerHTML = snap.docs.map(d=>{
 const o = d.data();
 const first = o.items?.[0] || {};
-return `<div class="order-card" onclick="openProd('${first.pid}')">
+return `<div class="order-card cracked-monolith" onclick="openProd('${first.pid}')">
 <img src="${first.img}" class="order-img" onerror="this.src='https://placehold.co/72x72/0a0a0a/d8d4cb?text=ITEM'">
 <div style="flex:1">
 <div style="font-weight:700;letter-spacing:1px">${first.name || 'SPECIMEN'}</div>
@@ -2390,19 +2467,155 @@ localStorage.setItem('lang', lang);
 applyTranslations();
 };
 
-async function checkReviewStatus() {}
-window.openReviewModal = () => openModal('review-modal');
-window.openReport = () => openModal('report-modal');
+/* =========================================================================
+   ⭐ REVIEWS & RATINGS SYSTEM
+   ========================================================================= */
+function setupReviewStarEvents() {
+const starsContainer = $('rev-stars');
+if (!starsContainer) return;
+const stars = starsContainer.querySelectorAll('span');
+stars.forEach((star, index) => {
+star.style.cursor = 'pointer';
+star.onclick = () => setRating(index + 1);
+});
+}
 
+window.setRating = n => {
+revStars = n;
+const starsContainer = $('rev-stars');
+if (!starsContainer) return;
+const stars = starsContainer.querySelectorAll('span');
+stars.forEach((star, index) => {
+star.textContent = index < revStars ? '★' : '☆';
+star.style.color = index < revStars ? 'var(--chalk)' : 'var(--bone-ghost)';
+});
+};
+
+window.openReviewModal = () => {
+if (!user) { openModal('login-modal'); return; }
+if (userData?.reviewStatus === 'pending' || userData?.reviewStatus === 'approved') {
+alert(lang === 'ru' ? 'Вы уже оставили отзыв.' : 'You already left a review.');
+return;
+}
+revStars = 0;
+setRating(0);
+if($('rev-text')) $('rev-text').value = '';
+if($('rev-err')) $('rev-err').textContent = '';
+openModal('review-modal');
+};
+
+window.submitReview = async () => {
+if (!user) { openModal('login-modal'); return; }
+const err = $('rev-err');
+if (!revStars) {
+if(err) err.textContent = lang === 'ru' ? '❌ Выберите оценку (1-5 звёзд)' : '❌ Please select star rating';
+return;
+}
+const text = $('rev-text')?.value?.trim();
+if (!text) {
+if(err) err.textContent = lang === 'ru' ? '❌ Напишите текст отзыва' : '❌ Please enter review text';
+return;
+}
+try {
+await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/reviews'), {
+uid: user.uid,
+name: userData?.name || user.email.split('@')[0],
+rating: revStars,
+text,
+status: 'pending',
+ts: serverTimestamp()
+});
+if(userData) userData.reviewStatus = 'pending';
+await updateDoc(doc(db, 'artifacts/byrmalda-prod/users', user.uid), { reviewStatus: 'pending' });
+alert(lang === 'ru' ? '✅ Отзыв отправлен на модерацию' : '✅ Review submitted for moderation');
+closeModal('review-modal');
+} catch(e) {
+if(err) err.textContent = (lang === 'ru' ? 'Ошибка: ' : 'Error: ') + e.message;
+}
+};
+
+window.loadPublicReviews = async () => {
+const c = $('reviews-list');
+if (!c) return;
+c.innerHTML = '<div class="text-center" style="padding:24px"><div class="loading"></div></div>';
+try {
+const snap = await getDocs(query(collection(db, 'artifacts/byrmalda-prod/public/data/reviews'), where('status', '==', 'approved'), orderBy('ts', 'desc'), limit(50)));
+if (snap.empty) {
+c.innerHTML = `<div class="text-center" style="padding:48px;color:var(--bone-ghost);letter-spacing:2px">${lang === 'ru' ? 'ОТЗЫВОВ ПОКА НЕТ' : 'NO REVIEWS YET'}</div>`;
+return;
+}
+c.innerHTML = snap.docs.map(d => {
+const r = d.data();
+const stars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
+return `<div class="review-card cracked-monolith" style="background:var(--bg-surface);border:1px solid var(--line);padding:20px;margin-bottom:16px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<span style="font-weight:700;letter-spacing:1px;font-size:13px">${r.name || 'ANONYMOUS'}</span>
+<span style="color:var(--chalk);letter-spacing:3px;font-size:14px">${stars}</span>
+</div>
+<div style="font-size:12px;color:var(--bone);line-height:1.6;margin-bottom:8px">${r.text}</div>
+<div style="font-size:9px;color:var(--bone-ghost);letter-spacing:1px;text-transform:uppercase">${fmtDate(r.ts)}</div>
+</div>`;
+}).join('');
+} catch(e) {
+console.error(e);
+c.innerHTML = `<div class="text-center" style="padding:24px;color:var(--blood-bright)">ОШИБКА ЗАГРУЗКИ</div>`;
+}
+};
+
+async function checkReviewStatus() {}
+
+/* =========================================================================
+   🚨 REPORTS
+   ========================================================================= */
+window.openReport = () => openModal('report-modal');
+window.submitReport = async () => {
+if (!user) { openModal('login-modal'); return; }
+const txt = $('rep-text')?.value?.trim();
+if (!txt) return;
+try {
+await addDoc(collection(db, 'artifacts/byrmalda-prod/public/data/reports'), {
+uid: user.uid,
+name: userData?.name || user.email.split('@')[0],
+text: txt,
+ts: serverTimestamp(),
+status: 'new'
+});
+alert(lang === 'ru' ? '✅ Жалоба отправлена' : '✅ Report submitted');
+closeModal('report-modal');
+if($('rep-text')) $('rep-text').value = '';
+} catch(e) {
+alert(e.message);
+}
+};
+
+/* =========================================================================
+   📏 SIZE CHARTS (Distinct Clothing vs Footwear)
+   ========================================================================= */
 window.showSizeChart = type => {
 const c = $('sz-content');
-if(c) {
+const title = $('sz-title');
+if(!c) return;
+
+if (type === 'footwear') {
+if(title) title.textContent = lang === 'ru' ? 'РАЗМЕРНАЯ СЕТКА (ОБУВЬ)' : 'SIZE CHART (FOOTWEAR)';
 c.innerHTML = `<table style="width:100%;font-size:11px;border-collapse:collapse;letter-spacing:1px">
-<tr style="border-bottom:1px solid var(--line-strong)"><th style="padding:8px;text-align:left">SIZE</th><th>CHEST (CM)</th><th>WAIST (CM)</th></tr>
-<tr style="border-bottom:1px solid var(--line)"><td>46 (S)</td><td>92</td><td>76</td></tr>
-<tr style="border-bottom:1px solid var(--line)"><td>48 (M)</td><td>96</td><td>80</td></tr>
-<tr style="border-bottom:1px solid var(--line)"><td>50 (L)</td><td>100</td><td>84</td></tr>
-<tr><td>52 (XL)</td><td>104</td><td>88</td></tr>
+<tr style="border-bottom:1px solid var(--line-strong)"><th style="padding:10px;text-align:left">RU</th><th>EU</th><th>US</th><th>СТОПА (СМ)</th></tr>
+<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">39</td><td>40</td><td>7.0</td><td>25.5</td></tr>
+<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">40</td><td>41</td><td>8.0</td><td>26.0</td></tr>
+<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">41</td><td>42</td><td>8.5</td><td>26.5</td></tr>
+<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">42</td><td>43</td><td>9.5</td><td>27.5</td></tr>
+<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">43</td><td>44</td><td>10.5</td><td>28.0</td></tr>
+<tr><td style="padding:8px">44</td><td>45</td><td>11.5</td><td>29.0</td></tr>
+</table>`;
+} else {
+if(title) title.textContent = lang === 'ru' ? 'РАЗМЕРНАЯ СЕТКА (ОДЕЖДА)' : 'SIZE CHART (CLOTHING)';
+c.innerHTML = `<table style="width:100%;font-size:11px;border-collapse:collapse;letter-spacing:1px">
+<tr style="border-bottom:1px solid var(--line-strong)"><th style="padding:10px;text-align:left">РАЗМЕР</th><th>ГРУДЬ (СМ)</th><th>ТАЛИЯ (СМ)</th><th>БЁДРА (СМ)</th></tr>
+<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">44 (XS)</td><td>86-90</td><td>70-74</td><td>88-92</td></tr>
+<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">46 (S)</td><td>90-94</td><td>74-78</td><td>92-96</td></tr>
+<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">48 (M)</td><td>94-98</td><td>78-82</td><td>96-100</td></tr>
+<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px">50 (L)</td><td>98-102</td><td>82-86</td><td>100-104</td></tr>
+<tr><td style="padding:8px">52 (XL)</td><td>102-106</td><td>86-90</td><td>104-108</td></tr>
 </table>`;
 }
 openModal('sizechart-modal');
@@ -2457,7 +2670,7 @@ Object.assign(window, {
 navigate, openModal, closeModal, openLogin, switchReg, doLogin, regStep1, regStep2,
 openAvatarModal, submitAvatar, filterType, handleSearch, openProd, setGal, galNav,
 addToCart, updCart, delCart, checkout, confirmCheckout, sendMsg,
-toggleTheme, toggleLang, openReviewModal, openReport, showSizeChart,
+toggleTheme, toggleLang, openReviewModal, openReport, submitReview, submitReport, loadPublicReviews, setRating, showSizeChart,
 openAvatarSettingsModal, submitAvatarFromSettings, validateSingleFile,
 openDeliveryModal, selectDelivery, saveDelivery, carouselNav, confirmLogout, doLogout,
 logoutFromBan, toggleMaintenance, saveMaintenanceSchedule, emergencyStopMaintenance,
