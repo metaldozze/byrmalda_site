@@ -1930,66 +1930,35 @@ function playTabClickSound() {
   } catch (e) { }
 }
 
-// warm, quiet pad: only mid/low-mid sines, slow breathing, no sub-bass
+// DRONE MONOLITH: plays alberto-balsalm.mp3 (same folder as this html), looped
+const DRONE_SRC = 'alberto-balsalm.mp3';
+let droneAudio = null;
 function toggleDarkDrone() {
   const btn = $('soundscape-btn');
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  if (isDronePlaying && padNodes) {
-    const { master, oscs, lfo } = padNodes;
-    master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.6);
-    setTimeout(() => {
-      oscs.forEach(o => { try { o.stop(); o.disconnect(); } catch (e) { } });
-      try { lfo.stop(); } catch (e) { }
-    }, 2800);
-    padNodes = null;
+  if (!droneAudio) {
+    droneAudio = new Audio(DRONE_SRC);
+    droneAudio.loop = true;
+    droneAudio.volume = 0.6;
+    droneAudio.preload = 'auto';
+    droneAudio.addEventListener('error', () => {
+      isDronePlaying = false;
+      btn?.classList.remove('active');
+      alert(lang === 'ru' ? `Не найден файл ${DRONE_SRC} — положите его в одну папку с сайтом.` : `File ${DRONE_SRC} not found — put it in the same folder as the site.`);
+    });
+  }
+  if (isDronePlaying) {
+    droneAudio.pause();
     isDronePlaying = false;
     btn?.classList.remove('active');
     return;
   }
-
-  const master = ctx.createGain();
-  master.gain.setValueAtTime(0.0001, ctx.currentTime);
-  master.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 4);
-
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 700;
-  filter.Q.value = 0.3;
-
-  // slow breathing of the volume (very small depth)
-  const lfo = ctx.createOscillator();
-  const lfoGain = ctx.createGain();
-  lfo.frequency.value = 0.06;
-  lfoGain.gain.value = 0.006;
-  lfo.connect(lfoGain);
-  lfoGain.connect(master.gain);
-  lfo.start();
-
-  // C major-ish open chord: C3, G3, C4, E4 (soft, consonant)
-  const notes = [[130.81, 0.5], [196.0, 0.38], [261.63, 0.26], [329.63, 0.13]];
-  const oscs = [];
-  notes.forEach(([f, vol], i) => {
-    [-2, 2].forEach(cents => {
-      const o = ctx.createOscillator();
-      o.type = 'sine';
-      o.frequency.value = f;
-      o.detune.value = cents + i;
-      const g = ctx.createGain();
-      g.gain.value = vol / 2;
-      o.connect(g); g.connect(filter);
-      o.start();
-      oscs.push(o);
-    });
-  });
-  filter.connect(master);
-  master.connect(ctx.destination);
-
-  padNodes = { master, oscs, lfo };
   isDronePlaying = true;
   btn?.classList.add('active');
+  droneAudio.play().catch(err => {
+    console.error('drone play:', err);
+    isDronePlaying = false;
+    btn?.classList.remove('active');
+  });
 }
 
 function toggleXrayMode() {
